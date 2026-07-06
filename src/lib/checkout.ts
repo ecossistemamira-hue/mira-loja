@@ -3,6 +3,10 @@ import 'server-only'
 import { lerCarrinhoId } from '@/lib/cart'
 import { obterCarrinho } from '@/lib/cart-queries'
 import type { CheckoutInput } from '@/lib/checkout-schema'
+import {
+  emailPagamentoConfirmado,
+  emailPedidoRecebido,
+} from '@/lib/email'
 import { moedaDoGrupo, precoNaMoeda } from '@/lib/format'
 import { createServiceClient } from '@/lib/supabase'
 
@@ -184,21 +188,42 @@ export async function criarPedidosDoCarrinho(
   // ── Fase 4: esvazia o carrinho ────────────────────────────────────────────
   await svc.from('carrinho_itens').delete().eq('carrinho_id', carrinhoId)
 
+  // E-mail de "pedido recebido" (best-effort; não bloqueia o checkout).
+  await emailPedidoRecebido(
+    emailNorm,
+    dados.nome.trim(),
+    criados.map((p) => ({ codigo: p.codigo, total: p.total, moeda: p.moeda })),
+  ).catch(() => null)
+
   return { ok: true, pedidos: criados }
 }
 
+export type DadosPagamento = {
+  gateway?: string
+  gatewayPaymentId?: string
+  metodo?: string
+  origem?: string
+}
+
 /**
- * Pagamento de TESTE (sem Mercado Pago): aprova o pedido e baixa o estoque.
- * Em produção, isto será feito pelo webhook do gateway. Idempotente por status.
+ * Aprova o pagamento de um pedido: baixa o estoque definitivamente, marca `pago`,
+ * atualiza a linha de pagamento e envia o e-mail de confirmação. Chamado tanto
+ * pelo botão de pagamento de teste quanto pelo webhook do gateway.
+ *
+ * IDEMPOTENTE: se o pedido não está mais em `aguardando_pagamento`, não faz nada
+ * (protege contra reentrega de webhook, que o Mercado Pago faz com frequência).
  */
-export async function simularPagamentoAprovado(
+export async function aprovarPagamento(
   pedidoId: string,
+  dados: DadosPagamento = {},
 ): Promise<{ ok: boolean; error?: string }> {
   const svc = createServiceClient()
 
   const { data: pedido } = await svc
     .from('pedidos')
-    .select('id, status')
+    .select(
+      'id, status, codigo, total, moeda, comprador_email, comprador_nome',
+    )
     .eq('id', pedidoId)
     .maybeSingle()
   if (!pedido) return { ok: false, error: 'pedido_nao_encontrado' }
@@ -222,16 +247,84 @@ export async function simularPagamentoAprovado(
   }
 
   await svc.from('pedidos').update({ status: 'pago' }).eq('id', pedidoId)
-  await svc.from('pagamentos').update({ status: 'approved' }).eq('pedido_id', pedidoId)
+  await svc
+    .from('pagamentos')
+    .update({
+      status: 'approved',
+      gateway: dados.gateway ?? undefined,
+      gateway_payment_id: dados.gatewayPaymentId ?? undefined,
+      metodo: dados.metodo ?? undefined,
+    })
+    .eq('pedido_id', pedidoId)
   await svc.from('pedido_eventos').insert({
     pedido_id: pedidoId,
     status_de: 'aguardando_pagamento',
     status_para: 'pago',
-    origem: 'teste',
-    payload: { nota: 'pagamento simulado (sem gateway real)' },
+    origem: dados.origem ?? 'webhook',
   })
 
+  const moeda = pedido.moeda === 'BRL' ? 'BRL' : 'PYG'
+  await emailPagamentoConfirmado(pedido.comprador_email, pedido.comprador_nome, {
+    codigo: pedido.codigo,
+    total: Number(pedido.total),
+    moeda,
+  }).catch(() => null)
+
   return { ok: true }
+}
+
+/**
+ * Expira pedidos não pagos além do TTL e devolve a reserva de estoque.
+ * Chamado pelo cron (Vercel Cron). Retorna quantos expiraram.
+ */
+export async function expirarPedidosVencidos(): Promise<number> {
+  const svc = createServiceClient()
+
+  const agora = new Date().toISOString()
+  const { data: vencidos } = await svc
+    .from('pedidos')
+    .select('id')
+    .eq('status', 'aguardando_pagamento')
+    .not('expira_em', 'is', null)
+    .lt('expira_em', agora)
+    .limit(500)
+
+  if (!vencidos || vencidos.length === 0) return 0
+
+  for (const p of vencidos) {
+    const { data: itens } = await svc
+      .from('pedido_itens')
+      .select('produto_id, quantidade')
+      .eq('pedido_id', p.id)
+    for (const it of itens ?? []) {
+      if (it.produto_id) {
+        await svc.rpc('liberar_reserva_estoque', {
+          p_produto_id: it.produto_id,
+          p_qtd: it.quantidade,
+        })
+      }
+    }
+    await svc.from('pedidos').update({ status: 'expirado' }).eq('id', p.id)
+    await svc.from('pedido_eventos').insert({
+      pedido_id: p.id,
+      status_de: 'aguardando_pagamento',
+      status_para: 'expirado',
+      origem: 'cron',
+    })
+  }
+
+  return vencidos.length
+}
+
+/** Busca um pedido por código pra o webhook resolver o id. */
+export async function obterIdPorCodigo(codigo: string): Promise<string | null> {
+  const svc = createServiceClient()
+  const { data } = await svc
+    .from('pedidos')
+    .select('id')
+    .eq('codigo', codigo)
+    .maybeSingle()
+  return data?.id ?? null
 }
 
 // Consulta um pedido pelo código (página de sucesso). Via service pra não

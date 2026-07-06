@@ -4,8 +4,8 @@ import { revalidatePath } from 'next/cache'
 
 import { CheckoutSchema, type CheckoutInput } from '@/lib/checkout-schema'
 import {
+  aprovarPagamento,
   criarPedidosDoCarrinho,
-  simularPagamentoAprovado,
   type PedidoCriado,
 } from '@/lib/checkout'
 
@@ -34,7 +34,7 @@ export async function finalizarCheckout(
 export async function pagarTeste(
   pedidoId: string,
 ): Promise<{ ok: boolean; error?: string }> {
-  const r = await simularPagamentoAprovado(pedidoId)
+  const r = await aprovarPagamento(pedidoId, { gateway: 'manual', origem: 'teste' })
   revalidatePath('/checkout/sucesso')
   return r
 }
