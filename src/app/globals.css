@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-sans);
+
+  /* Marca Mira — azul unificado + acento vermelho (mesmo manual do platform). */
+  --color-marca: #0004ff;
+  --color-marca-hover: #0000b8;
+  --color-marca-50: #e9eaff;
+  --color-marca-escuro: #00003d;
+  --color-acento: #ff0a0a;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #111827;
+}
+
+html {
+  color: var(--foreground);
+  background: #fafafa;
+}
+
+body {
+  font-family: var(--font-sans), system-ui, sans-serif;
+}

@@ -1,0 +1,42 @@
+{
+  "site": {
+    "nome": "Mira Shop",
+    "tagline": "A loja da rede Mira"
+  },
+  "nav": {
+    "inicio": "Início",
+    "buscar": "Buscar",
+    "placeholder_busca": "Buscar produtos…"
+  },
+  "home": {
+    "hero_titulo": "Produtos da rede Mira",
+    "hero_subtitulo": "Descubra o que as franquias Mira estão vendendo.",
+    "recentes": "Novidades",
+    "categorias": "Categorias",
+    "vazio_titulo": "Ainda não há produtos",
+    "vazio_dica": "Em breve você encontra aqui os produtos publicados pelas franquias."
+  },
+  "produto": {
+    "sem_estoque": "Sem estoque",
+    "em_estoque": "Em estoque",
+    "unidades_disponiveis": "{n} disponíveis",
+    "comprar_whatsapp": "Comprar pelo WhatsApp",
+    "entrega_envio": "Envio disponível",
+    "entrega_retirada": "Retirada na franquia",
+    "descricao": "Descrição",
+    "categoria": "Categoria",
+    "voltar": "Voltar",
+    "sem_preco": "Preço sob consulta",
+    "whatsapp_mensagem": "Olá, tenho interesse no produto: {nome}"
+  },
+  "busca": {
+    "titulo": "Resultados",
+    "resultados": "{n} resultados para \"{termo}\"",
+    "sem_resultados": "Não encontramos produtos para a sua busca.",
+    "todas_categorias": "Todas"
+  },
+  "rodape": {
+    "direitos": "Rede de franquias Mira",
+    "idioma": "Idioma"
+  }
+}
