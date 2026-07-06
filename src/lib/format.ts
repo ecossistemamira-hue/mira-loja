@@ -38,3 +38,26 @@ export function estoqueDisponivel(
 ): number {
   return Math.max(0, (p.estoque ?? 0) - (p.estoque_reservado ?? 0))
 }
+
+type ItemPrecos = { precoPyg: number | null; precoBrl: number | null }
+
+/**
+ * Moeda de um grupo (franquia) do carrinho/checkout: a da franquia, mas cai pra
+ * moeda em que os itens realmente têm preço (evita total zerado).
+ */
+export function moedaDoGrupo(
+  itens: ItemPrecos[],
+  franquiaMoeda: string | null | undefined,
+): Moeda {
+  const preferida: Moeda = franquiaMoeda === 'BRL' ? 'BRL' : 'PYG'
+  const temPreco = (m: Moeda) =>
+    itens.some((i) => (m === 'BRL' ? i.precoBrl : i.precoPyg) != null)
+  if (temPreco(preferida)) return preferida
+  const outra: Moeda = preferida === 'BRL' ? 'PYG' : 'BRL'
+  return temPreco(outra) ? outra : preferida
+}
+
+export function precoNaMoeda(item: ItemPrecos, moeda: Moeda): number | null {
+  const v = moeda === 'BRL' ? item.precoBrl : item.precoPyg
+  return v != null ? Number(v) : null
+}

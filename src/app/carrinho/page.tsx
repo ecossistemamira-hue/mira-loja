@@ -105,9 +105,14 @@ export default async function CarrinhoPage() {
         })}
       </div>
 
-      {/* Checkout entra na próxima etapa da Fase 2 (pagamento Mercado Pago). */}
-      <div className="mt-6 rounded-xl border border-dashed border-gray-300 bg-white px-5 py-4 text-center">
-        <p className="text-[13px] text-gray-500">{t('checkout_em_breve')}</p>
+      <div className="mt-6 flex justify-end">
+        <Link
+          href="/checkout"
+          className="inline-flex h-12 items-center justify-center rounded-xl px-8 text-[15px] font-semibold text-white transition-[filter] hover:brightness-95"
+          style={{ background: '#0004ff' }}
+        >
+          {t('ir_checkout')}
+        </Link>
       </div>
     </div>
   )

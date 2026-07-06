@@ -20,3 +20,20 @@ export function createLojaClient() {
     auth: { persistSession: false, autoRefreshToken: false },
   })
 }
+
+/**
+ * Cliente com SERVICE ROLE — ignora RLS. Usar SOMENTE em código de servidor
+ * ('use server' / server-only) pra operações que o anon não pode: criar pedidos,
+ * escrever em compradores/pagamentos, baixar estoque no webhook. NUNCA expor a
+ * chave ao cliente (sem NEXT_PUBLIC).
+ */
+export function createServiceClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !key) {
+    throw new Error('Faltam NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY.')
+  }
+  return createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  })
+}
