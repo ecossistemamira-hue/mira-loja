@@ -6,7 +6,8 @@
   "nav": {
     "inicio": "Início",
     "buscar": "Buscar",
-    "placeholder_busca": "Buscar produtos…"
+    "placeholder_busca": "Buscar produtos…",
+    "carrinho": "Carrinho"
   },
   "home": {
     "hero_titulo": "Produtos da rede Mira",
@@ -38,5 +39,18 @@
   "rodape": {
     "direitos": "Rede de franquias Mira",
     "idioma": "Idioma"
+  },
+  "carrinho": {
+    "adicionar": "Adicionar ao carrinho",
+    "adicionado": "Adicionado!",
+    "titulo": "Seu carrinho",
+    "n_itens": "{n} itens",
+    "aviso_grupos": "os produtos são agrupados por vendedor",
+    "vendedor": "Vendedor",
+    "subtotal_vendedor": "Subtotal do vendedor",
+    "vazio_titulo": "Seu carrinho está vazio",
+    "vazio_dica": "Adicione produtos da loja para começar sua compra.",
+    "continuar_comprando": "Continuar comprando",
+    "checkout_em_breve": "O pagamento com cartão e Pix chega na próxima etapa. Por enquanto você já pode montar o carrinho."
   }
 }

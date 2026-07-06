@@ -28,3 +28,37 @@ export type ProdutoFotoVitrine = {
 export type ProdutoComFotos = ProdutoVitrine & {
   fotos: ProdutoFotoVitrine[]
 }
+
+export type FranquiaPublica = {
+  id: string
+  nome_fantasia: string
+  cidade: string | null
+  pais: string
+  logo_url: string | null
+  moeda: string
+}
+
+// Item do carrinho já resolvido com dados do produto (pra render).
+export type ItemCarrinho = {
+  itemId: string
+  produtoId: string
+  franquiaId: string
+  nome: string
+  slug: string | null
+  imagemUrl: string | null
+  precoPyg: number | null
+  precoBrl: number | null
+  disponivel: number
+  quantidade: number
+}
+
+// Carrinho agrupado por franquia (um pedido por franquia no checkout — §2.3).
+export type GrupoCarrinho = {
+  franquia: FranquiaPublica | null
+  itens: ItemCarrinho[]
+}
+
+export type CarrinhoResolvido = {
+  grupos: GrupoCarrinho[]
+  totalItens: number
+}

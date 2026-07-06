@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 
+import { AddToCartButton } from '@/components/add-to-cart-button'
 import { ProductGallery } from '@/components/product-gallery'
 import { estoqueDisponivel, precoExibicao } from '@/lib/format'
 import { obterProdutoPorSlug } from '@/lib/queries'
@@ -142,17 +143,21 @@ export default async function ProdutoPage({ params }: Props) {
             )}
           </div>
 
-          {/* CTA temporário (Fase 1: sem carrinho ainda) */}
-          {whatsappUrl && !semEstoque && (
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 inline-flex h-12 items-center justify-center gap-2 rounded-xl px-6 text-[15px] font-semibold text-white transition-[filter] hover:brightness-95"
-              style={{ background: '#0004ff' }}
-            >
-              {t('comprar_whatsapp')}
-            </a>
+          {/* Ação principal: adicionar ao carrinho (Fase 2) */}
+          {!semEstoque && (
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <AddToCartButton produtoId={produto.id} />
+              {whatsappUrl && (
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-gray-300 px-5 text-[14px] font-semibold text-gray-700 hover:border-gray-400"
+                >
+                  {t('comprar_whatsapp')}
+                </a>
+              )}
+            </div>
           )}
 
           {/* Descrição */}
