@@ -29,6 +29,16 @@ export type ProdutoComFotos = ProdutoVitrine & {
   fotos: ProdutoFotoVitrine[]
 }
 
+/** Detalhe do produto: vitrine + ficha técnica + vendedor (franquia). */
+export type ProdutoDetalhe = ProdutoComFotos & {
+  peso_gramas: number | null
+  altura_cm: number | null
+  largura_cm: number | null
+  comprimento_cm: number | null
+  franquia_id: string
+  vendedor: FranquiaPublica | null
+}
+
 export type FranquiaPublica = {
   id: string
   nome_fantasia: string

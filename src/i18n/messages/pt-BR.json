@@ -1,14 +1,15 @@
 {
   "site": {
-    "nome": "Mira Shop",
-    "tagline": "A loja da rede Mira"
+    "nome": "Ofertas Paraguai",
+    "tagline": "Seu marketplace de confiança no Paraguai"
   },
   "nav": {
     "inicio": "Início",
     "buscar": "Buscar",
     "placeholder_busca": "Buscar produtos…",
     "carrinho": "Carrinho",
-    "ver_todos_resultados": "Ver todos os resultados para \"{termo}\""
+    "ver_todos_resultados": "Ver todos os resultados para \"{termo}\"",
+    "categorias": "Categorias"
   },
   "home": {
     "hero_titulo": "Produtos da rede Mira",
@@ -42,7 +43,15 @@
     "categoria": "Categoria",
     "voltar": "Voltar",
     "sem_preco": "Preço sob consulta",
-    "whatsapp_mensagem": "Olá, tenho interesse no produto: {nome}"
+    "whatsapp_mensagem": "Olá, tenho interesse no produto: {nome}",
+    "breadcrumb_inicio": "Início",
+    "breadcrumb_categorias": "Categorias",
+    "especificacoes": "Especificações",
+    "spec_peso": "Peso",
+    "spec_dimensoes": "Dimensões",
+    "spec_vendedor": "Vendedor",
+    "vendido_por": "Vendido por",
+    "franquia_verificada": "Franquia verificada"
   },
   "busca": {
     "titulo": "Resultados",
@@ -54,7 +63,7 @@
   "rodape": {
     "direitos": "Rede de franquias Mira",
     "idioma": "Idioma",
-    "tagline": "O marketplace da rede de franquias Mira — produtos do Paraguai e do Brasil.",
+    "tagline": "Seu marketplace de confiança no Paraguai — produtos vendidos pelas franquias da rede Mira.",
     "nav_titulo": "Loja",
     "nav_inicio": "Início",
     "nav_buscar": "Buscar produtos",
@@ -64,7 +73,8 @@
     "ajuda_whatsapp": "Falar no WhatsApp",
     "ajuda_retirada": "Retirada grátis na franquia vendedora",
     "rede_titulo": "A rede",
-    "rede_texto": "Cada produto é vendido por uma franquia Mira. Você compra da franquia e a matriz garante o padrão."
+    "rede_texto": "Cada produto é vendido por uma franquia Mira. Você compra da franquia e a matriz garante o padrão.",
+    "nav_categorias": "Categorias"
   },
   "carrinho": {
     "adicionar": "Adicionar ao carrinho",
@@ -127,5 +137,12 @@
     "vazio_titulo": "Nenhum favorito ainda",
     "vazio_dica": "Toque no coração de um produto para salvá-lo aqui.",
     "explorar": "Explorar a loja"
+  },
+  "categorias": {
+    "titulo": "Categorias",
+    "subtitulo": "Explore os produtos da rede por departamento.",
+    "breadcrumb_inicio": "Início",
+    "n_produtos": "{n, plural, one {# produto} other {# produtos}}",
+    "vazio": "Ainda não há categorias com produtos publicados."
   }
 }

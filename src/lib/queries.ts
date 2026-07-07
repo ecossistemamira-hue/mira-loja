@@ -1,7 +1,11 @@
 import 'server-only'
 
 import { createLojaClient } from '@/lib/supabase'
-import type { ProdutoComFotos, ProdutoVitrine } from '@/lib/types'
+import type {
+  FranquiaPublica,
+  ProdutoDetalhe,
+  ProdutoVitrine,
+} from '@/lib/types'
 
 const COLUNAS_VITRINE =
   'id, nome, slug, descricao, categoria, preco_brl, preco_pyg, imagem_url, estoque, estoque_reservado, permite_envio, permite_retirada, created_at'
@@ -41,6 +45,27 @@ export async function listarProdutosVitrine(
   return (data ?? []) as ProdutoVitrine[]
 }
 
+/** Categorias com contagem de produtos publicados (página /categorias). */
+export async function listarCategoriasComContagem(): Promise<
+  { categoria: string; total: number }[]
+> {
+  const supabase = createLojaClient()
+  const { data, error } = await supabase
+    .from('produtos')
+    .select('categoria')
+    .not('categoria', 'is', null)
+    .limit(2000)
+  if (error) return []
+  const contagem = new Map<string, number>()
+  for (const row of data ?? []) {
+    const c = (row as { categoria: string | null }).categoria
+    if (c) contagem.set(c, (contagem.get(c) ?? 0) + 1)
+  }
+  return [...contagem.entries()]
+    .map(([categoria, total]) => ({ categoria, total }))
+    .sort((a, b) => b.total - a.total || a.categoria.localeCompare(b.categoria))
+}
+
 /** Categorias distintas dos produtos publicados (pros filtros da vitrine). */
 export async function listarCategoriasVitrine(): Promise<string[]> {
   const supabase = createLojaClient()
@@ -58,13 +83,15 @@ export async function listarCategoriasVitrine(): Promise<string[]> {
   return [...set].sort((a, b) => a.localeCompare(b))
 }
 
+const COLUNAS_DETALHE = `${COLUNAS_VITRINE}, peso_gramas, altura_cm, largura_cm, comprimento_cm, franquia_id`
+
 export async function obterProdutoPorSlug(
   slug: string,
-): Promise<ProdutoComFotos | null> {
+): Promise<ProdutoDetalhe | null> {
   const supabase = createLojaClient()
   const { data: produto, error } = await supabase
     .from('produtos')
-    .select(COLUNAS_VITRINE)
+    .select(COLUNAS_DETALHE)
     .eq('slug', slug)
     .maybeSingle()
   if (error || !produto) {
@@ -72,15 +99,25 @@ export async function obterProdutoPorSlug(
     return null
   }
 
-  const { data: fotos } = await supabase
-    .from('produto_fotos')
-    .select('id, url, ordem, alt')
-    .eq('produto_id', (produto as ProdutoVitrine).id)
-    .order('ordem', { ascending: true })
+  const base = produto as Omit<ProdutoDetalhe, 'fotos' | 'vendedor'>
+
+  const [{ data: fotos }, { data: vendedor }] = await Promise.all([
+    supabase
+      .from('produto_fotos')
+      .select('id, url, ordem, alt')
+      .eq('produto_id', base.id)
+      .order('ordem', { ascending: true }),
+    supabase
+      .from('franquias_publicas')
+      .select('id, nome_fantasia, cidade, pais, logo_url, moeda')
+      .eq('id', base.franquia_id)
+      .maybeSingle(),
+  ])
 
   return {
-    ...(produto as ProdutoVitrine),
+    ...base,
     fotos: fotos ?? [],
+    vendedor: (vendedor as FranquiaPublica | null) ?? null,
   }
 }
 

@@ -20,7 +20,7 @@ function obterCliente(): Resend | null {
 }
 
 const FROM =
-  process.env.RESEND_FROM_EMAIL || 'Mira Shop <no-reply@mirafranquicia.com>'
+  process.env.RESEND_FROM_EMAIL || 'Ofertas Paraguai <no-reply@mirafranquicia.com>'
 
 type Moeda = 'BRL' | 'PYG'
 
@@ -38,7 +38,7 @@ async function enviar(to: string, subject: string, html: string) {
 function layout(titulo: string, corpo: string): string {
   return `<div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;color:#111827">
     <div style="background:#a02237;color:#fff;padding:20px 24px;border-radius:12px 12px 0 0">
-      <div style="font-size:18px;font-weight:800">Mira Shop</div>
+      <div style="font-size:18px;font-weight:800">Ofertas Paraguai</div>
     </div>
     <div style="border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;padding:24px">
       <h1 style="font-size:18px;margin:0 0 12px">${titulo}</h1>
@@ -74,7 +74,7 @@ export async function emailPedidoRecebido(
     `¡Gracias por tu compra, ${nome}!`,
     `<p style="font-size:14px;color:#374151;line-height:1.6">Recibimos tu pedido. Te avisamos apenas se confirme el pago.</p>${linhas}`,
   )
-  await enviar(to, 'Recibimos tu pedido · Mira Shop', html)
+  await enviar(to, 'Recibimos tu pedido · Ofertas Paraguai', html)
 }
 
 /** Pagamento confirmado de um pedido. */

@@ -1,4 +1,4 @@
-import { ChevronLeft, Package, Store, Truck } from 'lucide-react'
+import { MapPin, Package, ShieldCheck, Store, Truck } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -68,9 +68,36 @@ export default async function ProdutoPage({ params }: Props) {
             ? 'https://schema.org/OutOfStock'
             : 'https://schema.org/InStock',
           url: `${SITE_URL}/p/${produto.slug ?? produto.id}`,
+          seller: produto.vendedor
+            ? { '@type': 'Organization', name: produto.vendedor.nome_fantasia }
+            : undefined,
         }
       : undefined,
   }
+
+  // Ficha técnica — só entradas com dado preenchido.
+  const dimensoes =
+    produto.altura_cm != null &&
+    produto.largura_cm != null &&
+    produto.comprimento_cm != null
+      ? `${Number(produto.altura_cm)} × ${Number(produto.largura_cm)} × ${Number(produto.comprimento_cm)} cm`
+      : null
+  const peso =
+    produto.peso_gramas != null
+      ? produto.peso_gramas >= 1000
+        ? `${(produto.peso_gramas / 1000).toLocaleString()} kg`
+        : `${produto.peso_gramas} g`
+      : null
+  const specs: Array<{ rotulo: string; valor: string }> = [
+    ...(produto.categoria
+      ? [{ rotulo: t('categoria'), valor: produto.categoria }]
+      : []),
+    ...(peso ? [{ rotulo: t('spec_peso'), valor: peso }] : []),
+    ...(dimensoes ? [{ rotulo: t('spec_dimensoes'), valor: dimensoes }] : []),
+    ...(produto.vendedor
+      ? [{ rotulo: t('spec_vendedor'), valor: produto.vendedor.nome_fantasia }]
+      : []),
+  ]
 
   const msg = encodeURIComponent(t('whatsapp_mensagem', { nome: produto.nome }))
   const whatsappUrl = WHATSAPP ? `https://wa.me/${WHATSAPP}?text=${msg}` : null
@@ -83,13 +110,29 @@ export default async function ProdutoPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <Link
-        href="/"
-        className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-gray-500 transition-colors hover:text-marca"
-      >
-        <ChevronLeft className="size-3.5" />
-        {t('voltar')}
-      </Link>
+      {/* Breadcrumb: Início / Categorias / [categoria] / nome */}
+      <nav className="mb-4 flex flex-wrap items-center text-[13px] text-gray-500">
+        <Link href="/" className="transition-colors hover:text-marca">
+          {t('breadcrumb_inicio')}
+        </Link>
+        <span className="mx-2 text-gray-300">/</span>
+        <Link href="/categorias" className="transition-colors hover:text-marca">
+          {t('breadcrumb_categorias')}
+        </Link>
+        {produto.categoria && (
+          <>
+            <span className="mx-2 text-gray-300">/</span>
+            <Link
+              href={`/buscar?categoria=${encodeURIComponent(produto.categoria)}`}
+              className="transition-colors hover:text-marca"
+            >
+              {produto.categoria}
+            </Link>
+          </>
+        )}
+        <span className="mx-2 text-gray-300">/</span>
+        <span className="truncate text-gray-900">{produto.nome}</span>
+      </nav>
 
       <div className="grid gap-8 lg:grid-cols-2">
         <ProductGallery
@@ -107,6 +150,27 @@ export default async function ProdutoPage({ params }: Props) {
           <h1 className="mt-1 text-3xl font-bold leading-tight tracking-tight">
             {produto.nome}
           </h1>
+
+          {/* Especificações (ficha técnica, como no OfertasParaguai) */}
+          {specs.length > 0 && (
+            <div className="mt-5 rounded-lg bg-gray-50 p-4">
+              <h2 className="mb-3 text-sm font-bold text-gray-900">
+                {t('especificacoes')}
+              </h2>
+              <div className="grid grid-cols-2 gap-4">
+                {specs.map((s) => (
+                  <div key={s.rotulo}>
+                    <p className="text-xs font-semibold uppercase text-gray-500">
+                      {s.rotulo}
+                    </p>
+                    <p className="mt-1 text-sm font-medium text-gray-900">
+                      {s.valor}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Bloco de preço em destaque (assinatura do design) */}
           <div className="mt-5 rounded-2xl border border-marca/10 bg-marca/5 p-5">
@@ -143,6 +207,35 @@ export default async function ProdutoPage({ params }: Props) {
               </span>
             )}
           </div>
+
+          {/* Vendido por (franquia da rede) */}
+          {produto.vendedor && (
+            <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-marca/10 text-marca">
+                  <Store className="size-5" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-extrabold uppercase tracking-widest text-gray-400">
+                    {t('vendido_por')}
+                  </p>
+                  <p className="truncate text-sm font-semibold text-gray-900">
+                    {produto.vendedor.nome_fantasia}
+                  </p>
+                  {produto.vendedor.cidade && (
+                    <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-gray-500">
+                      <MapPin className="size-3" />
+                      {produto.vendedor.cidade}, {produto.vendedor.pais}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-blue-100 px-2.5 py-1 text-[10px] font-bold text-blue-700">
+                <ShieldCheck className="size-3.5" />
+                {t('franquia_verificada')}
+              </span>
+            </div>
+          )}
 
           {/* Ação principal: adicionar ao carrinho (Fase 2) */}
           {!semEstoque && (

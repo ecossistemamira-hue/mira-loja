@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 
@@ -11,15 +12,14 @@ export async function SiteFooter() {
     <footer className="border-t border-gray-100 bg-gray-50">
       <div className="mx-auto grid max-w-[1400px] gap-8 px-6 py-10 sm:grid-cols-2 lg:grid-cols-4">
         {/* Marca */}
-        <div className="flex flex-col gap-2.5">
-          <div className="flex items-center gap-2">
-            <span className="grid size-8 place-items-center rounded-lg bg-marca font-display text-[15px] font-extrabold text-white">
-              M
-            </span>
-            <span className="font-display text-[16px] font-bold tracking-tight">
-              {tSite('nome')}
-            </span>
-          </div>
+        <div className="flex flex-col gap-3">
+          <Image
+            src="/logo-horizontal.png"
+            alt={tSite('nome')}
+            width={486}
+            height={211}
+            className="h-12 w-auto self-start"
+          />
           <p className="max-w-[260px] text-xs leading-relaxed text-gray-500">
             {t('tagline')}
           </p>
@@ -28,6 +28,7 @@ export async function SiteFooter() {
         {/* Navegação */}
         <ColunaFooter titulo={t('nav_titulo')}>
           <LinkFooter href="/">{t('nav_inicio')}</LinkFooter>
+          <LinkFooter href="/categorias">{t('nav_categorias')}</LinkFooter>
           <LinkFooter href="/buscar">{t('nav_buscar')}</LinkFooter>
           <LinkFooter href="/favoritos">{t('nav_favoritos')}</LinkFooter>
           <LinkFooter href="/carrinho">{t('nav_carrinho')}</LinkFooter>
