@@ -6,6 +6,7 @@ import { getTranslations } from 'next-intl/server'
 
 import { AddToCartButton } from '@/components/add-to-cart-button'
 import { ProductGallery } from '@/components/product-gallery'
+import { WishlistButton } from '@/components/wishlist-button'
 import { estoqueDisponivel, precoExibicao } from '@/lib/format'
 import { obterProdutoPorSlug } from '@/lib/queries'
 
@@ -75,7 +76,7 @@ export default async function ProdutoPage({ params }: Props) {
   const whatsappUrl = WHATSAPP ? `https://wa.me/${WHATSAPP}?text=${msg}` : null
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6">
+    <div className="mx-auto max-w-[1100px] px-4 py-6 sm:px-6">
       {/* JSON-LD Product pra SEO/rich results */}
       <script
         type="application/ld+json"
@@ -84,7 +85,7 @@ export default async function ProdutoPage({ params }: Props) {
 
       <Link
         href="/"
-        className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-[#0004ff]"
+        className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-gray-500 transition-colors hover:text-marca"
       >
         <ChevronLeft className="size-3.5" />
         {t('voltar')}
@@ -99,45 +100,45 @@ export default async function ProdutoPage({ params }: Props) {
 
         <div className="flex flex-col">
           {produto.categoria && (
-            <span className="text-xs font-medium uppercase tracking-wide text-gray-400">
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-gray-400">
               {produto.categoria}
             </span>
           )}
-          <h1 className="mt-1 text-2xl font-extrabold leading-tight tracking-tight">
+          <h1 className="mt-1 text-3xl font-bold leading-tight tracking-tight">
             {produto.nome}
           </h1>
 
-          <div className="mt-4">
+          {/* Bloco de preço em destaque (assinatura do design) */}
+          <div className="mt-5 rounded-2xl border border-marca/10 bg-marca/5 p-5">
             {preco ? (
-              <span className="text-3xl font-extrabold text-gray-900">
+              <span className="font-display text-4xl font-black text-marca">
                 {preco.texto}
               </span>
             ) : (
               <span className="text-lg text-gray-400">{t('sem_preco')}</span>
             )}
-          </div>
-
-          <div className="mt-2 text-[13px] font-semibold">
-            {semEstoque ? (
-              <span className="text-red-600">{t('sem_estoque')}</span>
-            ) : (
-              <span className="text-emerald-600">
-                {t('em_estoque')} · {t('unidades_disponiveis', { n: disponivel })}
-              </span>
-            )}
+            <div className="mt-1.5 text-[13px] font-semibold">
+              {semEstoque ? (
+                <span className="text-red-600">{t('sem_estoque')}</span>
+              ) : (
+                <span className="text-emerald-600">
+                  {t('em_estoque')} · {t('unidades_disponiveis', { n: disponivel })}
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Entrega */}
-          <div className="mt-4 flex flex-col gap-2 text-[13px] text-gray-600">
+          <div className="mt-4 flex flex-wrap gap-2 text-[12px] font-medium text-gray-600">
             {produto.permite_envio && (
-              <span className="inline-flex items-center gap-2">
-                <Truck className="size-4 text-gray-400" />
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-50 px-3 py-1.5">
+                <Truck className="size-3.5 text-gray-400" />
                 {t('entrega_envio')}
               </span>
             )}
             {produto.permite_retirada && (
-              <span className="inline-flex items-center gap-2">
-                <Store className="size-4 text-gray-400" />
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-50 px-3 py-1.5">
+                <Store className="size-3.5 text-gray-400" />
                 {t('entrega_retirada')}
               </span>
             )}
@@ -147,12 +148,23 @@ export default async function ProdutoPage({ params }: Props) {
           {!semEstoque && (
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <AddToCartButton produtoId={produto.id} />
+              <WishlistButton
+                variante="pagina"
+                item={{
+                  id: produto.id,
+                  slug: produto.slug,
+                  nome: produto.nome,
+                  imagemUrl: imagem ?? null,
+                  precoTexto: preco?.texto ?? null,
+                  categoria: produto.categoria,
+                }}
+              />
               {whatsappUrl && (
                 <a
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-gray-300 px-5 text-[14px] font-semibold text-gray-700 hover:border-gray-400"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-gray-200 px-5 text-[14px] font-semibold text-gray-700 transition-colors hover:border-marca/40 hover:text-marca"
                 >
                   {t('comprar_whatsapp')}
                 </a>

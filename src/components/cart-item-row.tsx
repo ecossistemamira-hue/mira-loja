@@ -60,7 +60,7 @@ export function CartItemRow({
       <div className="flex min-w-0 flex-1 flex-col">
         <Link
           href={`/p/${item.slug ?? item.produtoId}`}
-          className="line-clamp-2 text-[13.5px] font-semibold leading-tight hover:text-[#0004ff]"
+          className="line-clamp-2 text-[13.5px] font-semibold leading-tight hover:text-marca"
         >
           {item.nome}
         </Link>

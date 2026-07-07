@@ -2,10 +2,18 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 
+import { WishlistButton } from '@/components/wishlist-button'
+import { cn } from '@/lib/cn'
 import { estoqueDisponivel, precoExibicao } from '@/lib/format'
 import type { ProdutoVitrine } from '@/lib/types'
 
-export async function ProductCard({ produto }: { produto: ProdutoVitrine }) {
+type Props = {
+  produto: ProdutoVitrine
+  /** Largura fixa pra uso em carrossel horizontal (w-52 shrink-0). */
+  compacto?: boolean
+}
+
+export async function ProductCard({ produto, compacto = false }: Props) {
   const t = await getTranslations('produto')
   const preco = precoExibicao(produto)
   const disponivel = estoqueDisponivel(produto)
@@ -14,46 +22,86 @@ export async function ProductCard({ produto }: { produto: ProdutoVitrine }) {
   return (
     <Link
       href={`/p/${produto.slug ?? produto.id}`}
-      className="group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-shadow hover:shadow-[0_6px_20px_-6px_rgba(0,0,61,0.15)]"
+      className={cn(
+        'group relative flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white',
+        'transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-lg',
+        compacto && 'w-52 shrink-0',
+      )}
     >
-      <div className="relative aspect-square bg-gray-100">
+      {/* Imagem — fundo degradê + object-contain com zoom no hover */}
+      <div className="relative flex h-44 items-center justify-center bg-gradient-to-b from-gray-50 to-white px-6 pb-2 pt-5">
         {produto.imagem_url ? (
-          <Image
-            src={produto.imagem_url}
-            alt={produto.nome}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 240px"
-            className="object-cover transition-transform group-hover:scale-[1.03]"
-          />
+          <div className="relative h-32 w-full">
+            <Image
+              src={produto.imagem_url}
+              alt={produto.nome}
+              fill
+              sizes="(max-width: 640px) 50vw, 208px"
+              className="object-contain transition-transform duration-300 group-hover:scale-[1.07]"
+            />
+          </div>
         ) : (
-          <div className="grid h-full place-items-center text-4xl">📦</div>
+          <span className="text-4xl">📦</span>
         )}
+
         {semEstoque && (
-          <span className="absolute right-2 top-2 rounded-full bg-gray-900/80 px-2 py-0.5 text-[10px] font-semibold text-white">
+          <span className="absolute left-2.5 top-2.5 rounded-full bg-gray-900/80 px-2 py-0.5 text-[10px] font-bold text-white">
             {t('sem_estoque')}
           </span>
         )}
+
+        <WishlistButton
+          className="absolute right-2.5 top-2.5"
+          item={{
+            id: produto.id,
+            slug: produto.slug,
+            nome: produto.nome,
+            imagemUrl: produto.imagem_url,
+            precoTexto: preco?.texto ?? null,
+            categoria: produto.categoria,
+          }}
+        />
       </div>
 
-      <div className="flex flex-1 flex-col gap-1.5 p-3">
+      {/* Info */}
+      <div className="flex flex-1 flex-col gap-1 border-t border-gray-50 px-4 pb-4 pt-3">
         {produto.categoria && (
-          <span className="text-[11px] font-medium uppercase tracking-wide text-gray-400">
+          <span className="text-[10px] font-extrabold uppercase tracking-widest text-gray-400">
             {produto.categoria}
           </span>
         )}
-        <h3 className="line-clamp-2 text-[13.5px] font-semibold leading-tight text-gray-900">
+        <h3 className="line-clamp-2 text-[13px] font-semibold leading-snug text-gray-800">
           {produto.nome}
         </h3>
         <div className="mt-auto pt-1.5">
           {preco ? (
-            <span className="text-[15px] font-bold text-gray-900">
+            <span className="font-display text-[17px] font-black text-marca">
               {preco.texto}
             </span>
           ) : (
-            <span className="text-[13px] text-gray-400">{t('sem_preco')}</span>
+            <span className="text-[12px] text-gray-400">{t('sem_preco')}</span>
           )}
         </div>
       </div>
     </Link>
+  )
+}
+
+/** Skeleton do card pros estados de loading dos carrosséis. */
+export function ProductCardSkeleton({ compacto = false }: { compacto?: boolean }) {
+  return (
+    <div
+      className={cn(
+        'animate-pulse overflow-hidden rounded-2xl border border-gray-100 bg-white',
+        compacto && 'w-52 shrink-0',
+      )}
+    >
+      <div className="h-44 bg-gray-100" />
+      <div className="flex flex-col gap-2 px-4 pb-4 pt-3">
+        <div className="h-2.5 w-16 rounded bg-gray-100" />
+        <div className="h-3.5 w-full rounded bg-gray-100" />
+        <div className="h-5 w-24 rounded bg-gray-100" />
+      </div>
+    </div>
   )
 }

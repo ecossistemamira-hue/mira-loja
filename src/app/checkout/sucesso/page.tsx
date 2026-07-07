@@ -53,7 +53,7 @@ export default async function SucessoPage({ searchParams }: Props) {
               className="flex flex-wrap items-center gap-3 rounded-xl border border-gray-200 bg-white px-5 py-4"
             >
               <div className="min-w-0 flex-1">
-                <div className="font-mono text-[14px] font-bold text-[#0000b8]">
+                <div className="font-mono text-[14px] font-bold text-marca-hover">
                   {p.codigo}
                 </div>
                 <div className="mt-0.5 flex items-center gap-1.5 text-[12.5px] text-gray-500">
@@ -83,7 +83,7 @@ export default async function SucessoPage({ searchParams }: Props) {
         <Link
           href="/"
           className="inline-flex h-10 items-center rounded-lg px-5 text-sm font-semibold text-white"
-          style={{ background: '#0004ff' }}
+          style={{ background: '#a02237' }}
         >
           {t('voltar_loja')}
         </Link>

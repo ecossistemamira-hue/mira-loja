@@ -2,25 +2,51 @@
 
 @theme inline {
   --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
 
-  /* Marca Mira — azul unificado + acento vermelho (mesmo manual do platform). */
-  --color-marca: #0004ff;
-  --color-marca-hover: #0000b8;
-  --color-marca-50: #e9eaff;
-  --color-marca-escuro: #00003d;
+  /* Marca da loja — carmim/vinho herdado do design OfertasParaguai.
+     Tints (bg-marca/5, /10…) saem de graça no Tailwind v4 via color-mix. */
+  --color-marca: #a02237;
+  --color-marca-hover: #7d1a2b;
+  --color-marca-50: #faeef0;
+  --color-marca-escuro: #4a0c1a;
   --color-acento: #ff0a0a;
 }
 
 :root {
   --background: #ffffff;
-  --foreground: #111827;
+  --foreground: #2c303a;
 }
 
 html {
   color: var(--foreground);
   background: #fafafa;
+  scroll-behavior: smooth;
 }
 
 body {
   font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Títulos na fonte display, tracking apertado — assinatura do design. */
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: rgb(160 34 55 / 0.15);
+  color: #7d1a2b;
+}
+
+/* Scroll horizontal sem barra visível (carrosséis, pills). */
+.scroll-oculto {
+  scrollbar-width: none;
+}
+.scroll-oculto::-webkit-scrollbar {
+  display: none;
 }

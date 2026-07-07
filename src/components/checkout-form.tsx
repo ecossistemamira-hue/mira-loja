@@ -124,7 +124,7 @@ export function CheckoutForm() {
         onClick={enviar}
         disabled={pending}
         className="inline-flex h-12 items-center justify-center gap-2 rounded-xl px-6 text-[15px] font-semibold text-white transition-[filter] hover:brightness-95 disabled:opacity-60"
-        style={{ background: '#0004ff' }}
+        style={{ background: '#a02237' }}
       >
         {pending && <Loader2 className="size-4 animate-spin" />}
         {t('finalizar')}
@@ -154,7 +154,7 @@ function Campo({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-10 rounded-lg border border-gray-300 px-3 text-[14px] outline-none focus:border-[#0004ff]"
+        className="h-10 rounded-lg border border-gray-300 px-3 text-[14px] outline-none focus:border-marca/40"
       />
     </label>
   )
@@ -178,7 +178,7 @@ function OpcaoEntrega({
       className={cn(
         'inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-[13px] font-semibold transition-colors',
         ativo
-          ? 'border-[#0004ff] bg-[#e9eaff] text-[#0000b8]'
+          ? 'border-marca bg-marca-50 text-marca-hover'
           : 'border-gray-300 text-gray-600 hover:border-gray-400',
       )}
     >

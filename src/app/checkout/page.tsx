@@ -26,7 +26,7 @@ export default async function CheckoutPage() {
     <div className="mx-auto max-w-4xl px-4 py-8">
       <Link
         href="/carrinho"
-        className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-[#0004ff]"
+        className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-marca"
       >
         <ChevronLeft className="size-3.5" />
         {t('voltar_carrinho')}

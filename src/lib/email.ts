@@ -37,7 +37,7 @@ async function enviar(to: string, subject: string, html: string) {
 
 function layout(titulo: string, corpo: string): string {
   return `<div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;color:#111827">
-    <div style="background:#0004ff;color:#fff;padding:20px 24px;border-radius:12px 12px 0 0">
+    <div style="background:#a02237;color:#fff;padding:20px 24px;border-radius:12px 12px 0 0">
       <div style="font-size:18px;font-weight:800">Mira Shop</div>
     </div>
     <div style="border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;padding:24px">
@@ -50,7 +50,7 @@ function layout(titulo: string, corpo: string): string {
 
 function linhaPedido(codigo: string, total: number, moeda: Moeda): string {
   return `<div style="background:#f9fafb;border:1px solid #f3f4f6;border-radius:8px;padding:12px 16px;margin:8px 0;display:flex;justify-content:space-between">
-    <span style="font-family:monospace;font-weight:600;color:#0000b8">${codigo}</span>
+    <span style="font-family:monospace;font-weight:600;color:#7d1a2b">${codigo}</span>
     <span style="font-weight:700">${formatarPreco(total, moeda)}</span>
   </div>`
 }

@@ -5,10 +5,12 @@ import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 
 import { definirLocale } from '@/app/actions'
+import { cn } from '@/lib/cn'
 
+// Bandeiras como no OfertasParaguai — ES (Paraguai) primeiro, mercado principal.
 const OPCOES = [
-  { valor: 'es', label: 'ES' },
-  { valor: 'pt-BR', label: 'PT' },
+  { valor: 'es', label: 'ES', bandeira: '🇵🇾' },
+  { valor: 'pt-BR', label: 'PT', bandeira: '🇧🇷' },
 ] as const
 
 export function LocaleSwitcher() {
@@ -25,7 +27,7 @@ export function LocaleSwitcher() {
   }
 
   return (
-    <div className="inline-flex items-center rounded-full border border-gray-200 bg-white p-0.5 text-xs font-semibold">
+    <div className="inline-flex items-center gap-0.5 rounded-full border border-gray-200 bg-white p-0.5 text-xs font-semibold">
       {OPCOES.map((o) => {
         const ativo = o.valor === locale
         return (
@@ -34,14 +36,15 @@ export function LocaleSwitcher() {
             type="button"
             onClick={() => trocar(o.valor)}
             disabled={pending}
-            className={
+            className={cn(
+              'inline-flex items-center gap-1 rounded-full px-2 py-1 transition-all',
               ativo
-                ? 'rounded-full px-2.5 py-1 text-white'
-                : 'rounded-full px-2.5 py-1 text-gray-500 hover:text-gray-800'
-            }
-            style={ativo ? { background: '#0004ff' } : undefined}
+                ? 'bg-marca text-white'
+                : 'text-gray-500 hover:text-gray-800',
+            )}
             aria-pressed={ativo}
           >
+            <span aria-hidden>{o.bandeira}</span>
             {o.label}
           </button>
         )

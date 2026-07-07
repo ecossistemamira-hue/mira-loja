@@ -49,7 +49,7 @@ export function ProductGallery({ nome, fotos, fallbackUrl }: Props) {
               type="button"
               onClick={() => setAtiva(i)}
               className="relative size-16 overflow-hidden rounded-lg border-2 bg-gray-100 transition-colors"
-              style={{ borderColor: i === ativa ? '#0004ff' : '#e5e7eb' }}
+              style={{ borderColor: i === ativa ? '#a02237' : '#e5e7eb' }}
               aria-label={`${nome} ${i + 1}`}
             >
               <Image

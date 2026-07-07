@@ -7,7 +7,8 @@
     "inicio": "Início",
     "buscar": "Buscar",
     "placeholder_busca": "Buscar produtos…",
-    "carrinho": "Carrinho"
+    "carrinho": "Carrinho",
+    "ver_todos_resultados": "Ver todos os resultados para \"{termo}\""
   },
   "home": {
     "hero_titulo": "Produtos da rede Mira",
@@ -15,7 +16,20 @@
     "recentes": "Novidades",
     "categorias": "Categorias",
     "vazio_titulo": "Ainda não há produtos",
-    "vazio_dica": "Em breve você encontra aqui os produtos publicados pelas franquias."
+    "vazio_dica": "Em breve você encontra aqui os produtos publicados pelas franquias.",
+    "ver_todos": "Ver todos",
+    "hero_badge_1": "Rede Mira",
+    "hero_titulo_1": "Produtos das franquias Mira",
+    "hero_subtitulo_1": "Compre direto de quem faz — cada produto é vendido por uma franquia da rede, com envio ou retirada.",
+    "hero_cta_1": "Explorar produtos",
+    "hero_badge_2": "Fronteira",
+    "hero_titulo_2": "Do Paraguai e do Brasil",
+    "hero_subtitulo_2": "Preços em guaranis e reais, do jeito que a fronteira funciona. Sem conversão escondida.",
+    "hero_cta_2": "Ver ofertas",
+    "hero_badge_3": "Novidades",
+    "hero_titulo_3": "Sempre tem coisa nova",
+    "hero_subtitulo_3": "As franquias publicam produtos novos toda semana. Salve seus favoritos com o coração.",
+    "hero_cta_3": "Ver novidades"
   },
   "produto": {
     "sem_estoque": "Sem estoque",
@@ -34,11 +48,23 @@
     "titulo": "Resultados",
     "resultados": "{n} resultados para \"{termo}\"",
     "sem_resultados": "Não encontramos produtos para a sua busca.",
-    "todas_categorias": "Todas"
+    "todas_categorias": "Todas",
+    "filtro_categorias": "Categorias"
   },
   "rodape": {
     "direitos": "Rede de franquias Mira",
-    "idioma": "Idioma"
+    "idioma": "Idioma",
+    "tagline": "O marketplace da rede de franquias Mira — produtos do Paraguai e do Brasil.",
+    "nav_titulo": "Loja",
+    "nav_inicio": "Início",
+    "nav_buscar": "Buscar produtos",
+    "nav_favoritos": "Favoritos",
+    "nav_carrinho": "Carrinho",
+    "ajuda_titulo": "Ajuda",
+    "ajuda_whatsapp": "Falar no WhatsApp",
+    "ajuda_retirada": "Retirada grátis na franquia vendedora",
+    "rede_titulo": "A rede",
+    "rede_texto": "Cada produto é vendido por uma franquia Mira. Você compra da franquia e a matriz garante o padrão."
   },
   "carrinho": {
     "adicionar": "Adicionar ao carrinho",
@@ -93,5 +119,13 @@
     "pagar_teste": "Simular pagamento aprovado",
     "voltar_loja": "Voltar à loja",
     "ir_checkout": "Finalizar compra"
+  },
+  "favoritos": {
+    "titulo": "Meus favoritos",
+    "adicionar": "Adicionar aos favoritos",
+    "remover": "Remover dos favoritos",
+    "vazio_titulo": "Nenhum favorito ainda",
+    "vazio_dica": "Toque no coração de um produto para salvá-lo aqui.",
+    "explorar": "Explorar a loja"
   }
 }
