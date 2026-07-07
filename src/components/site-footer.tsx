@@ -2,6 +2,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 
+import { NewsletterForm } from '@/components/newsletter-form'
+
 const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP ?? ''
 
 export async function SiteFooter() {
@@ -36,6 +38,7 @@ export async function SiteFooter() {
 
         {/* Ajuda */}
         <ColunaFooter titulo={t('ajuda_titulo')}>
+          <LinkFooter href="/faq">{t('ajuda_faq')}</LinkFooter>
           {WHATSAPP && (
             <a
               href={`https://wa.me/${WHATSAPP}`}
@@ -49,11 +52,12 @@ export async function SiteFooter() {
           <span className="text-xs text-gray-500">{t('ajuda_retirada')}</span>
         </ColunaFooter>
 
-        {/* Rede */}
-        <ColunaFooter titulo={t('rede_titulo')}>
+        {/* Newsletter */}
+        <ColunaFooter titulo={t('newsletter_titulo')}>
           <p className="text-xs leading-relaxed text-gray-500">
-            {t('rede_texto')}
+            {t('newsletter_dica')}
           </p>
+          <NewsletterForm />
         </ColunaFooter>
       </div>
 

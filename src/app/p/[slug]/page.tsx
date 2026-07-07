@@ -5,10 +5,13 @@ import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 
 import { AddToCartButton } from '@/components/add-to-cart-button'
+import { CategoryCarousel } from '@/components/category-carousel'
+import { ProductCard } from '@/components/product-card'
 import { ProductGallery } from '@/components/product-gallery'
+import { ShareButtons } from '@/components/share-buttons'
 import { WishlistButton } from '@/components/wishlist-button'
 import { estoqueDisponivel, precoExibicao } from '@/lib/format'
-import { obterProdutoPorSlug } from '@/lib/queries'
+import { listarProdutosVitrine, obterProdutoPorSlug } from '@/lib/queries'
 
 export const revalidate = 300
 
@@ -101,6 +104,14 @@ export default async function ProdutoPage({ params }: Props) {
 
   const msg = encodeURIComponent(t('whatsapp_mensagem', { nome: produto.nome }))
   const whatsappUrl = WHATSAPP ? `https://wa.me/${WHATSAPP}?text=${msg}` : null
+  const urlProduto = `${SITE_URL}/p/${produto.slug ?? produto.id}`
+
+  // Relacionados: mesma categoria, excluindo o próprio produto.
+  const relacionados = produto.categoria
+    ? (await listarProdutosVitrine({ categoria: produto.categoria, limite: 9 }))
+        .filter((p) => p.id !== produto.id)
+        .slice(0, 8)
+    : []
 
   return (
     <div className="mx-auto max-w-[1100px] px-4 py-6 sm:px-6">
@@ -265,9 +276,14 @@ export default async function ProdutoPage({ params }: Props) {
             </div>
           )}
 
+          {/* Compartilhar */}
+          <div className="mt-5">
+            <ShareButtons titulo={produto.nome} url={urlProduto} />
+          </div>
+
           {/* Descrição */}
           {produto.descricao && (
-            <div className="mt-8">
+            <div className="mt-7">
               <h2 className="mb-2 flex items-center gap-2 text-sm font-bold">
                 <Package className="size-4 text-gray-400" />
                 {t('descricao')}
@@ -279,6 +295,20 @@ export default async function ProdutoPage({ params }: Props) {
           )}
         </div>
       </div>
+
+      {/* Mais desta categoria */}
+      {relacionados.length > 0 && (
+        <section className="mt-8 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+          <h2 className="mb-4 font-display text-[17px] font-bold text-gray-900">
+            {t('relacionados')}
+          </h2>
+          <CategoryCarousel>
+            {relacionados.map((p) => (
+              <ProductCard key={p.id} produto={p} compacto />
+            ))}
+          </CategoryCarousel>
+        </section>
+      )}
     </div>
   )
 }

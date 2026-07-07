@@ -8,6 +8,7 @@ import {
   criarPedidosDoCarrinho,
   type PedidoCriado,
 } from '@/lib/checkout'
+import { obterUsuarioLoja } from '@/lib/supabase-auth'
 
 type ResultadoFinalizar =
   | { ok: true; pedidos: PedidoCriado[] }
@@ -23,7 +24,8 @@ export async function finalizarCheckout(
 
   // Ano do pedido: server roda em Node, Date disponível normalmente.
   const ano = new Date().getFullYear()
-  const r = await criarPedidosDoCarrinho(parsed.data, ano)
+  const usuario = await obterUsuarioLoja()
+  const r = await criarPedidosDoCarrinho(parsed.data, ano, usuario?.id ?? null)
   if (!r.ok) return r
 
   revalidatePath('/carrinho')

@@ -53,6 +53,8 @@ async function liberarReservas(
 export async function criarPedidosDoCarrinho(
   dados: CheckoutInput,
   ano: number,
+  /** auth.uid() do comprador logado — vincula o pedido à conta dele. */
+  authUserId?: string | null,
 ): Promise<ResultadoCheckout> {
   const carrinhoId = await lerCarrinhoId()
   if (!carrinhoId) return { ok: false, error: 'carrinho_vazio' }
@@ -78,34 +80,66 @@ export async function criarPedidosDoCarrinho(
     }
   }
 
-  // ── Fase 2: comprador (reusa por email se já existe como convidado) ───────
+  // ── Fase 2: comprador ─────────────────────────────────────────────────────
+  // Logado: usa/cria o comprador da conta (auth_user_id). Convidado: reusa
+  // por e-mail (sem conta) ou cria um novo.
   const emailNorm = dados.email.trim().toLowerCase()
   let compradorId: string | null = null
-  const { data: existente } = await svc
-    .from('compradores')
-    .select('id')
-    .eq('email', emailNorm)
-    .is('auth_user_id', null)
-    .maybeSingle()
-  if (existente) {
-    compradorId = existente.id
-  } else {
-    const { data: novo, error } = await svc
+
+  if (authUserId) {
+    const { data: daConta } = await svc
       .from('compradores')
-      .insert({
-        nome: dados.nome.trim(),
-        email: emailNorm,
-        telefone: dados.telefone || null,
-        documento: dados.documento || null,
-        pais: dados.endereco?.pais ?? 'BR',
-      })
       .select('id')
-      .single()
-    if (error || !novo) {
-      await liberarReservas(svc, reservas)
-      return { ok: false, error: 'falha_comprador' }
+      .eq('auth_user_id', authUserId)
+      .maybeSingle()
+    if (daConta) {
+      compradorId = daConta.id
+      // Completa dados que o comprador preencheu agora no checkout.
+      await svc
+        .from('compradores')
+        .update({
+          telefone: dados.telefone || null,
+          documento: dados.documento || null,
+        })
+        .eq('id', daConta.id)
     }
-    compradorId = novo.id
+  }
+
+  if (!compradorId) {
+    const { data: existente } = await svc
+      .from('compradores')
+      .select('id')
+      .eq('email', emailNorm)
+      .is('auth_user_id', null)
+      .maybeSingle()
+    if (existente) {
+      compradorId = existente.id
+      if (authUserId) {
+        // Comprador convidado com o mesmo e-mail vira o comprador da conta.
+        await svc
+          .from('compradores')
+          .update({ auth_user_id: authUserId })
+          .eq('id', existente.id)
+      }
+    } else {
+      const { data: novo, error } = await svc
+        .from('compradores')
+        .insert({
+          auth_user_id: authUserId ?? null,
+          nome: dados.nome.trim(),
+          email: emailNorm,
+          telefone: dados.telefone || null,
+          documento: dados.documento || null,
+          pais: dados.endereco?.pais ?? 'BR',
+        })
+        .select('id')
+        .single()
+      if (error || !novo) {
+        await liberarReservas(svc, reservas)
+        return { ok: false, error: 'falha_comprador' }
+      }
+      compradorId = novo.id
+    }
   }
 
   // ── Fase 3: um pedido por franquia ────────────────────────────────────────

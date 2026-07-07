@@ -6,6 +6,7 @@ import { getTranslations } from 'next-intl/server'
 
 import { CheckoutForm } from '@/components/checkout-form'
 import { obterCarrinho } from '@/lib/cart-queries'
+import { createAuthClient } from '@/lib/supabase-auth'
 import { formatarPreco, moedaDoGrupo, precoNaMoeda } from '@/lib/format'
 
 export const metadata: Metadata = {
@@ -22,6 +23,26 @@ export default async function CheckoutPage() {
   // Sem itens não há o que finalizar.
   if (totalItens === 0) redirect('/carrinho')
 
+  // Logado: pré-preenche com os dados da conta (RLS compradores_self).
+  const supabase = await createAuthClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  let defaults: { nome?: string; email?: string; telefone?: string; documento?: string } | undefined
+  if (user) {
+    const { data: comprador } = await supabase
+      .from('compradores')
+      .select('nome, email, telefone, documento')
+      .eq('auth_user_id', user.id)
+      .maybeSingle()
+    defaults = {
+      nome: comprador?.nome ?? (user.user_metadata?.nome_completo as string | undefined),
+      email: comprador?.email ?? user.email ?? undefined,
+      telefone: comprador?.telefone ?? undefined,
+      documento: comprador?.documento ?? undefined,
+    }
+  }
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
       <Link
@@ -35,7 +56,7 @@ export default async function CheckoutPage() {
       <h1 className="mb-6 text-2xl font-extrabold tracking-tight">{t('titulo')}</h1>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        <CheckoutForm />
+        <CheckoutForm defaults={defaults} />
 
         {/* Resumo */}
         <aside className="lg:sticky lg:top-20 lg:self-start">

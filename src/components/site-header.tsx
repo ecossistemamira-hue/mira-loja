@@ -5,12 +5,23 @@ import { getTranslations } from 'next-intl/server'
 
 import { LocaleSwitcher } from '@/components/locale-switcher'
 import { SearchBox } from '@/components/search-box'
+import { UserMenu } from '@/components/user-menu'
 import { WishlistHeaderLink } from '@/components/wishlist-header-link'
 import { contarItensCarrinho } from '@/lib/cart-queries'
+import { obterUsuarioLoja } from '@/lib/supabase-auth'
 
 export async function SiteHeader() {
   const t = await getTranslations()
-  const itensCarrinho = await contarItensCarrinho()
+  const [itensCarrinho, usuario] = await Promise.all([
+    contarItensCarrinho(),
+    obterUsuarioLoja(),
+  ])
+  const usuarioNome = usuario
+    ? ((usuario.user_metadata?.nome_completo as string | undefined) ??
+      (usuario.user_metadata?.full_name as string | undefined) ??
+      usuario.email ??
+      null)
+    : null
 
   return (
     <header className="sticky top-0 z-40 border-b border-gray-100 bg-white shadow-sm">
@@ -52,6 +63,8 @@ export async function SiteHeader() {
               </span>
             )}
           </Link>
+
+          <UserMenu usuarioNome={usuarioNome} />
 
           <LocaleSwitcher />
         </div>

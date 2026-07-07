@@ -11,16 +11,23 @@ import { cn } from '@/lib/cn'
 
 type Metodo = 'envio' | 'retirada'
 
-export function CheckoutForm() {
+export type CheckoutDefaults = {
+  nome?: string
+  email?: string
+  telefone?: string
+  documento?: string
+}
+
+export function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults }) {
   const t = useTranslations('checkout')
   const router = useRouter()
   const [pending, start] = useTransition()
   const [erro, setErro] = useState<string | null>(null)
 
-  const [nome, setNome] = useState('')
-  const [email, setEmail] = useState('')
-  const [telefone, setTelefone] = useState('')
-  const [documento, setDocumento] = useState('')
+  const [nome, setNome] = useState(defaults?.nome ?? '')
+  const [email, setEmail] = useState(defaults?.email ?? '')
+  const [telefone, setTelefone] = useState(defaults?.telefone ?? '')
+  const [documento, setDocumento] = useState(defaults?.documento ?? '')
   const [metodo, setMetodo] = useState<Metodo>('envio')
   const [cep, setCep] = useState('')
   const [logradouro, setLogradouro] = useState('')
