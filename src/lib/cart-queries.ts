@@ -19,7 +19,6 @@ type ItemRow = {
     slug: string | null
     imagem_url: string | null
     preco_pyg: number | null
-    preco_usd: number | null
     estoque: number
     estoque_reservado: number
     franquia_id: string
@@ -46,7 +45,7 @@ export async function obterCarrinho(): Promise<CarrinhoResolvido> {
   const { data, error } = await supabase
     .from('carrinho_itens')
     .select(
-      'id, quantidade, produto_id, produtos(nome, slug, imagem_url, preco_pyg, preco_usd, estoque, estoque_reservado, franquia_id, deleted_at, publicado_loja, status, peso_gramas, altura_cm, largura_cm, comprimento_cm)',
+      'id, quantidade, produto_id, produtos(nome, slug, imagem_url, preco_pyg, estoque, estoque_reservado, franquia_id, deleted_at, publicado_loja, status, peso_gramas, altura_cm, largura_cm, comprimento_cm)',
     )
     .eq('carrinho_id', carrinhoId)
     .order('created_at', { ascending: true })
@@ -68,7 +67,6 @@ export async function obterCarrinho(): Promise<CarrinhoResolvido> {
       slug: p.slug,
       imagemUrl: p.imagem_url,
       precoPyg: p.preco_pyg,
-      precoUsd: p.preco_usd,
       disponivel: Math.max(0, (p.estoque ?? 0) - (p.estoque_reservado ?? 0)),
       quantidade: rowRaw.quantidade,
       pesoGramas: p.peso_gramas,

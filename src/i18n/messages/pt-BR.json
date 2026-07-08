@@ -66,7 +66,7 @@
     "frete_servico_courier": "Courier a domicílio",
     "frete_servico_encomienda": "Encomienda — retire na terminal",
     "frete_prazo_unico": "{n, plural, one {em até # dia útil} other {em até # dias úteis}}",
-    "frete_gratis_aviso": "Envio grátis em compras acima de Gs. 700.000 (US$ 100)."
+    "frete_gratis_aviso": "Envio grátis em compras acima de Gs. 700.000."
   },
   "busca": {
     "titulo": "Resultados",

@@ -22,8 +22,6 @@ function obterCliente(): Resend | null {
 const FROM =
   process.env.RESEND_FROM_EMAIL || 'Ofertas Paraguai <no-reply@mirafranquicia.com>'
 
-type Moeda = 'PYG' | 'USD'
-
 async function enviar(to: string, subject: string, html: string) {
   const resend = obterCliente()
   if (!resend) return
@@ -48,17 +46,16 @@ function layout(titulo: string, corpo: string): string {
   </div>`
 }
 
-function linhaPedido(codigo: string, total: number, moeda: Moeda): string {
+function linhaPedido(codigo: string, total: number): string {
   return `<div style="background:#f9fafb;border:1px solid #f3f4f6;border-radius:8px;padding:12px 16px;margin:8px 0;display:flex;justify-content:space-between">
     <span style="font-family:monospace;font-weight:600;color:#7d1a2b">${codigo}</span>
-    <span style="font-weight:700">${formatarPreco(total, moeda)}</span>
+    <span style="font-weight:700">${formatarPreco(total)}</span>
   </div>`
 }
 
 export type ResumoPedidoEmail = {
   codigo: string
   total: number
-  moeda: Moeda
 }
 
 /** Pedido(s) recebido(s) — aguardando pagamento. */
@@ -68,7 +65,7 @@ export async function emailPedidoRecebido(
   pedidos: ResumoPedidoEmail[],
 ) {
   const linhas = pedidos
-    .map((p) => linhaPedido(p.codigo, p.total, p.moeda))
+    .map((p) => linhaPedido(p.codigo, p.total))
     .join('')
   const html = layout(
     `¡Gracias por tu compra, ${nome}!`,
@@ -85,7 +82,7 @@ export async function emailPagamentoConfirmado(
 ) {
   const html = layout(
     `¡Pago confirmado, ${nome}!`,
-    `<p style="font-size:14px;color:#374151;line-height:1.6">La franquicia ya puede preparar tu pedido.</p>${linhaPedido(pedido.codigo, pedido.total, pedido.moeda)}`,
+    `<p style="font-size:14px;color:#374151;line-height:1.6">La franquicia ya puede preparar tu pedido.</p>${linhaPedido(pedido.codigo, pedido.total)}`,
   )
   await enviar(to, `Pago confirmado · ${pedido.codigo}`, html)
 }

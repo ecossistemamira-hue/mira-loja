@@ -7,7 +7,7 @@ import { getTranslations } from 'next-intl/server'
 import { CheckoutForm } from '@/components/checkout-form'
 import { obterCarrinho } from '@/lib/cart-queries'
 import { createAuthClient } from '@/lib/supabase-auth'
-import { formatarPreco, moedaDoGrupo, precoNaMoeda } from '@/lib/format'
+import { formatarPreco, subtotalItens } from '@/lib/format'
 
 export const metadata: Metadata = {
   title: 'Checkout',
@@ -64,11 +64,7 @@ export default async function CheckoutPage() {
             <h2 className="mb-3 text-sm font-bold">{t('resumo')}</h2>
             <div className="flex flex-col gap-3">
               {grupos.map((grupo, i) => {
-                const moeda = moedaDoGrupo(grupo.itens, grupo.franquia?.moeda)
-                const subtotal = grupo.itens.reduce((s, it) => {
-                  const p = precoNaMoeda(it, moeda)
-                  return s + (p != null ? p * it.quantidade : 0)
-                }, 0)
+                const subtotal = subtotalItens(grupo.itens)
                 return (
                   <div key={grupo.franquia?.id ?? i} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
                     <div className="mb-1 text-[12px] font-semibold text-gray-500">
@@ -80,16 +76,13 @@ export default async function CheckoutPage() {
                           {it.quantidade}× {it.nome}
                         </span>
                         <span className="shrink-0 font-medium">
-                          {formatarPreco(
-                            (precoNaMoeda(it, moeda) ?? 0) * it.quantidade,
-                            moeda,
-                          )}
+                          {formatarPreco((it.precoPyg ?? 0) * it.quantidade)}
                         </span>
                       </div>
                     ))}
                     <div className="mt-1.5 flex justify-between text-[13px] font-bold">
                       <span>{t('subtotal')}</span>
-                      <span>{formatarPreco(subtotal, moeda)}</span>
+                      <span>{formatarPreco(subtotal)}</span>
                     </div>
                   </div>
                 )

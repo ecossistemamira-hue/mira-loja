@@ -7,7 +7,7 @@ import {
   emailPagamentoConfirmado,
   emailPedidoRecebido,
 } from '@/lib/email'
-import { moedaDoGrupo, precoNaMoeda } from '@/lib/format'
+import { precoDoItem, subtotalItens } from '@/lib/format'
 import { calcularFrete, type ZonaEntrega } from '@/lib/frete'
 import { createServiceClient } from '@/lib/supabase'
 
@@ -15,7 +15,7 @@ export type PedidoCriado = {
   id: string
   codigo: string
   total: number
-  moeda: 'PYG' | 'USD'
+  moeda: 'PYG'
   franquia: string | null
 }
 
@@ -152,12 +152,9 @@ export async function criarPedidosDoCarrinho(
   const criados: PedidoCriado[] = []
 
   for (const grupo of grupos) {
-    const moeda = moedaDoGrupo(grupo.itens, grupo.franquia?.moeda)
+    const moeda = 'PYG' as const // marketplace vende só em guarani
     const franquiaId = grupo.itens[0]?.franquiaId
-    const subtotal = grupo.itens.reduce((s, i) => {
-      const p = precoNaMoeda(i, moeda)
-      return s + (p != null ? p * i.quantidade : 0)
-    }, 0)
+    const subtotal = subtotalItens(grupo.itens)
 
     // Frete recalculado AQUI (nunca confiar em valor vindo do cliente): zona
     // de entrega PY + peso, pela tabela própria da loja.
@@ -172,7 +169,6 @@ export async function criarPedidosDoCarrinho(
           comprimentoCm: i.comprimentoCm,
           quantidade: i.quantidade,
         })),
-        moeda,
         subtotal,
       })
       frete = opcao.valor
@@ -214,7 +210,7 @@ export async function criarPedidosDoCarrinho(
       pedido_id: pedido.id,
       produto_id: i.produtoId,
       nome_snapshot: i.nome,
-      preco_snapshot: precoNaMoeda(i, moeda) ?? 0,
+      preco_snapshot: precoDoItem(i) ?? 0,
       quantidade: i.quantidade,
     }))
     await svc.from('pedido_itens').insert(itensPayload)
@@ -248,7 +244,7 @@ export async function criarPedidosDoCarrinho(
   await emailPedidoRecebido(
     emailNorm,
     dados.nome.trim(),
-    criados.map((p) => ({ codigo: p.codigo, total: p.total, moeda: p.moeda })),
+    criados.map((p) => ({ codigo: p.codigo, total: p.total })),
   ).catch(() => null)
 
   return { ok: true, pedidos: criados }
@@ -319,11 +315,9 @@ export async function aprovarPagamento(
     origem: dados.origem ?? 'webhook',
   })
 
-  const moeda = pedido.moeda === 'USD' ? 'USD' : 'PYG'
   await emailPagamentoConfirmado(pedido.comprador_email, pedido.comprador_nome, {
     codigo: pedido.codigo,
     total: Number(pedido.total),
-    moeda,
   }).catch(() => null)
 
   return { ok: true }

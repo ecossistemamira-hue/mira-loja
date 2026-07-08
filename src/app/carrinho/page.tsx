@@ -5,12 +5,7 @@ import { getTranslations } from 'next-intl/server'
 
 import { CartItemRow } from '@/components/cart-item-row'
 import { obterCarrinho } from '@/lib/cart-queries'
-import {
-  formatarPreco,
-  moedaDoGrupo as moedaDosItens,
-  precoNaMoeda,
-} from '@/lib/format'
-import type { GrupoCarrinho } from '@/lib/types'
+import { formatarPreco, subtotalItens } from '@/lib/format'
 
 export const metadata: Metadata = {
   title: 'Carrinho',
@@ -19,17 +14,6 @@ export const metadata: Metadata = {
 
 // Carrinho depende do cookie do usuário — sempre dinâmico.
 export const dynamic = 'force-dynamic'
-
-function moedaDoGrupo(grupo: GrupoCarrinho): 'PYG' | 'USD' {
-  return moedaDosItens(grupo.itens, grupo.franquia?.moeda)
-}
-
-function subtotalGrupo(grupo: GrupoCarrinho, moeda: 'PYG' | 'USD'): number {
-  return grupo.itens.reduce((soma, i) => {
-    const preco = precoNaMoeda(i, moeda)
-    return soma + (preco != null ? preco * i.quantidade : 0)
-  }, 0)
-}
 
 export default async function CarrinhoPage() {
   const t = await getTranslations('carrinho')
@@ -63,8 +47,7 @@ export default async function CarrinhoPage() {
 
       <div className="flex flex-col gap-4">
         {grupos.map((grupo, i) => {
-          const moeda = moedaDoGrupo(grupo)
-          const subtotal = subtotalGrupo(grupo, moeda)
+          const subtotal = subtotalItens(grupo.itens)
           return (
             <section
               key={grupo.franquia?.id ?? i}
@@ -84,7 +67,7 @@ export default async function CarrinhoPage() {
 
               <div className="divide-y divide-gray-100 px-4">
                 {grupo.itens.map((item) => (
-                  <CartItemRow key={item.itemId} item={item} moeda={moeda} />
+                  <CartItemRow key={item.itemId} item={item} />
                 ))}
               </div>
 
@@ -93,7 +76,7 @@ export default async function CarrinhoPage() {
                   {t('subtotal_vendedor')}
                 </span>
                 <span className="text-[15px] font-bold">
-                  {formatarPreco(subtotal, moeda)}
+                  {formatarPreco(subtotal)}
                 </span>
               </footer>
             </section>

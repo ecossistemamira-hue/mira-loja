@@ -134,7 +134,7 @@ export default async function ContaPage() {
                       </p>
                     </div>
                     <span className="shrink-0 font-mono text-[14px] font-bold text-gray-900">
-                      {formatarPreco(Number(p.total), p.moeda === 'USD' ? 'USD' : 'PYG')}
+                      {formatarPreco(Number(p.total))}
                     </span>
                     <ChevronRight className="size-4 shrink-0 text-gray-300 transition-colors group-hover:text-marca" />
                   </Link>

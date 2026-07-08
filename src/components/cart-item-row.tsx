@@ -10,17 +10,11 @@ import { definirQuantidade, removerItem } from '@/app/cart-actions'
 import { formatarPreco } from '@/lib/format'
 import type { ItemCarrinho } from '@/lib/types'
 
-export function CartItemRow({
-  item,
-  moeda,
-}: {
-  item: ItemCarrinho
-  moeda: 'PYG' | 'USD'
-}) {
+export function CartItemRow({ item }: { item: ItemCarrinho }) {
   const router = useRouter()
   const [pending, start] = useTransition()
 
-  const preco = moeda === 'PYG' ? item.precoPyg : item.precoUsd
+  const preco = item.precoPyg
   const subtotal = preco != null ? Number(preco) * item.quantidade : null
   const noLimite = item.quantidade >= item.disponivel
 
@@ -66,7 +60,7 @@ export function CartItemRow({
         </Link>
         {preco != null && (
           <span className="mt-0.5 text-[12px] text-gray-500">
-            {formatarPreco(Number(preco), moeda)}
+            {formatarPreco(Number(preco))}
           </span>
         )}
 
@@ -113,7 +107,7 @@ export function CartItemRow({
 
       {subtotal != null && (
         <div className="shrink-0 text-right text-[14px] font-bold text-gray-900">
-          {formatarPreco(subtotal, moeda)}
+          {formatarPreco(subtotal)}
         </div>
       )}
     </div>

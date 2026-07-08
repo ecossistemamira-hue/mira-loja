@@ -45,7 +45,6 @@ export default async function SucessoPage({ searchParams }: Props) {
 
       <div className="mt-8 flex flex-col gap-3">
         {pedidos.map((p) => {
-          const moeda = p.moeda === 'USD' ? 'USD' : 'PYG'
           const pago = p.status === 'pago'
           return (
             <div
@@ -71,7 +70,7 @@ export default async function SucessoPage({ searchParams }: Props) {
                 </div>
               </div>
               <div className="text-[15px] font-bold">
-                {formatarPreco(Number(p.total), moeda)}
+                {formatarPreco(Number(p.total))}
               </div>
               {!pago && <PagarTesteButton pedidoId={p.id} />}
             </div>

@@ -78,8 +78,8 @@ export default async function ProdutoPage({ params }: Props) {
     offers: preco
       ? {
           '@type': 'Offer',
-          price: produto.preco_pyg ?? produto.preco_usd ?? undefined,
-          priceCurrency: preco.moeda,
+          price: produto.preco_pyg ?? undefined,
+          priceCurrency: 'PYG',
           availability: semEstoque
             ? 'https://schema.org/OutOfStock'
             : 'https://schema.org/InStock',
@@ -210,16 +210,9 @@ export default async function ProdutoPage({ params }: Props) {
           {/* Bloco de preço em destaque (assinatura do design) */}
           <div className="mt-5 rounded-2xl border border-marca/10 bg-marca/5 p-5">
             {preco ? (
-              <>
-                <span className="font-display text-4xl font-black text-marca">
-                  {preco.texto}
-                </span>
-                {preco.textoSecundario && (
-                  <span className="ml-3 align-baseline text-lg font-bold text-gray-400">
-                    {preco.textoSecundario}
-                  </span>
-                )}
-              </>
+              <span className="font-display text-4xl font-black text-marca">
+                {preco.texto}
+              </span>
             ) : (
               <span className="text-lg text-gray-400">{t('sem_preco')}</span>
             )}
@@ -260,12 +253,7 @@ export default async function ProdutoPage({ params }: Props) {
                 comprimentoCm: produto.comprimento_cm,
                 quantidade: 1,
               }}
-              moeda={preco?.moeda ?? 'PYG'}
-              subtotal={
-                preco?.moeda === 'USD'
-                  ? Number(produto.preco_usd ?? 0)
-                  : Number(produto.preco_pyg ?? 0)
-              }
+              subtotal={Number(produto.preco_pyg ?? 0)}
             />
           )}
 

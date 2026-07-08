@@ -1,41 +1,24 @@
 import type { ProdutoVitrine } from '@/lib/types'
 
-// Marketplace é 100% Paraguai: guarani (principal) e dólar. preco_brl é legado
-// e a loja NÃO usa.
-type Moeda = 'PYG' | 'USD'
+// Marketplace é 100% Paraguai e vende SÓ em guarani (decisão 2026-07-08).
+// preco_brl/preco_usd existem no banco como legado — a loja não lê.
 
-export function formatarPreco(valor: number, moeda: Moeda): string {
+export function formatarPreco(valor: number): string {
   return new Intl.NumberFormat('es-PY', {
     style: 'currency',
-    currency: moeda,
+    currency: 'PYG',
     // PYG não usa centavos.
-    minimumFractionDigits: moeda === 'PYG' ? 0 : 2,
-    maximumFractionDigits: moeda === 'PYG' ? 0 : 2,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   }).format(valor)
 }
 
-/**
- * Preço de exibição do produto: guarani na frente e, quando o produto também
- * tem preço em dólar, o USD vem como secundário (padrão das lojas de CDE).
- * Retorna null se o produto não tem preço nenhum.
- */
+/** Preço de exibição do produto (Gs.), ou null se não precificado. */
 export function precoExibicao(
-  p: Pick<ProdutoVitrine, 'preco_pyg' | 'preco_usd'>,
-): { texto: string; moeda: Moeda; textoSecundario: string | null } | null {
-  const pyg = p.preco_pyg != null ? Number(p.preco_pyg) : null
-  const usd = p.preco_usd != null ? Number(p.preco_usd) : null
-
-  if (pyg != null) {
-    return {
-      texto: formatarPreco(pyg, 'PYG'),
-      moeda: 'PYG',
-      textoSecundario: usd != null ? formatarPreco(usd, 'USD') : null,
-    }
-  }
-  if (usd != null) {
-    return { texto: formatarPreco(usd, 'USD'), moeda: 'USD', textoSecundario: null }
-  }
-  return null
+  p: Pick<ProdutoVitrine, 'preco_pyg'>,
+): { texto: string } | null {
+  if (p.preco_pyg == null) return null
+  return { texto: formatarPreco(Number(p.preco_pyg)) }
 }
 
 export function estoqueDisponivel(
@@ -44,25 +27,17 @@ export function estoqueDisponivel(
   return Math.max(0, (p.estoque ?? 0) - (p.estoque_reservado ?? 0))
 }
 
-type ItemPrecos = { precoPyg: number | null; precoUsd: number | null }
-
-/**
- * Moeda de um grupo (franquia) do carrinho/checkout: guarani por padrão (é o
- * mercado), dólar se a franquia opera em USD ou se os itens só têm preço USD.
- */
-export function moedaDoGrupo(
-  itens: ItemPrecos[],
-  franquiaMoeda: string | null | undefined,
-): Moeda {
-  const preferida: Moeda = franquiaMoeda === 'USD' ? 'USD' : 'PYG'
-  const temPreco = (m: Moeda) =>
-    itens.some((i) => (m === 'USD' ? i.precoUsd : i.precoPyg) != null)
-  if (temPreco(preferida)) return preferida
-  const outra: Moeda = preferida === 'USD' ? 'PYG' : 'USD'
-  return temPreco(outra) ? outra : preferida
+/** Preço unitário (Gs.) de um item do carrinho. */
+export function precoDoItem(item: { precoPyg: number | null }): number | null {
+  return item.precoPyg != null ? Number(item.precoPyg) : null
 }
 
-export function precoNaMoeda(item: ItemPrecos, moeda: Moeda): number | null {
-  const v = moeda === 'USD' ? item.precoUsd : item.precoPyg
-  return v != null ? Number(v) : null
+/** Subtotal (Gs.) de uma lista de itens do carrinho. */
+export function subtotalItens(
+  itens: { precoPyg: number | null; quantidade: number }[],
+): number {
+  return itens.reduce((soma, i) => {
+    const p = precoDoItem(i)
+    return soma + (p != null ? p * i.quantidade : 0)
+  }, 0)
 }

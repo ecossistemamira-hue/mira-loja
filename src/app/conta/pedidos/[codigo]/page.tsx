@@ -71,7 +71,6 @@ export default async function PedidoContaPage({ params }: Props) {
         .maybeSingle(),
     ])
 
-  const moeda = pedido.moeda === 'USD' ? ('USD' as const) : ('PYG' as const)
   const endereco = pedido.endereco_entrega as Record<string, string> | null
   const tStatus = await getTranslations('conta.status')
 
@@ -119,23 +118,23 @@ export default async function PedidoContaPage({ params }: Props) {
                   {item.nome_snapshot}
                 </span>
                 <span className="shrink-0 font-mono text-[13px] font-bold text-gray-900">
-                  {formatarPreco(Number(item.preco_snapshot) * item.quantidade, moeda)}
+                  {formatarPreco(Number(item.preco_snapshot) * item.quantidade)}
                 </span>
               </li>
             ))}
           </ul>
           <div className="mt-3 flex flex-col gap-1 border-t border-gray-100 pt-3 text-[13px]">
-            <LinhaTotal rotulo={t('pedido_subtotal')} valor={formatarPreco(Number(pedido.subtotal), moeda)} />
+            <LinhaTotal rotulo={t('pedido_subtotal')} valor={formatarPreco(Number(pedido.subtotal))} />
             {Number(pedido.desconto) > 0 && (
-              <LinhaTotal rotulo={t('pedido_desconto')} valor={`− ${formatarPreco(Number(pedido.desconto), moeda)}`} />
+              <LinhaTotal rotulo={t('pedido_desconto')} valor={`− ${formatarPreco(Number(pedido.desconto))}`} />
             )}
             {Number(pedido.frete) > 0 && (
-              <LinhaTotal rotulo={t('pedido_frete')} valor={formatarPreco(Number(pedido.frete), moeda)} />
+              <LinhaTotal rotulo={t('pedido_frete')} valor={formatarPreco(Number(pedido.frete))} />
             )}
             <div className="flex items-center justify-between pt-1">
               <span className="font-bold text-gray-900">{t('pedido_total')}</span>
               <span className="font-mono text-[16px] font-black text-marca">
-                {formatarPreco(Number(pedido.total), moeda)}
+                {formatarPreco(Number(pedido.total))}
               </span>
             </div>
           </div>

@@ -1,14 +1,12 @@
-// Entrega da loja — 100% Paraguai. Sem CEP (não se usa por lá): o comprador
-// escolhe a ZONA e cada zona tem a forma de entrega que o mercado paraguaio
-// já pratica:
+// Entrega da loja — 100% Paraguai, preços SÓ em guarani (moeda oficial; o
+// user decidiu 2026-07-08 vender numa moeda única). Sem CEP (não se usa por
+// lá): o comprador escolhe a ZONA e cada zona tem a forma de entrega que o
+// mercado paraguaio já pratica:
 //   - cde:      delivery próprio (moto) em Ciudad del Este e Alto Paraná
 //   - asuncion: courier (tipo AEX) pra Asunción e Gran Asunción
 //   - interior: encomienda — retira na terminal de ônibus mais próxima
 // Peso taxável = max(peso real, peso cubado A×L×C/6000), mínimo 1 kg.
-// Envio grátis acima do teto por moeda. Moedas do marketplace: Gs. e USD,
-// cada uma com a própria tabela (sem conversão de câmbio).
-
-export type MoedaLoja = 'PYG' | 'USD'
+// Envio grátis acima do teto.
 
 export type ZonaEntrega = 'cde' | 'asuncion' | 'interior'
 export const ZONAS_ENTREGA: ZonaEntrega[] = ['cde', 'asuncion', 'interior']
@@ -41,27 +39,14 @@ export type ItemFrete = {
 // Peso assumido quando o produto não tem peso cadastrado.
 const PESO_PADRAO_GRAMAS = 500
 
-// Envio grátis a partir deste subtotal (por moeda).
-export const FRETE_GRATIS_MINIMO: Record<MoedaLoja, number> = {
-  PYG: 700_000,
-  USD: 100,
-}
+// Envio grátis a partir deste subtotal (Gs.).
+export const FRETE_GRATIS_MINIMO = 700_000
 
-// base + porKg (peso taxável arredondado pra cima), por zona e moeda.
-const TABELA: Record<
-  MoedaLoja,
-  Record<ZonaEntrega, { base: number; porKg: number }>
-> = {
-  PYG: {
-    cde: { base: 20_000, porKg: 2_000 },
-    asuncion: { base: 40_000, porKg: 4_000 },
-    interior: { base: 35_000, porKg: 3_000 },
-  },
-  USD: {
-    cde: { base: 3, porKg: 0.5 },
-    asuncion: { base: 5.5, porKg: 0.5 },
-    interior: { base: 5, porKg: 0.5 },
-  },
+// base + porKg (peso taxável arredondado pra cima), em guarani.
+const TABELA: Record<ZonaEntrega, { base: number; porKg: number }> = {
+  cde: { base: 20_000, porKg: 2_000 },
+  asuncion: { base: 40_000, porKg: 4_000 },
+  interior: { base: 35_000, porKg: 3_000 },
 }
 
 const PRAZOS: Record<ZonaEntrega, { min: number; max: number }> = {
@@ -86,18 +71,16 @@ export function pesoTaxavelKg(itens: ItemFrete[]): number {
   return Math.max(1, Math.ceil(gramas / 1000))
 }
 
-/** Frete de UMA zona. `subtotal` decide o envio grátis. */
+/** Frete de UMA zona, em guarani. `subtotal` decide o envio grátis. */
 export function calcularFrete(params: {
   zona: ZonaEntrega
   itens: ItemFrete[]
-  moeda: MoedaLoja
   subtotal: number
 }): OpcaoFrete {
-  const { base, porKg } = TABELA[params.moeda][params.zona]
+  const { base, porKg } = TABELA[params.zona]
   const kg = pesoTaxavelKg(params.itens)
-  const bruto = base + porKg * kg
-  const valor = params.moeda === 'USD' ? Math.round(bruto * 100) / 100 : bruto
-  const gratis = params.subtotal >= FRETE_GRATIS_MINIMO[params.moeda]
+  const valor = base + porKg * kg
+  const gratis = params.subtotal >= FRETE_GRATIS_MINIMO
 
   return {
     zona: params.zona,
@@ -111,7 +94,6 @@ export function calcularFrete(params: {
 /** Frete das 3 zonas de uma vez (tabela da página do produto). */
 export function cotarTodasZonas(params: {
   itens: ItemFrete[]
-  moeda: MoedaLoja
   subtotal: number
 }): OpcaoFrete[] {
   return ZONAS_ENTREGA.map((zona) => calcularFrete({ ...params, zona }))

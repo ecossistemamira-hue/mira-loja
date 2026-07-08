@@ -45,12 +45,11 @@ describe('pesoTaxavelKg', () => {
   })
 })
 
-describe('calcularFrete (zonas do Paraguai)', () => {
-  it('delivery em CDE/Alto Paraná em guarani', () => {
+describe('calcularFrete (zonas do Paraguai, Gs.)', () => {
+  it('delivery em CDE/Alto Paraná', () => {
     const op = calcularFrete({
       zona: 'cde',
       itens: [item({ pesoGramas: 2000 })],
-      moeda: 'PYG',
       subtotal: 100_000,
     })
     expect(op.servico).toBe('delivery')
@@ -58,11 +57,10 @@ describe('calcularFrete (zonas do Paraguai)', () => {
     expect(op.prazoDias).toEqual({ min: 1, max: 1 })
   })
 
-  it('courier pra Asunción em guarani', () => {
+  it('courier pra Asunción', () => {
     const op = calcularFrete({
       zona: 'asuncion',
       itens: [item({ pesoGramas: 1000 })],
-      moeda: 'PYG',
       subtotal: 100_000,
     })
     expect(op.servico).toBe('courier')
@@ -70,35 +68,24 @@ describe('calcularFrete (zonas do Paraguai)', () => {
     expect(op.prazoDias.max).toBe(3)
   })
 
-  it('encomienda pro interior em dólar', () => {
+  it('encomienda pro interior', () => {
     const op = calcularFrete({
       zona: 'interior',
       itens: [item({ pesoGramas: 3000 })],
-      moeda: 'USD',
-      subtotal: 50,
+      subtotal: 100_000,
     })
     expect(op.servico).toBe('encomienda')
-    expect(op.valor).toBe(5 + 0.5 * 3) // 6.5
+    expect(op.valor).toBe(35_000 + 3_000 * 3) // 44.000
   })
 
-  it('envio grátis acima do teto da moeda', () => {
-    const gsGratis = calcularFrete({
+  it('envio grátis acima do teto', () => {
+    const op = calcularFrete({
       zona: 'asuncion',
       itens: [item()],
-      moeda: 'PYG',
-      subtotal: FRETE_GRATIS_MINIMO.PYG,
+      subtotal: FRETE_GRATIS_MINIMO,
     })
-    expect(gsGratis.gratis).toBe(true)
-    expect(gsGratis.valor).toBe(0)
-
-    const usdGratis = calcularFrete({
-      zona: 'interior',
-      itens: [item()],
-      moeda: 'USD',
-      subtotal: FRETE_GRATIS_MINIMO.USD,
-    })
-    expect(usdGratis.gratis).toBe(true)
-    expect(usdGratis.valor).toBe(0)
+    expect(op.gratis).toBe(true)
+    expect(op.valor).toBe(0)
   })
 })
 
@@ -106,7 +93,6 @@ describe('cotarTodasZonas', () => {
   it('devolve as 3 zonas na ordem cde → asuncion → interior', () => {
     const opcoes = cotarTodasZonas({
       itens: [item()],
-      moeda: 'PYG',
       subtotal: 100_000,
     })
     expect(opcoes.map((o) => o.zona)).toEqual(['cde', 'asuncion', 'interior'])

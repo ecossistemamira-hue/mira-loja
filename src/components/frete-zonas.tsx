@@ -5,7 +5,6 @@ import { formatarPreco } from '@/lib/format'
 import {
   cotarTodasZonas,
   type ItemFrete,
-  type MoedaLoja,
   type ServicoEntrega,
 } from '@/lib/frete'
 
@@ -21,15 +20,13 @@ const ICONE: Record<ServicoEntrega, typeof Truck> = {
  */
 export async function FreteZonas({
   item,
-  moeda,
   subtotal,
 }: {
   item: ItemFrete
-  moeda: MoedaLoja
   subtotal: number
 }) {
   const t = await getTranslations('produto')
-  const opcoes = cotarTodasZonas({ itens: [item], moeda, subtotal })
+  const opcoes = cotarTodasZonas({ itens: [item], subtotal })
 
   return (
     <div className="mt-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
@@ -66,7 +63,7 @@ export async function FreteZonas({
                 {op.gratis ? (
                   <span className="text-emerald-600">{t('frete_gratis')}</span>
                 ) : (
-                  formatarPreco(op.valor, moeda)
+                  formatarPreco(op.valor)
                 )}
               </span>
             </div>

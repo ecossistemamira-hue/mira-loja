@@ -152,7 +152,7 @@ export function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults }) {
                               {t('frete_gratis')}
                             </span>
                           ) : (
-                            formatarPreco(g.opcao.valor, g.moeda)
+                            formatarPreco(g.opcao.valor)
                           )}
                         </span>
                       ))
