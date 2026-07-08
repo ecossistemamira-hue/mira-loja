@@ -4,17 +4,19 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 
-import { AddToCartButton } from '@/components/add-to-cart-button'
+import { CompraBox } from '@/components/add-to-cart-button'
 import { AvaliacoesSection } from '@/components/avaliacoes-section'
+import { BeneficiosBar } from '@/components/beneficios-bar'
 import { CategoryCarousel } from '@/components/category-carousel'
 import { FreteAex } from '@/components/frete-aex'
 import { ProductCard } from '@/components/product-card'
 import { ProductGallery } from '@/components/product-gallery'
 import { ShareButtons } from '@/components/share-buttons'
 import { StarRating } from '@/components/star-rating'
+import { RegistrarVisita } from '@/components/vistos-recentemente'
 import { WishlistButton } from '@/components/wishlist-button'
-import { listarAvaliacoes } from '@/lib/avaliacoes'
-import { estoqueDisponivel, precoExibicao } from '@/lib/format'
+import { listarAvaliacoes, listarMediasAvaliacoes } from '@/lib/avaliacoes'
+import { estoqueDisponivel, precoExibicao, precoVenda } from '@/lib/format'
 import { listarProdutosVitrine, obterProdutoPorSlug } from '@/lib/queries'
 
 export const revalidate = 300
@@ -78,7 +80,7 @@ export default async function ProdutoPage({ params }: Props) {
     offers: preco
       ? {
           '@type': 'Offer',
-          price: produto.preco_pyg ?? undefined,
+          price: precoVenda(produto) ?? undefined,
           priceCurrency: 'PYG',
           availability: semEstoque
             ? 'https://schema.org/OutOfStock'
@@ -125,6 +127,9 @@ export default async function ProdutoPage({ params }: Props) {
         .filter((p) => p.id !== produto.id)
         .slice(0, 8)
     : []
+  const mediasRelacionados = await listarMediasAvaliacoes(
+    relacionados.map((p) => p.id),
+  )
 
   return (
     <div className="mx-auto max-w-[1100px] px-4 py-6 sm:px-6">
@@ -210,9 +215,21 @@ export default async function ProdutoPage({ params }: Props) {
           {/* Bloco de preço em destaque (assinatura do design) */}
           <div className="mt-5 rounded-2xl border border-marca/10 bg-marca/5 p-5">
             {preco ? (
-              <span className="font-display text-4xl font-black text-marca">
-                {preco.texto}
-              </span>
+              <>
+                {preco.textoAntigo && (
+                  <div className="mb-0.5 flex items-center gap-2">
+                    <span className="text-[15px] text-gray-400 line-through">
+                      {preco.textoAntigo}
+                    </span>
+                    <span className="rounded-full bg-marca px-2 py-0.5 text-[11px] font-black text-white">
+                      -{preco.descontoPct}%
+                    </span>
+                  </div>
+                )}
+                <span className="font-display text-4xl font-black text-marca">
+                  {preco.texto}
+                </span>
+              </>
             ) : (
               <span className="text-lg text-gray-400">{t('sem_preco')}</span>
             )}
@@ -282,10 +299,10 @@ export default async function ProdutoPage({ params }: Props) {
           )}
 
 
-          {/* Ação principal: adicionar ao carrinho (Fase 2) */}
+          {/* Ação principal: quantidade + comprar agora + carrinho */}
           {!semEstoque && (
             <div className="mt-6 flex flex-wrap items-center gap-3">
-              <AddToCartButton produtoId={produto.id} />
+              <CompraBox produtoId={produto.id} maxQtd={disponivel} />
               <WishlistButton
                 variante="pagina"
                 item={{
@@ -330,6 +347,22 @@ export default async function ProdutoPage({ params }: Props) {
         </div>
       </div>
 
+      {/* Registra no histórico local (vistos recentemente) */}
+      <RegistrarVisita
+        produto={{
+          id: produto.id,
+          slug: produto.slug,
+          nome: produto.nome,
+          imagemUrl: imagem ?? null,
+          precoTexto: preco?.texto ?? null,
+        }}
+      />
+
+      {/* Barra de confiança */}
+      <div className="mt-8">
+        <BeneficiosBar />
+      </div>
+
       {/* Avaliações */}
       <AvaliacoesSection produtoId={produto.id} resumo={avaliacoes} />
 
@@ -341,7 +374,12 @@ export default async function ProdutoPage({ params }: Props) {
           </h2>
           <CategoryCarousel>
             {relacionados.map((p) => (
-              <ProductCard key={p.id} produto={p} compacto />
+              <ProductCard
+                key={p.id}
+                produto={p}
+                compacto
+                avaliacao={mediasRelacionados.get(p.id) ?? null}
+              />
             ))}
           </CategoryCarousel>
         </section>

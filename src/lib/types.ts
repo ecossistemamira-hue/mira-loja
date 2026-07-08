@@ -10,6 +10,8 @@ export type ProdutoVitrine = {
   categoria: string | null
   // Marketplace PY vende só em guarani (preco_brl/preco_usd = legado no banco).
   preco_pyg: number | null
+  // Quando < preco_pyg, vitrine mostra "de X por Y" e o carrinho cobra este.
+  preco_promocional_pyg: number | null
   imagem_url: string | null
   estoque: number
   estoque_reservado: number
@@ -57,6 +59,7 @@ export type ItemCarrinho = {
   slug: string | null
   imagemUrl: string | null
   precoPyg: number | null
+  precoPromocionalPyg: number | null
   disponivel: number
   quantidade: number
   // Dados de frete (peso real + dimensões pro cubado).

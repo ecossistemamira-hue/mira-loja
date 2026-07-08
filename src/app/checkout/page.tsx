@@ -7,7 +7,7 @@ import { getTranslations } from 'next-intl/server'
 import { CheckoutForm } from '@/components/checkout-form'
 import { obterCarrinho } from '@/lib/cart-queries'
 import { createAuthClient } from '@/lib/supabase-auth'
-import { formatarPreco, subtotalItens } from '@/lib/format'
+import { formatarPreco, precoDoItem, subtotalItens } from '@/lib/format'
 
 export const metadata: Metadata = {
   title: 'Checkout',
@@ -76,7 +76,7 @@ export default async function CheckoutPage() {
                           {it.quantidade}× {it.nome}
                         </span>
                         <span className="shrink-0 font-medium">
-                          {formatarPreco((it.precoPyg ?? 0) * it.quantidade)}
+                          {formatarPreco((precoDoItem(it) ?? 0) * it.quantidade)}
                         </span>
                       </div>
                     ))}

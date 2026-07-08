@@ -2,9 +2,12 @@ import { Sparkles, Tag } from 'lucide-react'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 
+import { BeneficiosBar } from '@/components/beneficios-bar'
 import { CategoryCarousel } from '@/components/category-carousel'
 import { HeroCarousel, type SlideHero } from '@/components/hero-carousel'
 import { ProductCard } from '@/components/product-card'
+import { VistosRecentemente } from '@/components/vistos-recentemente'
+import { listarMediasAvaliacoes } from '@/lib/avaliacoes'
 import { listarCategoriasVitrine, listarProdutosVitrine } from '@/lib/queries'
 import type { ProdutoVitrine } from '@/lib/types'
 
@@ -18,6 +21,7 @@ export default async function HomePage() {
     listarProdutosVitrine({ limite: 60 }),
     listarCategoriasVitrine(),
   ])
+  const medias = await listarMediasAvaliacoes(produtos.map((p) => p.id))
 
   const slides: SlideHero[] = [1, 2, 3].map((n) => ({
     badge: t(`hero_badge_${n}`),
@@ -44,6 +48,11 @@ export default async function HomePage() {
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6">
       <HeroCarousel slides={slides} />
+
+      {/* Barra de confiança */}
+      <div className="mt-5">
+        <BeneficiosBar />
+      </div>
 
       {/* Pills de categorias */}
       {categorias.length > 0 && (
@@ -72,9 +81,17 @@ export default async function HomePage() {
             verTodosLabel={t('ver_todos')}
           >
             {produtos.slice(0, 12).map((p) => (
-              <ProductCard key={p.id} produto={p} compacto />
+              <ProductCard
+                key={p.id}
+                produto={p}
+                compacto
+                avaliacao={medias.get(p.id) ?? null}
+              />
             ))}
           </SecaoCarrossel>
+
+          {/* Vistos recentemente (histórico local do visitante) */}
+          <VistosRecentemente />
 
           {/* Uma seção por categoria relevante */}
           {secoesCategorias.map(([categoria, lista]) => (
@@ -86,7 +103,12 @@ export default async function HomePage() {
               verTodosLabel={t('ver_todos')}
             >
               {lista.slice(0, 12).map((p) => (
-                <ProductCard key={p.id} produto={p} compacto />
+                <ProductCard
+                  key={p.id}
+                  produto={p}
+                  compacto
+                  avaliacao={medias.get(p.id) ?? null}
+                />
               ))}
             </SecaoCarrossel>
           ))}

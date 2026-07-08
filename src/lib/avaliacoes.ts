@@ -71,3 +71,31 @@ export async function listarAvaliacoes(
     avaliacoes,
   }
 }
+
+/** Média/total de avaliações pra um lote de produtos (estrelas nos cards). */
+export async function listarMediasAvaliacoes(
+  produtoIds: string[],
+): Promise<Map<string, { media: number; total: number }>> {
+  const mapa = new Map<string, { media: number; total: number }>()
+  if (produtoIds.length === 0) return mapa
+
+  const supabase = createLojaClient()
+  const { data, error } = await supabase
+    .from('produto_avaliacoes')
+    .select('produto_id, nota')
+    .in('produto_id', produtoIds)
+    .limit(2000)
+  if (error || !data) return mapa
+
+  const somas = new Map<string, { soma: number; n: number }>()
+  for (const row of data as { produto_id: string; nota: number }[]) {
+    const s = somas.get(row.produto_id) ?? { soma: 0, n: 0 }
+    s.soma += row.nota
+    s.n += 1
+    somas.set(row.produto_id, s)
+  }
+  for (const [id, s] of somas) {
+    mapa.set(id, { media: Math.round((s.soma / s.n) * 10) / 10, total: s.n })
+  }
+  return mapa
+}

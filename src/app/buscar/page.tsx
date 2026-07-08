@@ -3,7 +3,9 @@ import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 
 import { ProductCard } from '@/components/product-card'
+import { listarMediasAvaliacoes } from '@/lib/avaliacoes'
 import { cn } from '@/lib/cn'
+import { precoVenda } from '@/lib/format'
 import { listarCategoriasVitrine, listarProdutosVitrine } from '@/lib/queries'
 
 export const metadata: Metadata = {
@@ -11,14 +13,20 @@ export const metadata: Metadata = {
   robots: { index: false },
 }
 
+const ORDENS = ['recentes', 'menor_preco', 'maior_preco'] as const
+type Ordem = (typeof ORDENS)[number]
+
 type Props = {
-  searchParams: Promise<{ q?: string; categoria?: string }>
+  searchParams: Promise<{ q?: string; categoria?: string; ordem?: string }>
 }
 
 export default async function BuscaPage({ searchParams }: Props) {
-  const { q, categoria } = await searchParams
+  const { q, categoria, ordem: ordemRaw } = await searchParams
   const t = await getTranslations('busca')
   const termo = (q ?? '').trim()
+  const ordem: Ordem = ORDENS.includes(ordemRaw as Ordem)
+    ? (ordemRaw as Ordem)
+    : 'recentes'
 
   const [produtos, categorias] = await Promise.all([
     listarProdutosVitrine({
@@ -29,23 +37,59 @@ export default async function BuscaPage({ searchParams }: Props) {
     listarCategoriasVitrine(),
   ])
 
+  // Ordena pelo preço EFETIVO (promocional quando válido) — em JS porque a
+  // regra coalesce(promo, cheio) não cabe num .order() simples.
+  if (ordem !== 'recentes') {
+    produtos.sort((a, b) => {
+      const pa = precoVenda(a) ?? Number.MAX_SAFE_INTEGER
+      const pb = precoVenda(b) ?? Number.MAX_SAFE_INTEGER
+      return ordem === 'menor_preco' ? pa - pb : pb - pa
+    })
+  }
+
+  const medias = await listarMediasAvaliacoes(produtos.map((p) => p.id))
+
   const titulo = categoria
     ? categoria
     : termo
       ? t('resultados', { n: produtos.length, termo })
       : t('titulo')
 
-  const hrefCategoria = (cat?: string) => {
+  const href = (over: { cat?: string | null; ord?: Ordem }) => {
     const params = new URLSearchParams()
     if (termo) params.set('q', termo)
+    const cat = over.cat === undefined ? categoria : over.cat
     if (cat) params.set('categoria', cat)
+    const ord = over.ord ?? ordem
+    if (ord !== 'recentes') params.set('ordem', ord)
     const s = params.toString()
     return s ? `/buscar?${s}` : '/buscar'
   }
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6">
-      <h1 className="mb-5 text-xl font-bold tracking-tight">{titulo}</h1>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-xl font-bold tracking-tight">{titulo}</h1>
+
+        {/* Ordenação */}
+        <nav className="flex items-center gap-1.5 text-[12.5px]">
+          <span className="mr-1 text-gray-400">{t('ordenar')}</span>
+          {ORDENS.map((o) => (
+            <Link
+              key={o}
+              href={href({ ord: o })}
+              className={cn(
+                'rounded-full px-3 py-1 font-medium transition-colors',
+                ordem === o
+                  ? 'bg-marca/10 font-semibold text-marca'
+                  : 'text-gray-600 hover:bg-gray-50',
+              )}
+            >
+              {t(`ordem_${o}`)}
+            </Link>
+          ))}
+        </nav>
+      </div>
 
       <div className="flex flex-col gap-5 lg:flex-row">
         {/* Sidebar de filtros (sticky) */}
@@ -56,13 +100,13 @@ export default async function BuscaPage({ searchParams }: Props) {
                 {t('filtro_categorias')}
               </span>
               <nav className="scroll-oculto flex gap-1.5 overflow-x-auto lg:flex-col lg:overflow-visible">
-                <FiltroLink href={hrefCategoria()} ativo={!categoria}>
+                <FiltroLink href={href({ cat: null })} ativo={!categoria}>
                   {t('todas_categorias')}
                 </FiltroLink>
                 {categorias.map((cat) => (
                   <FiltroLink
                     key={cat}
-                    href={hrefCategoria(cat)}
+                    href={href({ cat })}
                     ativo={categoria === cat}
                   >
                     {cat}
@@ -85,7 +129,11 @@ export default async function BuscaPage({ searchParams }: Props) {
           ) : (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
               {produtos.map((p) => (
-                <ProductCard key={p.id} produto={p} />
+                <ProductCard
+                  key={p.id}
+                  produto={p}
+                  avaliacao={medias.get(p.id) ?? null}
+                />
               ))}
             </div>
           )}

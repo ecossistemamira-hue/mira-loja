@@ -30,7 +30,8 @@
     "hero_badge_3": "Novedades",
     "hero_titulo_3": "Siempre hay algo nuevo",
     "hero_subtitulo_3": "Las franquicias publican productos nuevos cada semana. Guardá tus favoritos con el corazón.",
-    "hero_cta_3": "Ver novedades"
+    "hero_cta_3": "Ver novedades",
+    "vistos_recentemente": "Vistos recientemente"
   },
   "produto": {
     "sem_estoque": "Sin stock",
@@ -70,7 +71,11 @@
     "resultados": "{n} resultados para \"{termo}\"",
     "sem_resultados": "No encontramos productos para tu búsqueda.",
     "todas_categorias": "Todas",
-    "filtro_categorias": "Categorías"
+    "filtro_categorias": "Categorías",
+    "ordenar": "Ordenar:",
+    "ordem_recentes": "Más recientes",
+    "ordem_menor_preco": "Menor precio",
+    "ordem_maior_preco": "Mayor precio"
   },
   "rodape": {
     "direitos": "Red de franquicias Mira",
@@ -107,7 +112,8 @@
     "vazio_dica": "Agregá productos desde la tienda para empezar tu compra.",
     "continuar_comprando": "Seguir comprando",
     "checkout_em_breve": "El pago con tarjeta y Pix llega en la próxima etapa. Por ahora podés armar tu carrito.",
-    "ir_checkout": "Finalizar compra"
+    "ir_checkout": "Finalizar compra",
+    "comprar_agora": "Comprar ahora"
   },
   "checkout": {
     "titulo": "Finalizar compra",
@@ -289,5 +295,15 @@
     "atualizar": "Actualizar reseña",
     "login_convite": "¿Compraste este producto? Iniciá sesión para dejar tu reseña.",
     "login_link": "Iniciar sesión"
+  },
+  "beneficios": {
+    "envio_titulo": "Envíos a todo Paraguay",
+    "envio_corpo": "Entrega a domicilio por AEX",
+    "retiro_titulo": "Retirá en la franquicia",
+    "retiro_corpo": "Sin costo, en Ciudad del Este",
+    "pago_titulo": "Compra protegida",
+    "pago_corpo": "Stock reservado hasta el pago",
+    "atencion_titulo": "Atención humana",
+    "atencion_corpo": "Hablá con nosotros por WhatsApp"
   }
 }

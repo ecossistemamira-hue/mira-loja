@@ -7,14 +7,14 @@ import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 
 import { definirQuantidade, removerItem } from '@/app/cart-actions'
-import { formatarPreco } from '@/lib/format'
+import { formatarPreco, precoDoItem } from '@/lib/format'
 import type { ItemCarrinho } from '@/lib/types'
 
 export function CartItemRow({ item }: { item: ItemCarrinho }) {
   const router = useRouter()
   const [pending, start] = useTransition()
 
-  const preco = item.precoPyg
+  const preco = precoDoItem(item)
   const subtotal = preco != null ? Number(preco) * item.quantidade : null
   const noLimite = item.quantidade >= item.disponivel
 

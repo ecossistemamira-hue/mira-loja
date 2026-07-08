@@ -13,12 +13,43 @@ export function formatarPreco(valor: number): string {
   }).format(valor)
 }
 
-/** Preço de exibição do produto (Gs.), ou null se não precificado. */
-export function precoExibicao(
-  p: Pick<ProdutoVitrine, 'preco_pyg'>,
-): { texto: string } | null {
+type PrecosProduto = Pick<ProdutoVitrine, 'preco_pyg' | 'preco_promocional_pyg'>
+
+/** Promo vale quando existe e é menor que o preço cheio. */
+function promoValida(p: PrecosProduto): boolean {
+  return (
+    p.preco_promocional_pyg != null &&
+    p.preco_pyg != null &&
+    Number(p.preco_promocional_pyg) < Number(p.preco_pyg)
+  )
+}
+
+/** Preço que o comprador PAGA (promocional quando válido). */
+export function precoVenda(p: PrecosProduto): number | null {
   if (p.preco_pyg == null) return null
-  return { texto: formatarPreco(Number(p.preco_pyg)) }
+  return promoValida(p) ? Number(p.preco_promocional_pyg) : Number(p.preco_pyg)
+}
+
+/**
+ * Preço de exibição: texto do preço de venda + (quando em promoção) o preço
+ * antigo riscado e o % de desconto pro badge.
+ */
+export function precoExibicao(p: PrecosProduto): {
+  texto: string
+  textoAntigo: string | null
+  descontoPct: number | null
+} | null {
+  const venda = precoVenda(p)
+  if (venda == null) return null
+  if (!promoValida(p)) {
+    return { texto: formatarPreco(venda), textoAntigo: null, descontoPct: null }
+  }
+  const cheio = Number(p.preco_pyg)
+  return {
+    texto: formatarPreco(venda),
+    textoAntigo: formatarPreco(cheio),
+    descontoPct: Math.round((1 - venda / cheio) * 100),
+  }
 }
 
 export function estoqueDisponivel(
@@ -27,14 +58,19 @@ export function estoqueDisponivel(
   return Math.max(0, (p.estoque ?? 0) - (p.estoque_reservado ?? 0))
 }
 
-/** Preço unitário (Gs.) de um item do carrinho. */
-export function precoDoItem(item: { precoPyg: number | null }): number | null {
-  return item.precoPyg != null ? Number(item.precoPyg) : null
+type ItemPrecos = { precoPyg: number | null; precoPromocionalPyg: number | null }
+
+/** Preço unitário (Gs.) cobrado por um item do carrinho (promo quando válida). */
+export function precoDoItem(item: ItemPrecos): number | null {
+  return precoVenda({
+    preco_pyg: item.precoPyg,
+    preco_promocional_pyg: item.precoPromocionalPyg,
+  })
 }
 
 /** Subtotal (Gs.) de uma lista de itens do carrinho. */
 export function subtotalItens(
-  itens: { precoPyg: number | null; quantidade: number }[],
+  itens: (ItemPrecos & { quantidade: number })[],
 ): number {
   return itens.reduce((soma, i) => {
     const p = precoDoItem(i)

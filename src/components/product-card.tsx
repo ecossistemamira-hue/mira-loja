@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 
+import { StarRating } from '@/components/star-rating'
 import { WishlistButton } from '@/components/wishlist-button'
 import { cn } from '@/lib/cn'
 import { estoqueDisponivel, precoExibicao } from '@/lib/format'
@@ -11,9 +12,11 @@ type Props = {
   produto: ProdutoVitrine
   /** Largura fixa pra uso em carrossel horizontal (w-52 shrink-0). */
   compacto?: boolean
+  /** Média/total de avaliações (batch da página via listarMediasAvaliacoes). */
+  avaliacao?: { media: number; total: number } | null
 }
 
-export async function ProductCard({ produto, compacto = false }: Props) {
+export async function ProductCard({ produto, compacto = false, avaliacao }: Props) {
   const t = await getTranslations('produto')
   const preco = precoExibicao(produto)
   const disponivel = estoqueDisponivel(produto)
@@ -44,10 +47,16 @@ export async function ProductCard({ produto, compacto = false }: Props) {
           <span className="text-4xl">📦</span>
         )}
 
-        {semEstoque && (
+        {semEstoque ? (
           <span className="absolute left-2.5 top-2.5 rounded-full bg-gray-900/80 px-2 py-0.5 text-[10px] font-bold text-white">
             {t('sem_estoque')}
           </span>
+        ) : (
+          preco?.descontoPct != null && (
+            <span className="absolute left-2.5 top-2.5 rounded-full bg-marca px-2 py-0.5 text-[10.5px] font-black text-white">
+              -{preco.descontoPct}%
+            </span>
+          )
         )}
 
         <WishlistButton
@@ -73,11 +82,27 @@ export async function ProductCard({ produto, compacto = false }: Props) {
         <h3 className="line-clamp-2 text-[13px] font-semibold leading-snug text-gray-800">
           {produto.nome}
         </h3>
+
+        {avaliacao && avaliacao.total > 0 && (
+          <span className="flex items-center gap-1 text-[11px] text-gray-500">
+            <StarRating nota={avaliacao.media} tamanho={11} />
+            <span className="font-semibold text-gray-600">{avaliacao.media}</span>
+            <span>({avaliacao.total})</span>
+          </span>
+        )}
+
         <div className="mt-auto pt-1.5">
           {preco ? (
-            <span className="font-display text-[17px] font-black text-marca">
-              {preco.texto}
-            </span>
+            <>
+              {preco.textoAntigo && (
+                <span className="block text-[11.5px] text-gray-400 line-through">
+                  {preco.textoAntigo}
+                </span>
+              )}
+              <span className="font-display text-[17px] font-black text-marca">
+                {preco.texto}
+              </span>
+            </>
           ) : (
             <span className="text-[12px] text-gray-400">{t('sem_preco')}</span>
           )}
