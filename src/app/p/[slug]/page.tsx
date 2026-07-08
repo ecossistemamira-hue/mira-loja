@@ -216,15 +216,11 @@ export default async function ProdutoPage({ params }: Props) {
             ) : (
               <span className="text-lg text-gray-400">{t('sem_preco')}</span>
             )}
-            <div className="mt-1.5 text-[13px] font-semibold">
-              {semEstoque ? (
+            {semEstoque && (
+              <div className="mt-1.5 text-[13px] font-semibold">
                 <span className="text-red-600">{t('sem_estoque')}</span>
-              ) : (
-                <span className="text-emerald-600">
-                  {t('em_estoque')} · {t('unidades_disponiveis', { n: disponivel })}
-                </span>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Entrega */}
