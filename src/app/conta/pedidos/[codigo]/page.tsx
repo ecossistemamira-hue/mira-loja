@@ -71,7 +71,7 @@ export default async function PedidoContaPage({ params }: Props) {
         .maybeSingle(),
     ])
 
-  const moeda = pedido.moeda === 'BRL' ? ('BRL' as const) : ('PYG' as const)
+  const moeda = pedido.moeda === 'USD' ? ('USD' as const) : ('PYG' as const)
   const endereco = pedido.endereco_entrega as Record<string, string> | null
   const tStatus = await getTranslations('conta.status')
 

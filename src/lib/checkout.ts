@@ -8,14 +8,14 @@ import {
   emailPedidoRecebido,
 } from '@/lib/email'
 import { moedaDoGrupo, precoNaMoeda } from '@/lib/format'
-import { calcularFrete } from '@/lib/frete'
+import { calcularFrete, type ZonaEntrega } from '@/lib/frete'
 import { createServiceClient } from '@/lib/supabase'
 
 export type PedidoCriado = {
   id: string
   codigo: string
   total: number
-  moeda: 'BRL' | 'PYG'
+  moeda: 'PYG' | 'USD'
   franquia: string | null
 }
 
@@ -146,7 +146,9 @@ export async function criarPedidosDoCarrinho(
   // ── Fase 3: um pedido por franquia ────────────────────────────────────────
   const expiraEm = new Date(Date.now() + TTL_MINUTOS * 60_000).toISOString()
   const enderecoSnapshot =
-    dados.metodoEntrega === 'envio' && dados.endereco ? dados.endereco : null
+    dados.metodoEntrega === 'envio' && dados.endereco
+      ? { ...dados.endereco, zona_entrega: dados.zonaEntrega ?? null }
+      : null
   const criados: PedidoCriado[] = []
 
   for (const grupo of grupos) {
@@ -157,12 +159,12 @@ export async function criarPedidosDoCarrinho(
       return s + (p != null ? p * i.quantidade : 0)
     }, 0)
 
-    // Frete recalculado AQUI (nunca confiar em valor vindo do cliente): tabela
-    // própria por zona/peso até o gateway real (Melhor Envio) entrar.
+    // Frete recalculado AQUI (nunca confiar em valor vindo do cliente): zona
+    // de entrega PY + peso, pela tabela própria da loja.
     let frete = 0
-    if (dados.metodoEntrega === 'envio' && dados.endereco) {
-      const opcoes = calcularFrete({
-        cep: dados.endereco.cep,
+    if (dados.metodoEntrega === 'envio' && dados.zonaEntrega) {
+      const opcao = calcularFrete({
+        zona: dados.zonaEntrega as ZonaEntrega,
         itens: grupo.itens.map((i) => ({
           pesoGramas: i.pesoGramas,
           alturaCm: i.alturaCm,
@@ -173,10 +175,7 @@ export async function criarPedidosDoCarrinho(
         moeda,
         subtotal,
       })
-      const escolhida = opcoes?.find(
-        (o) => o.servico === (dados.servicoFrete ?? 'economico'),
-      )
-      frete = escolhida?.valor ?? 0
+      frete = opcao.valor
     }
 
     const { data: codigo } = await svc.rpc('gerar_codigo_pedido', {
@@ -320,7 +319,7 @@ export async function aprovarPagamento(
     origem: dados.origem ?? 'webhook',
   })
 
-  const moeda = pedido.moeda === 'BRL' ? 'BRL' : 'PYG'
+  const moeda = pedido.moeda === 'USD' ? 'USD' : 'PYG'
   await emailPagamentoConfirmado(pedido.comprador_email, pedido.comprador_nome, {
     codigo: pedido.codigo,
     total: Number(pedido.total),

@@ -8,8 +8,9 @@ export type ProdutoVitrine = {
   slug: string | null
   descricao: string | null
   categoria: string | null
-  preco_brl: number | null
+  // Marketplace PY: guarani + dólar (preco_brl é legado, a loja não lê).
   preco_pyg: number | null
+  preco_usd: number | null
   imagem_url: string | null
   estoque: number
   estoque_reservado: number
@@ -57,7 +58,7 @@ export type ItemCarrinho = {
   slug: string | null
   imagemUrl: string | null
   precoPyg: number | null
-  precoBrl: number | null
+  precoUsd: number | null
   disponivel: number
   quantidade: number
   // Dados de frete (peso real + dimensões pro cubado).

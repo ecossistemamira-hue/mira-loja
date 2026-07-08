@@ -5,7 +5,11 @@ import { getTranslations } from 'next-intl/server'
 
 import { CartItemRow } from '@/components/cart-item-row'
 import { obterCarrinho } from '@/lib/cart-queries'
-import { formatarPreco } from '@/lib/format'
+import {
+  formatarPreco,
+  moedaDoGrupo as moedaDosItens,
+  precoNaMoeda,
+} from '@/lib/format'
 import type { GrupoCarrinho } from '@/lib/types'
 
 export const metadata: Metadata = {
@@ -16,22 +20,14 @@ export const metadata: Metadata = {
 // Carrinho depende do cookie do usuário — sempre dinâmico.
 export const dynamic = 'force-dynamic'
 
-// Moeda do grupo = a da franquia, mas cai pra moeda que os itens realmente têm
-// preço (evita subtotal R$ 0,00 quando o produto só foi precificado na outra).
-function moedaDoGrupo(grupo: GrupoCarrinho): 'BRL' | 'PYG' {
-  const preferida: 'BRL' | 'PYG' =
-    grupo.franquia?.moeda === 'BRL' ? 'BRL' : 'PYG'
-  const temPreco = (m: 'BRL' | 'PYG') =>
-    grupo.itens.some((i) => (m === 'BRL' ? i.precoBrl : i.precoPyg) != null)
-  if (temPreco(preferida)) return preferida
-  const outra: 'BRL' | 'PYG' = preferida === 'BRL' ? 'PYG' : 'BRL'
-  return temPreco(outra) ? outra : preferida
+function moedaDoGrupo(grupo: GrupoCarrinho): 'PYG' | 'USD' {
+  return moedaDosItens(grupo.itens, grupo.franquia?.moeda)
 }
 
-function subtotalGrupo(grupo: GrupoCarrinho, moeda: 'BRL' | 'PYG'): number {
+function subtotalGrupo(grupo: GrupoCarrinho, moeda: 'PYG' | 'USD'): number {
   return grupo.itens.reduce((soma, i) => {
-    const preco = moeda === 'PYG' ? i.precoPyg : i.precoBrl
-    return soma + (preco != null ? Number(preco) * i.quantidade : 0)
+    const preco = precoNaMoeda(i, moeda)
+    return soma + (preco != null ? preco * i.quantidade : 0)
   }, 0)
 }
 

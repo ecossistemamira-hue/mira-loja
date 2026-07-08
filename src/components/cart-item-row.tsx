@@ -15,12 +15,12 @@ export function CartItemRow({
   moeda,
 }: {
   item: ItemCarrinho
-  moeda: 'BRL' | 'PYG'
+  moeda: 'PYG' | 'USD'
 }) {
   const router = useRouter()
   const [pending, start] = useTransition()
 
-  const preco = moeda === 'PYG' ? item.precoPyg : item.precoBrl
+  const preco = moeda === 'PYG' ? item.precoPyg : item.precoUsd
   const subtotal = preco != null ? Number(preco) * item.quantidade : null
   const noLimite = item.quantidade >= item.disponivel
 

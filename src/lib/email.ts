@@ -22,7 +22,7 @@ function obterCliente(): Resend | null {
 const FROM =
   process.env.RESEND_FROM_EMAIL || 'Ofertas Paraguai <no-reply@mirafranquicia.com>'
 
-type Moeda = 'BRL' | 'PYG'
+type Moeda = 'PYG' | 'USD'
 
 async function enviar(to: string, subject: string, html: string) {
   const resend = obterCliente()

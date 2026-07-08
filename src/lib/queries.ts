@@ -8,7 +8,7 @@ import type {
 } from '@/lib/types'
 
 const COLUNAS_VITRINE =
-  'id, nome, slug, descricao, categoria, preco_brl, preco_pyg, imagem_url, estoque, estoque_reservado, permite_envio, permite_retirada, created_at'
+  'id, nome, slug, descricao, categoria, preco_pyg, preco_usd, imagem_url, estoque, estoque_reservado, permite_envio, permite_retirada, created_at'
 
 type ListarParams = {
   busca?: string

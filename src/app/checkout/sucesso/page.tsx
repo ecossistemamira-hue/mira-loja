@@ -45,7 +45,7 @@ export default async function SucessoPage({ searchParams }: Props) {
 
       <div className="mt-8 flex flex-col gap-3">
         {pedidos.map((p) => {
-          const moeda = p.moeda === 'BRL' ? 'BRL' : 'PYG'
+          const moeda = p.moeda === 'USD' ? 'USD' : 'PYG'
           const pago = p.status === 'pago'
           return (
             <div
