@@ -1,9 +1,7 @@
 import { z } from 'zod'
 
-import { ZONAS_ENTREGA } from '@/lib/frete'
-
-// Endereço paraguaio: sem CEP obrigatório (código postal quase não se usa);
-// referência é o campo que os deliveries pedem.
+// Endereço paraguaio: sem CEP (não se usa por lá); referência é o campo que
+// as entregas pedem. Cidade/departamento vêm do seletor de cidades da AEX.
 export const EnderecoSchema = z.object({
   logradouro: z.string().min(1).max(200), // dirección
   numero: z.string().max(20).optional().or(z.literal('')),
@@ -22,17 +20,17 @@ export const CheckoutSchema = z
     telefone: z.string().max(30).optional().or(z.literal('')),
     documento: z.string().max(30).optional().or(z.literal('')),
     metodoEntrega: z.enum(['envio', 'retirada']),
-    // Zona de entrega PY (define forma + preço); o valor é recalculado no servidor.
-    zonaEntrega: z.enum(ZONAS_ENTREGA as [string, ...string[]]).optional(),
+    // Cidade da tabela AEX (id); o frete é recalculado no servidor por ela.
+    cidadeEntregaId: z.number().int().positive().optional(),
     endereco: EnderecoSchema.optional(),
   })
   .refine((d) => d.metodoEntrega !== 'envio' || !!d.endereco, {
     message: 'Endereço é obrigatório para envio',
     path: ['endereco'],
   })
-  .refine((d) => d.metodoEntrega !== 'envio' || !!d.zonaEntrega, {
-    message: 'Escolha a zona de entrega',
-    path: ['zonaEntrega'],
+  .refine((d) => d.metodoEntrega !== 'envio' || d.cidadeEntregaId != null, {
+    message: 'Escolha a cidade de entrega',
+    path: ['cidadeEntregaId'],
   })
 
 export type CheckoutInput = z.infer<typeof CheckoutSchema>

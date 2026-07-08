@@ -1,25 +1,19 @@
 'use client'
 
-import { Bike, Bus, Loader2, Store, Truck } from 'lucide-react'
+import { Loader2, Store, Truck } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { useState, useTransition } from 'react'
+import { useMemo, useState, useTransition } from 'react'
 
 import { finalizarCheckout } from '@/app/checkout/checkout-actions'
 import { cotarFreteCarrinho, type FreteCarrinhoResultado } from '@/app/frete-actions'
 import { CheckoutSchema } from '@/lib/checkout-schema'
 import { cn } from '@/lib/cn'
 import { formatarPreco } from '@/lib/format'
-import { ZONAS_ENTREGA, type ZonaEntrega } from '@/lib/frete'
+import { cidadesPorDepartamento, obterCidade } from '@/lib/frete'
 
 type Metodo = 'envio' | 'retirada'
 type GruposFrete = Extract<FreteCarrinhoResultado, { ok: true }>['grupos']
-
-const ICONE_ZONA: Record<ZonaEntrega, typeof Truck> = {
-  cde: Bike,
-  asuncion: Truck,
-  interior: Bus,
-}
 
 export type CheckoutDefaults = {
   nome?: string
@@ -39,21 +33,24 @@ export function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults }) {
   const [telefone, setTelefone] = useState(defaults?.telefone ?? '')
   const [documento, setDocumento] = useState(defaults?.documento ?? '')
   const [metodo, setMetodo] = useState<Metodo>('envio')
-  const [zona, setZona] = useState<ZonaEntrega | null>(null)
+  const [cidadeId, setCidadeId] = useState<number | ''>('')
   const [gruposFrete, setGruposFrete] = useState<GruposFrete | null>(null)
   const [cotando, setCotando] = useState(false)
   const [logradouro, setLogradouro] = useState('')
   const [numero, setNumero] = useState('')
   const [referencia, setReferencia] = useState('')
   const [bairro, setBairro] = useState('')
-  const [cidade, setCidade] = useState('')
-  const [departamento, setDepartamento] = useState('')
 
-  // Cota o frete da zona escolhida (o valor final é recalculado no servidor).
-  const escolherZona = (z: ZonaEntrega) => {
-    setZona(z)
+  const grupos = useMemo(() => cidadesPorDepartamento(), [])
+  const cidadeSelecionada = cidadeId === '' ? null : obterCidade(cidadeId)
+
+  // Cota o frete do carrinho pra cidade escolhida (recalculado no servidor).
+  const escolherCidade = (id: number | '') => {
+    setCidadeId(id)
+    setGruposFrete(null)
+    if (id === '') return
     setCotando(true)
-    void cotarFreteCarrinho(z).then((r) => {
+    void cotarFreteCarrinho(id).then((r) => {
       setCotando(false)
       setGruposFrete(r.ok ? r.grupos : null)
     })
@@ -67,7 +64,7 @@ export function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults }) {
       telefone,
       documento,
       metodoEntrega: metodo,
-      zonaEntrega: zona ?? undefined,
+      cidadeEntregaId: cidadeId === '' ? undefined : cidadeId,
       endereco:
         metodo === 'envio'
           ? {
@@ -75,8 +72,8 @@ export function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults }) {
               numero,
               complemento: referencia,
               bairro,
-              cidade,
-              estado: departamento,
+              cidade: cidadeSelecionada?.cidade ?? '',
+              estado: cidadeSelecionada?.departamento ?? '',
               pais: 'PY',
             }
           : undefined,
@@ -93,6 +90,8 @@ export function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults }) {
           setErro(t('erro_sem_estoque', { produto: r.error.split(':')[1] ?? '' }))
         } else if (r.error === 'carrinho_vazio') {
           setErro(t('erro_carrinho_vazio'))
+        } else if (r.error === 'frete:peso_excede') {
+          setErro(t('erro_frete_peso'))
         } else {
           setErro(t('erro_generico'))
         }
@@ -136,74 +135,67 @@ export function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults }) {
 
         {metodo === 'envio' ? (
           <>
-            {/* Zona de entrega (define forma + preço, padrão PY: sem CEP) */}
-            <p className="mb-2 text-[12.5px] font-semibold text-gray-700">
-              {t('zona_titulo')}
-            </p>
-            <div className="mb-4 flex flex-col gap-2">
-              {ZONAS_ENTREGA.map((z) => {
-                const Icone = ICONE_ZONA[z]
-                const cotacao =
-                  zona === z && gruposFrete
-                    ? gruposFrete.map((g, i) => (
+            {/* Cidade de destino (tabela AEX) */}
+            <label className="mb-4 flex flex-col gap-1">
+              <span className="text-[12.5px] font-semibold text-gray-700">
+                {t('cidade_entrega')}
+              </span>
+              <select
+                value={cidadeId}
+                onChange={(e) =>
+                  escolherCidade(e.target.value === '' ? '' : Number(e.target.value))
+                }
+                className="h-10 rounded-lg border border-gray-300 bg-white px-3 text-[14px] outline-none focus:border-marca/40"
+              >
+                <option value="">{t('cidade_placeholder')}</option>
+                {grupos.map((g) => (
+                  <optgroup key={g.departamento} label={g.departamento}>
+                    {g.cidades.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.cidade}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </label>
+
+            {/* Cotação AEX da cidade escolhida */}
+            {cidadeId !== '' && (
+              <div className="mb-4 flex items-center justify-between rounded-lg bg-gray-50 px-4 py-2.5 text-[13px]">
+                <span className="min-w-0">
+                  <span className="block font-semibold text-gray-800">
+                    {t('frete_servico_aex')}
+                  </span>
+                  <span className="block text-[12px] text-gray-500">
+                    {t('frete_fonte')}
+                  </span>
+                </span>
+                <span className="shrink-0 font-bold">
+                  {cotando ? (
+                    <Loader2 className="size-4 animate-spin text-gray-400" />
+                  ) : (
+                    gruposFrete?.map((g, i) =>
+                      g.cotacao.ok ? (
                         <span key={i} className="ml-2">
-                          {g.opcao.gratis ? (
-                            <span className="text-emerald-600">
-                              {t('frete_gratis')}
-                            </span>
-                          ) : (
-                            formatarPreco(g.opcao.valor)
-                          )}
+                          {formatarPreco(g.cotacao.valor)}
                         </span>
-                      ))
-                    : null
-                return (
-                  <label
-                    key={z}
-                    className={cn(
-                      'flex cursor-pointer items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-[13px] transition-colors',
-                      zona === z
-                        ? 'border-marca bg-marca-50'
-                        : 'border-gray-300 hover:border-gray-400',
-                    )}
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <input
-                        type="radio"
-                        name="zona-entrega"
-                        checked={zona === z}
-                        onChange={() => escolherZona(z)}
-                        className="accent-[#a02237]"
-                      />
-                      <Icone className="size-4 text-gray-400" />
-                      <span>
-                        <span className="block font-semibold">
-                          {t(`zona_${z}`)}
-                        </span>
-                        <span className="block text-[12px] text-gray-500">
-                          {t(`zona_${z}_detalhe`)}
-                        </span>
-                      </span>
-                    </span>
-                    <span className="shrink-0 font-bold">
-                      {zona === z && cotando ? (
-                        <Loader2 className="size-4 animate-spin text-gray-400" />
                       ) : (
-                        cotacao
-                      )}
-                    </span>
-                  </label>
-                )
-              })}
-            </div>
+                        <span key={i} className="ml-2 text-[12px] font-medium text-amber-700">
+                          {t('erro_frete_peso')}
+                        </span>
+                      ),
+                    )
+                  )}
+                </span>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-6">
               <Campo label={t('logradouro')} value={logradouro} onChange={setLogradouro} className="sm:col-span-4" />
               <Campo label={t('numero')} value={numero} onChange={setNumero} className="sm:col-span-2" />
-              <Campo label={t('referencia')} value={referencia} onChange={setReferencia} className="sm:col-span-6" />
+              <Campo label={t('referencia')} value={referencia} onChange={setReferencia} className="sm:col-span-4" />
               <Campo label={t('bairro')} value={bairro} onChange={setBairro} className="sm:col-span-2" />
-              <Campo label={t('cidade')} value={cidade} onChange={setCidade} className="sm:col-span-2" />
-              <Campo label={t('departamento')} value={departamento} onChange={setDepartamento} className="sm:col-span-2" />
             </div>
           </>
         ) : (

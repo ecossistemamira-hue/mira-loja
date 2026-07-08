@@ -1,32 +1,16 @@
-// Entrega da loja — 100% Paraguai, preços SÓ em guarani (moeda oficial; o
-// user decidiu 2026-07-08 vender numa moeda única). Sem CEP (não se usa por
-// lá): o comprador escolhe a ZONA e cada zona tem a forma de entrega que o
-// mercado paraguaio já pratica:
-//   - cde:      delivery próprio (moto) em Ciudad del Este e Alto Paraná
-//   - asuncion: courier (tipo AEX) pra Asunción e Gran Asunción
-//   - interior: encomienda — retira na terminal de ônibus mais próxima
-// Peso taxável = max(peso real, peso cubado A×L×C/6000), mínimo 1 kg.
-// Envio grátis acima do teto.
+// Frete da loja: cotação REAL pela tabela oficial da AEX (courier líder do
+// Paraguai, representante FedEx), origem Ciudad del Este. O comprador escolhe
+// a CIDADE de destino — é assim que o próprio cotizador da AEX funciona (lá
+// não se usa CEP). Dados em `frete-aex-tabela.ts` (fonte + data lá).
+// Preços em guarani; pedidos sempre PYG.
 
-export type ZonaEntrega = 'cde' | 'asuncion' | 'interior'
-export const ZONAS_ENTREGA: ZonaEntrega[] = ['cde', 'asuncion', 'interior']
+// Import relativo de propósito: o vitest não resolve o alias @/.
+import { CIDADES_AEX, type CidadeAex } from './frete-aex-tabela'
 
-/** Forma de entrega usada em cada zona. */
-export type ServicoEntrega = 'delivery' | 'courier' | 'encomienda'
+export { CIDADES_AEX, type CidadeAex }
 
-export const SERVICO_DA_ZONA: Record<ZonaEntrega, ServicoEntrega> = {
-  cde: 'delivery',
-  asuncion: 'courier',
-  interior: 'encomienda',
-}
-
-export type OpcaoFrete = {
-  zona: ZonaEntrega
-  servico: ServicoEntrega
-  valor: number
-  prazoDias: { min: number; max: number }
-  gratis: boolean
-}
+/** Faixas de peso ("cajas") da AEX, em kg. Acima da última = sob consulta. */
+export const CAIXAS_KG = [3, 10, 20, 30] as const
 
 export type ItemFrete = {
   pesoGramas: number | null
@@ -36,26 +20,21 @@ export type ItemFrete = {
   quantidade: number
 }
 
+export type CotacaoFrete =
+  | {
+      ok: true
+      cidade: CidadeAex
+      valor: number
+      /** Índice da caixa (0-3) usada na cotação. */
+      caixa: number
+      pesoKg: number
+    }
+  | { ok: false; error: 'cidade_invalida' | 'peso_excede' }
+
 // Peso assumido quando o produto não tem peso cadastrado.
 const PESO_PADRAO_GRAMAS = 500
 
-// Envio grátis a partir deste subtotal (Gs.).
-export const FRETE_GRATIS_MINIMO = 700_000
-
-// base + porKg (peso taxável arredondado pra cima), em guarani.
-const TABELA: Record<ZonaEntrega, { base: number; porKg: number }> = {
-  cde: { base: 20_000, porKg: 2_000 },
-  asuncion: { base: 40_000, porKg: 4_000 },
-  interior: { base: 35_000, porKg: 3_000 },
-}
-
-const PRAZOS: Record<ZonaEntrega, { min: number; max: number }> = {
-  cde: { min: 1, max: 1 }, // delivery no dia/24h
-  asuncion: { min: 1, max: 3 },
-  interior: { min: 2, max: 5 },
-}
-
-/** Peso taxável em kg (inteiro, mínimo 1): max(real, cubado A×L×C/6000). */
+/** Peso taxável em kg: max(peso real, peso cubado A×L×C/6000) somado. */
 export function pesoTaxavelKg(itens: ItemFrete[]): number {
   let gramas = 0
   for (const it of itens) {
@@ -68,33 +47,44 @@ export function pesoTaxavelKg(itens: ItemFrete[]): number {
         : 0
     gramas += Math.max(real, cubado) * it.quantidade
   }
-  return Math.max(1, Math.ceil(gramas / 1000))
+  return Math.max(0.1, gramas / 1000)
 }
 
-/** Frete de UMA zona, em guarani. `subtotal` decide o envio grátis. */
-export function calcularFrete(params: {
-  zona: ZonaEntrega
-  itens: ItemFrete[]
-  subtotal: number
-}): OpcaoFrete {
-  const { base, porKg } = TABELA[params.zona]
-  const kg = pesoTaxavelKg(params.itens)
-  const valor = base + porKg * kg
-  const gratis = params.subtotal >= FRETE_GRATIS_MINIMO
+/** Índice da caixa AEX pro peso, ou null se passa de 30 kg (sob consulta). */
+export function caixaDoPeso(pesoKg: number): number | null {
+  const i = CAIXAS_KG.findIndex((max) => pesoKg <= max)
+  return i === -1 ? null : i
+}
 
-  return {
-    zona: params.zona,
-    servico: SERVICO_DA_ZONA[params.zona],
-    valor: gratis ? 0 : valor,
-    prazoDias: PRAZOS[params.zona],
-    gratis,
+export function obterCidade(cidadeId: number): CidadeAex | null {
+  return CIDADES_AEX.find((c) => c.id === cidadeId) ?? null
+}
+
+/** Cotação AEX: cidade de destino + itens → preço real da tabela. */
+export function cotarFrete(cidadeId: number, itens: ItemFrete[]): CotacaoFrete {
+  const cidade = obterCidade(cidadeId)
+  if (!cidade) return { ok: false, error: 'cidade_invalida' }
+
+  const pesoKg = pesoTaxavelKg(itens)
+  const caixa = caixaDoPeso(pesoKg)
+  if (caixa == null) return { ok: false, error: 'peso_excede' }
+
+  return { ok: true, cidade, valor: cidade.precos[caixa], caixa, pesoKg }
+}
+
+/** Cidades agrupadas por departamento (pros selects), em ordem alfabética. */
+export function cidadesPorDepartamento(): {
+  departamento: string
+  cidades: CidadeAex[]
+}[] {
+  const grupos = new Map<string, CidadeAex[]>()
+  for (const c of CIDADES_AEX) {
+    const lista = grupos.get(c.departamento) ?? []
+    lista.push(c)
+    grupos.set(c.departamento, lista)
   }
-}
-
-/** Frete das 3 zonas de uma vez (tabela da página do produto). */
-export function cotarTodasZonas(params: {
-  itens: ItemFrete[]
-  subtotal: number
-}): OpcaoFrete[] {
-  return ZONAS_ENTREGA.map((zona) => calcularFrete({ ...params, zona }))
+  return [...grupos.entries()].map(([departamento, cidades]) => ({
+    departamento,
+    cidades,
+  }))
 }

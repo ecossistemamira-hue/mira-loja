@@ -7,7 +7,7 @@ import { getTranslations } from 'next-intl/server'
 import { AddToCartButton } from '@/components/add-to-cart-button'
 import { AvaliacoesSection } from '@/components/avaliacoes-section'
 import { CategoryCarousel } from '@/components/category-carousel'
-import { FreteZonas } from '@/components/frete-zonas'
+import { FreteAex } from '@/components/frete-aex'
 import { ProductCard } from '@/components/product-card'
 import { ProductGallery } from '@/components/product-gallery'
 import { ShareButtons } from '@/components/share-buttons'
@@ -243,9 +243,9 @@ export default async function ProdutoPage({ params }: Props) {
             )}
           </div>
 
-          {/* Formas de entrega no Paraguai (sem CEP) */}
+          {/* Cotação AEX por cidade de destino (PY não usa CEP) */}
           {produto.permite_envio && (
-            <FreteZonas
+            <FreteAex
               item={{
                 pesoGramas: produto.peso_gramas,
                 alturaCm: produto.altura_cm,
@@ -253,7 +253,6 @@ export default async function ProdutoPage({ params }: Props) {
                 comprimentoCm: produto.comprimento_cm,
                 quantidade: 1,
               }}
-              subtotal={Number(produto.preco_pyg ?? 0)}
             />
           )}
 
@@ -285,6 +284,7 @@ export default async function ProdutoPage({ params }: Props) {
               </span>
             </div>
           )}
+
 
           {/* Ação principal: adicionar ao carrinho (Fase 2) */}
           {!semEstoque && (

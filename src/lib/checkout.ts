@@ -8,7 +8,7 @@ import {
   emailPedidoRecebido,
 } from '@/lib/email'
 import { precoDoItem, subtotalItens } from '@/lib/format'
-import { calcularFrete, type ZonaEntrega } from '@/lib/frete'
+import { cotarFrete } from '@/lib/frete'
 import { createServiceClient } from '@/lib/supabase'
 
 export type PedidoCriado = {
@@ -147,7 +147,7 @@ export async function criarPedidosDoCarrinho(
   const expiraEm = new Date(Date.now() + TTL_MINUTOS * 60_000).toISOString()
   const enderecoSnapshot =
     dados.metodoEntrega === 'envio' && dados.endereco
-      ? { ...dados.endereco, zona_entrega: dados.zonaEntrega ?? null }
+      ? { ...dados.endereco, cidade_aex_id: dados.cidadeEntregaId ?? null }
       : null
   const criados: PedidoCriado[] = []
 
@@ -156,22 +156,25 @@ export async function criarPedidosDoCarrinho(
     const franquiaId = grupo.itens[0]?.franquiaId
     const subtotal = subtotalItens(grupo.itens)
 
-    // Frete recalculado AQUI (nunca confiar em valor vindo do cliente): zona
-    // de entrega PY + peso, pela tabela própria da loja.
+    // Frete recalculado AQUI (nunca confiar em valor vindo do cliente):
+    // tabela oficial da AEX pela cidade de destino + peso.
     let frete = 0
-    if (dados.metodoEntrega === 'envio' && dados.zonaEntrega) {
-      const opcao = calcularFrete({
-        zona: dados.zonaEntrega as ZonaEntrega,
-        itens: grupo.itens.map((i) => ({
+    if (dados.metodoEntrega === 'envio' && dados.cidadeEntregaId != null) {
+      const cotacao = cotarFrete(
+        dados.cidadeEntregaId,
+        grupo.itens.map((i) => ({
           pesoGramas: i.pesoGramas,
           alturaCm: i.alturaCm,
           larguraCm: i.larguraCm,
           comprimentoCm: i.comprimentoCm,
           quantidade: i.quantidade,
         })),
-        subtotal,
-      })
-      frete = opcao.valor
+      )
+      if (!cotacao.ok) {
+        await liberarReservas(svc, reservas)
+        return { ok: false, error: `frete:${cotacao.error}` }
+      }
+      frete = cotacao.valor
     }
 
     const { data: codigo } = await svc.rpc('gerar_codigo_pedido', {
