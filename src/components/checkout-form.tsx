@@ -6,10 +6,14 @@ import { useTranslations } from 'next-intl'
 import { useState, useTransition } from 'react'
 
 import { finalizarCheckout } from '@/app/checkout/checkout-actions'
+import { cotarFreteCarrinho, type FreteCarrinhoResultado } from '@/app/frete-actions'
 import { CheckoutSchema } from '@/lib/checkout-schema'
 import { cn } from '@/lib/cn'
+import { formatarPreco } from '@/lib/format'
+import type { ServicoFrete } from '@/lib/frete'
 
 type Metodo = 'envio' | 'retirada'
+type GruposFrete = Extract<FreteCarrinhoResultado, { ok: true }>['grupos']
 
 export type CheckoutDefaults = {
   nome?: string
@@ -30,6 +34,10 @@ export function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults }) {
   const [documento, setDocumento] = useState(defaults?.documento ?? '')
   const [metodo, setMetodo] = useState<Metodo>('envio')
   const [cep, setCep] = useState('')
+  const [servicoFrete, setServicoFrete] = useState<ServicoFrete>('economico')
+  const [gruposFrete, setGruposFrete] = useState<GruposFrete | null>(null)
+  const [cotando, setCotando] = useState(false)
+  const [erroFrete, setErroFrete] = useState(false)
   const [logradouro, setLogradouro] = useState('')
   const [numero, setNumero] = useState('')
   const [complemento, setComplemento] = useState('')
@@ -37,6 +45,21 @@ export function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults }) {
   const [cidade, setCidade] = useState('')
   const [estado, setEstado] = useState('')
   const [pais, setPais] = useState('PY')
+
+  // Cota o frete quando o comprador sai do campo de CEP (e ao trocar de CEP).
+  const cotarFrete = async (cepAtual: string) => {
+    if (cepAtual.replace(/\D/g, '').length < 4) return
+    setCotando(true)
+    setErroFrete(false)
+    const r = await cotarFreteCarrinho(cepAtual)
+    setCotando(false)
+    if (!r.ok) {
+      setGruposFrete(null)
+      setErroFrete(r.error === 'cep_invalido')
+      return
+    }
+    setGruposFrete(r.grupos)
+  }
 
   const enviar = () => {
     setErro(null)
@@ -46,6 +69,7 @@ export function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults }) {
       telefone,
       documento,
       metodoEntrega: metodo,
+      servicoFrete,
       endereco:
         metodo === 'envio'
           ? { cep, logradouro, numero, complemento, bairro, cidade, estado, pais }
@@ -105,16 +129,97 @@ export function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults }) {
         </div>
 
         {metodo === 'envio' ? (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-6">
-            <Campo label={t('cep')} value={cep} onChange={setCep} className="sm:col-span-2" />
-            <Campo label={t('logradouro')} value={logradouro} onChange={setLogradouro} className="sm:col-span-3" />
-            <Campo label={t('numero')} value={numero} onChange={setNumero} className="sm:col-span-1" />
-            <Campo label={t('complemento')} value={complemento} onChange={setComplemento} className="sm:col-span-2" />
-            <Campo label={t('bairro')} value={bairro} onChange={setBairro} className="sm:col-span-2" />
-            <Campo label={t('cidade')} value={cidade} onChange={setCidade} className="sm:col-span-2" />
-            <Campo label={t('estado')} value={estado} onChange={setEstado} className="sm:col-span-3" />
-            <Campo label={t('pais')} value={pais} onChange={setPais} className="sm:col-span-3" />
-          </div>
+          <>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-6">
+              <Campo
+                label={t('cep')}
+                value={cep}
+                onChange={setCep}
+                onBlur={() => void cotarFrete(cep)}
+                className="sm:col-span-2"
+              />
+              <Campo label={t('logradouro')} value={logradouro} onChange={setLogradouro} className="sm:col-span-3" />
+              <Campo label={t('numero')} value={numero} onChange={setNumero} className="sm:col-span-1" />
+              <Campo label={t('complemento')} value={complemento} onChange={setComplemento} className="sm:col-span-2" />
+              <Campo label={t('bairro')} value={bairro} onChange={setBairro} className="sm:col-span-2" />
+              <Campo label={t('cidade')} value={cidade} onChange={setCidade} className="sm:col-span-2" />
+              <Campo label={t('estado')} value={estado} onChange={setEstado} className="sm:col-span-3" />
+              <Campo label={t('pais')} value={pais} onChange={setPais} className="sm:col-span-3" />
+            </div>
+
+            {/* Cotação de frete */}
+            <div className="mt-4">
+              {cotando && (
+                <p className="inline-flex items-center gap-2 text-[13px] text-gray-500">
+                  <Loader2 className="size-3.5 animate-spin" />
+                  {t('frete_cotando')}
+                </p>
+              )}
+              {erroFrete && !cotando && (
+                <p className="text-[13px] font-medium text-red-600">
+                  {t('frete_cep_invalido')}
+                </p>
+              )}
+              {gruposFrete && !cotando && (
+                <div className="flex flex-col gap-2">
+                  <p className="text-[12.5px] font-semibold text-gray-700">
+                    {t('frete_escolha')}
+                  </p>
+                  {(['economico', 'expresso'] as const).map((servico) => {
+                    const linhas = gruposFrete.map((g) => {
+                      const op = g.opcoes.find((o) => o.servico === servico)
+                      return { g, op }
+                    })
+                    const prazo = linhas[0]?.op?.prazoDias
+                    return (
+                      <label
+                        key={servico}
+                        className={cn(
+                          'flex cursor-pointer items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-[13px] transition-colors',
+                          servicoFrete === servico
+                            ? 'border-marca bg-marca-50'
+                            : 'border-gray-300 hover:border-gray-400',
+                        )}
+                      >
+                        <span className="flex items-center gap-2.5">
+                          <input
+                            type="radio"
+                            name="servico-frete"
+                            checked={servicoFrete === servico}
+                            onChange={() => setServicoFrete(servico)}
+                            className="accent-[#a02237]"
+                          />
+                          <span className="font-semibold">
+                            {t(`frete_${servico}`)}
+                            {prazo && (
+                              <span className="ml-2 font-normal text-gray-500">
+                                {t('frete_prazo', { min: prazo.min, max: prazo.max })}
+                              </span>
+                            )}
+                          </span>
+                        </span>
+                        <span className="shrink-0 font-bold">
+                          {linhas.map(({ g, op }, i) =>
+                            op ? (
+                              <span key={i} className="ml-2">
+                                {op.gratis ? (
+                                  <span className="text-emerald-600">
+                                    {t('frete_gratis')}
+                                  </span>
+                                ) : (
+                                  formatarPreco(op.valor, g.moeda)
+                                )}
+                              </span>
+                            ) : null,
+                          )}
+                        </span>
+                      </label>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          </>
         ) : (
           <p className="text-[13px] text-gray-500">{t('retirada_dica')}</p>
         )}
@@ -145,12 +250,14 @@ function Campo({
   label,
   value,
   onChange,
+  onBlur,
   type = 'text',
   className,
 }: {
   label: string
   value: string
   onChange: (v: string) => void
+  onBlur?: () => void
   type?: string
   className?: string
 }) {
@@ -161,6 +268,7 @@ function Campo({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
         className="h-10 rounded-lg border border-gray-300 px-3 text-[14px] outline-none focus:border-marca/40"
       />
     </label>

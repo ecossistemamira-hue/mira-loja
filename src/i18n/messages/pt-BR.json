@@ -54,7 +54,17 @@
     "franquia_verificada": "Franquia verificada",
     "compartilhar": "Compartilhar",
     "copiar_link": "Copiar link",
-    "relacionados": "Mais desta categoria"
+    "relacionados": "Mais desta categoria",
+    "frete_titulo": "Calcular frete e prazo",
+    "frete_placeholder": "Seu CEP ou código postal",
+    "frete_calcular": "Calcular",
+    "frete_cep_invalido": "Não reconhecemos esse CEP/código postal.",
+    "frete_sem_envio": "Este produto é só retirada na franquia.",
+    "frete_economico": "Econômico",
+    "frete_expresso": "Expresso",
+    "frete_prazo": "{min}–{max} dias úteis",
+    "frete_gratis": "Grátis",
+    "n_avaliacoes": "{n, plural, one {# avaliação} other {# avaliações}}"
   },
   "busca": {
     "titulo": "Resultados",
@@ -123,7 +133,7 @@
     "resumo": "Resumo",
     "vendedor": "Vendedor",
     "subtotal": "Subtotal",
-    "frete_aviso": "O frete é calculado na próxima etapa (Fase 3).",
+    "frete_aviso": "O frete é somado ao total de cada pedido conforme a opção escolhida.",
     "finalizar": "Finalizar pedido",
     "pagamento_teste_aviso": "Pagamento de teste: por enquanto o pedido é criado sem cobrança real.",
     "erro_campos": "Revise os campos obrigatórios.",
@@ -138,7 +148,14 @@
     "status_pago": "Pago",
     "pagar_teste": "Simular pagamento aprovado",
     "voltar_loja": "Voltar à loja",
-    "ir_checkout": "Finalizar compra"
+    "ir_checkout": "Finalizar compra",
+    "frete_cotando": "Calculando frete…",
+    "frete_escolha": "Escolha o frete",
+    "frete_economico": "Econômico",
+    "frete_expresso": "Expresso",
+    "frete_prazo": "{min}–{max} dias úteis",
+    "frete_gratis": "Grátis",
+    "frete_cep_invalido": "Não reconhecemos esse CEP — confira o campo."
   },
   "favoritos": {
     "titulo": "Meus favoritos",
@@ -253,5 +270,29 @@
     "nao_achou": "Não achou sua resposta?",
     "nao_achou_dica": "Fala com a gente que ajudamos.",
     "falar_whatsapp": "Falar no WhatsApp"
+  },
+  "avaliacoes": {
+    "secao_titulo": "Avaliações de clientes",
+    "n_avaliacoes": "{n, plural, one {# avaliação} other {# avaliações}}",
+    "vazio": "Este produto ainda não tem avaliações. Seja o primeiro a avaliar!",
+    "compra_verificada": "Compra verificada",
+    "titulo_nova": "Avalie este produto",
+    "titulo_editar": "Editar sua avaliação",
+    "nota_aria": "{n} estrelas",
+    "nota_1": "Ruim",
+    "nota_2": "Regular",
+    "nota_3": "Bom",
+    "nota_4": "Muito bom",
+    "nota_5": "Excelente",
+    "titulo_placeholder": "Título (opcional)",
+    "comentario_placeholder": "Conte como foi sua experiência com o produto (opcional)",
+    "erro_nota": "Escolha uma nota de 1 a 5 estrelas.",
+    "erro_login": "Você precisa estar logado pra avaliar.",
+    "erro_generico": "Não foi possível enviar sua avaliação. Tente de novo.",
+    "sucesso": "Avaliação enviada. Obrigado!",
+    "enviar": "Enviar avaliação",
+    "atualizar": "Atualizar avaliação",
+    "login_convite": "Comprou este produto? Entre na sua conta pra deixar sua avaliação.",
+    "login_link": "Entrar"
   }
 }

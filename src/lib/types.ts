@@ -60,6 +60,11 @@ export type ItemCarrinho = {
   precoBrl: number | null
   disponivel: number
   quantidade: number
+  // Dados de frete (peso real + dimensões pro cubado).
+  pesoGramas: number | null
+  alturaCm: number | null
+  larguraCm: number | null
+  comprimentoCm: number | null
 }
 
 // Carrinho agrupado por franquia (um pedido por franquia no checkout — §2.3).

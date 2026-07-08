@@ -19,6 +19,8 @@ export const CheckoutSchema = z
     telefone: z.string().max(30).optional().or(z.literal('')),
     documento: z.string().max(30).optional().or(z.literal('')),
     metodoEntrega: z.enum(['envio', 'retirada']),
+    // Serviço escolhido na cotação; o valor em si é recalculado no servidor.
+    servicoFrete: z.enum(['economico', 'expresso']).default('economico'),
     endereco: EnderecoSchema.optional(),
   })
   .refine((d) => d.metodoEntrega !== 'envio' || !!d.endereco, {

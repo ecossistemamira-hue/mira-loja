@@ -5,11 +5,15 @@ import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 
 import { AddToCartButton } from '@/components/add-to-cart-button'
+import { AvaliacoesSection } from '@/components/avaliacoes-section'
 import { CategoryCarousel } from '@/components/category-carousel'
+import { FreteWidget } from '@/components/frete-widget'
 import { ProductCard } from '@/components/product-card'
 import { ProductGallery } from '@/components/product-gallery'
 import { ShareButtons } from '@/components/share-buttons'
+import { StarRating } from '@/components/star-rating'
 import { WishlistButton } from '@/components/wishlist-button'
+import { listarAvaliacoes } from '@/lib/avaliacoes'
 import { estoqueDisponivel, precoExibicao } from '@/lib/format'
 import { listarProdutosVitrine, obterProdutoPorSlug } from '@/lib/queries'
 
@@ -54,6 +58,7 @@ export default async function ProdutoPage({ params }: Props) {
   const disponivel = estoqueDisponivel(produto)
   const semEstoque = disponivel <= 0
   const imagem = produto.imagem_url ?? produto.fotos[0]?.url
+  const avaliacoes = await listarAvaliacoes(produto.id)
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -62,6 +67,14 @@ export default async function ProdutoPage({ params }: Props) {
     description: produto.descricao ?? undefined,
     image: imagem ? [imagem] : undefined,
     category: produto.categoria ?? undefined,
+    aggregateRating:
+      avaliacoes.total > 0
+        ? {
+            '@type': 'AggregateRating',
+            ratingValue: avaliacoes.media,
+            reviewCount: avaliacoes.total,
+          }
+        : undefined,
     offers: preco
       ? {
           '@type': 'Offer',
@@ -162,6 +175,17 @@ export default async function ProdutoPage({ params }: Props) {
             {produto.nome}
           </h1>
 
+          {avaliacoes.total > 0 && (
+            <a
+              href="#avaliacoes"
+              className="mt-1.5 inline-flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-marca"
+            >
+              <StarRating nota={avaliacoes.media} tamanho={14} />
+              <span className="font-semibold">{avaliacoes.media}</span>
+              <span>({t('n_avaliacoes', { n: avaliacoes.total })})</span>
+            </a>
+          )}
+
           {/* Especificações (ficha técnica, como no OfertasParaguai) */}
           {specs.length > 0 && (
             <div className="mt-5 rounded-lg bg-gray-50 p-4">
@@ -218,6 +242,9 @@ export default async function ProdutoPage({ params }: Props) {
               </span>
             )}
           </div>
+
+          {/* Calculadora de frete */}
+          {produto.permite_envio && <FreteWidget produtoId={produto.id} />}
 
           {/* Vendido por (franquia da rede) */}
           {produto.vendedor && (
@@ -295,6 +322,9 @@ export default async function ProdutoPage({ params }: Props) {
           )}
         </div>
       </div>
+
+      {/* Avaliações */}
+      <AvaliacoesSection produtoId={produto.id} resumo={avaliacoes} />
 
       {/* Mais desta categoria */}
       {relacionados.length > 0 && (

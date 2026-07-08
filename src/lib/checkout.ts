@@ -8,6 +8,7 @@ import {
   emailPedidoRecebido,
 } from '@/lib/email'
 import { moedaDoGrupo, precoNaMoeda } from '@/lib/format'
+import { calcularFrete } from '@/lib/frete'
 import { createServiceClient } from '@/lib/supabase'
 
 export type PedidoCriado = {
@@ -156,6 +157,28 @@ export async function criarPedidosDoCarrinho(
       return s + (p != null ? p * i.quantidade : 0)
     }, 0)
 
+    // Frete recalculado AQUI (nunca confiar em valor vindo do cliente): tabela
+    // própria por zona/peso até o gateway real (Melhor Envio) entrar.
+    let frete = 0
+    if (dados.metodoEntrega === 'envio' && dados.endereco) {
+      const opcoes = calcularFrete({
+        cep: dados.endereco.cep,
+        itens: grupo.itens.map((i) => ({
+          pesoGramas: i.pesoGramas,
+          alturaCm: i.alturaCm,
+          larguraCm: i.larguraCm,
+          comprimentoCm: i.comprimentoCm,
+          quantidade: i.quantidade,
+        })),
+        moeda,
+        subtotal,
+      })
+      const escolhida = opcoes?.find(
+        (o) => o.servico === (dados.servicoFrete ?? 'economico'),
+      )
+      frete = escolhida?.valor ?? 0
+    }
+
     const { data: codigo } = await svc.rpc('gerar_codigo_pedido', {
       p_ano: ano,
     })
@@ -170,8 +193,8 @@ export async function criarPedidosDoCarrinho(
         moeda,
         subtotal,
         desconto: 0,
-        frete: 0, // frete real chega na Fase 3 (Melhor Envio)
-        total: subtotal,
+        frete,
+        total: subtotal + frete,
         metodo_entrega: dados.metodoEntrega,
         endereco_entrega: enderecoSnapshot,
         comprador_nome: dados.nome.trim(),
@@ -207,7 +230,7 @@ export async function criarPedidosDoCarrinho(
       pedido_id: pedido.id,
       gateway: 'manual',
       status: 'pending',
-      valor: subtotal,
+      valor: subtotal + frete,
     })
 
     criados.push({
