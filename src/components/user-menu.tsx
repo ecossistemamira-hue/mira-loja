@@ -38,13 +38,6 @@ export function UserMenu({ usuarioNome }: Props) {
     )
   }
 
-  const iniciais = usuarioNome
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((p) => p.charAt(0))
-    .join('')
-    .toUpperCase()
 
   return (
     <div ref={ref} className="relative">
@@ -58,7 +51,7 @@ export function UserMenu({ usuarioNome }: Props) {
           aberto && 'bg-marca text-white',
         )}
       >
-        {iniciais || <UserRound className="size-4" />}
+        <UserRound className="size-4" />
       </button>
 
       {aberto && (
