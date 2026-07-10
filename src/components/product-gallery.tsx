@@ -22,7 +22,26 @@ export function ProductGallery({ nome, fotos, fallbackUrl }: Props) {
         : []
   const [ativa, setAtiva] = useState(0)
   const [lightbox, setLightbox] = useState(false)
+  // Zoom do lightbox: guarda A FOTO em que o zoom foi ativado — trocar de foto
+  // desativa sozinho (sem setState em effect, que o lint do React 19 barra).
+  const [zoomEm, setZoomEm] = useState<{ i: number; origem: string } | null>(
+    null,
+  )
   const toqueX = useRef<number | null>(null)
+
+  const zoomAtivo = lightbox && zoomEm?.i === ativa
+
+  const fecharLightbox = () => {
+    setLightbox(false)
+    setZoomEm(null)
+  }
+
+  const origemDoEvento = (e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = ((e.clientX - rect.left) / rect.width) * 100
+    const y = ((e.clientY - rect.top) / rect.height) * 100
+    return `${x.toFixed(1)}% ${y.toFixed(1)}%`
+  }
 
   const total = urls.length
   const anterior = useCallback(
@@ -35,7 +54,10 @@ export function ProductGallery({ nome, fotos, fallbackUrl }: Props) {
   useEffect(() => {
     if (!lightbox) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setLightbox(false)
+      if (e.key === 'Escape') {
+        setLightbox(false)
+        setZoomEm(null)
+      }
       if (e.key === 'ArrowLeft') anterior()
       if (e.key === 'ArrowRight') proxima()
     }
@@ -56,12 +78,13 @@ export function ProductGallery({ nome, fotos, fallbackUrl }: Props) {
     )
   }
 
-  // Swipe no mobile (imagem principal e lightbox).
+  // Swipe no mobile (imagem principal e lightbox). Com zoom ativo o swipe
+  // não troca de foto (o gesto vira "explorar a imagem").
   const onTouchStart = (e: React.TouchEvent) => {
     toqueX.current = e.touches[0].clientX
   }
   const onTouchEnd = (e: React.TouchEvent) => {
-    if (toqueX.current == null || total < 2) return
+    if (toqueX.current == null || total < 2 || zoomAtivo) return
     const delta = e.changedTouches[0].clientX - toqueX.current
     if (Math.abs(delta) > 40) (delta > 0 ? anterior : proxima)()
     toqueX.current = null
@@ -140,7 +163,7 @@ export function ProductGallery({ nome, fotos, fallbackUrl }: Props) {
           role="dialog"
           aria-modal="true"
           aria-label={nome}
-          onClick={() => setLightbox(false)}
+          onClick={fecharLightbox}
         >
           {/* Topo: contador + fechar */}
           <div className="flex items-center justify-between px-4 py-3 text-white">
@@ -149,7 +172,7 @@ export function ProductGallery({ nome, fotos, fallbackUrl }: Props) {
             </span>
             <button
               type="button"
-              onClick={() => setLightbox(false)}
+              onClick={fecharLightbox}
               className="grid size-10 place-items-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
               aria-label="Fechar"
             >
@@ -157,21 +180,44 @@ export function ProductGallery({ nome, fotos, fallbackUrl }: Props) {
             </button>
           </div>
 
-          {/* Imagem */}
+          {/* Imagem — clique dá zoom no ponto; com zoom, o mouse "passeia" */}
           <div
             className="relative mx-auto min-h-0 w-full max-w-5xl flex-1 px-4 pb-4"
             onClick={(e) => e.stopPropagation()}
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
           >
-            <Image
-              key={urls[ativa]}
-              src={urls[ativa]}
-              alt={nome}
-              fill
-              sizes="100vw"
-              className="object-contain"
-            />
+            <div
+              className={cn(
+                // absolute (não h-full): o pai é flex-1 e o 100% colapsaria.
+                'absolute inset-x-4 top-0 bottom-4 overflow-hidden',
+                zoomAtivo ? 'cursor-zoom-out' : 'cursor-zoom-in',
+              )}
+              onClick={(e) =>
+                setZoomEm(
+                  zoomAtivo ? null : { i: ativa, origem: origemDoEvento(e) },
+                )
+              }
+              onMouseMove={(e) => {
+                if (zoomAtivo)
+                  setZoomEm({ i: ativa, origem: origemDoEvento(e) })
+              }}
+            >
+              <Image
+                key={urls[ativa]}
+                src={urls[ativa]}
+                alt={nome}
+                fill
+                sizes="100vw"
+                className={cn(
+                  // transition-transform só anima o scale — transform-origin
+                  // (o "passeio" do mouse) muda instantâneo, como deve.
+                  'object-contain transition-transform duration-200',
+                  zoomAtivo && 'scale-[2.2]',
+                )}
+                style={{ transformOrigin: zoomEm?.origem ?? '50% 50%' }}
+              />
+            </div>
             {total > 1 && (
               <>
                 <SetaGaleria lado="esq" onClick={anterior} rotulo="Foto anterior" clara />

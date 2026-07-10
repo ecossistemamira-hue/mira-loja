@@ -1,4 +1,4 @@
-import { MapPin, Package, ShieldCheck, Store, Truck } from 'lucide-react'
+import { BadgeCheck, MapPin, Package, ShieldCheck, Store, Truck } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -6,6 +6,7 @@ import { getTranslations } from 'next-intl/server'
 
 import { CompraBox } from '@/components/add-to-cart-button'
 import { AvaliacoesSection } from '@/components/avaliacoes-section'
+import { AvisoEstoque } from '@/components/aviso-estoque'
 import { BeneficiosBar } from '@/components/beneficios-bar'
 import { CategoryCarousel } from '@/components/category-carousel'
 import { FreteAex } from '@/components/frete-aex'
@@ -240,6 +241,25 @@ export default async function ProdutoPage({ params }: Props) {
               </div>
             )}
           </div>
+
+          {/* Selos de confiança editados pela franquia */}
+          {produto.selos.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {produto.selos.map((selo) => (
+                <span
+                  key={selo}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-marca/15 bg-marca/5 px-3 py-1.5 text-[12px] font-bold text-marca"
+                >
+                  <BadgeCheck className="size-3.5" />
+                  {selo}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Esgotado: avise-me quando voltar. Sem prefill de e-mail do
+              logado — ler cookies aqui quebraria o ISR (revalidate) da PDP. */}
+          {semEstoque && <AvisoEstoque produtoId={produto.id} />}
 
           {/* Entrega */}
           <div className="mt-4 flex flex-wrap gap-2 text-[12px] font-medium text-gray-600">

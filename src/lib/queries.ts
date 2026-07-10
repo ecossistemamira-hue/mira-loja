@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { pontuarBusca } from '@/lib/busca-fuzzy'
 import { createLojaClient } from '@/lib/supabase'
 import type {
   FranquiaPublica,
@@ -18,34 +19,51 @@ type ListarParams = {
   limite?: number
 }
 
+/** Candidatos que a busca fuzzy rankeia em memória — teto do catálogo. */
+const MAX_CANDIDATOS_BUSCA = 500
+
 /**
  * Lista produtos da vitrine. A RLS `produtos_publico` já restringe a
  * aprovados + publicados + não deletados — não precisamos filtrar isso aqui.
+ *
+ * Busca com tolerância a typo: em vez de ILIKE (que exige acerto exato),
+ * puxamos o catálogo filtrado (pequeno) e rankeamos em JS com `pontuarBusca`
+ * — "cajxa" acha "Caixa", "asuncion" acha "Asunción".
  */
 export async function listarProdutosVitrine(
   params: ListarParams = {},
 ): Promise<ProdutoVitrine[]> {
   const supabase = createLojaClient()
+  const buscando = !!params.busca?.trim()
+
   let q = supabase
     .from('produtos')
     .select(COLUNAS_VITRINE)
     .order('created_at', { ascending: false })
-    .limit(params.limite ?? 60)
+    .limit(buscando ? MAX_CANDIDATOS_BUSCA : (params.limite ?? 60))
 
   if (params.categoria) q = q.eq('categoria', params.categoria)
   if (params.franquiaId) q = q.eq('franquia_id', params.franquiaId)
-  if (params.busca && params.busca.trim()) {
-    // Escapa curingas do LIKE pra busca literal.
-    const termo = params.busca.trim().replace(/[%_\\]/g, (m) => `\\${m}`)
-    q = q.ilike('nome', `%${termo}%`)
-  }
 
   const { data, error } = await q
   if (error) {
     console.error('[loja.listarProdutosVitrine]', error)
     return []
   }
-  return (data ?? []) as ProdutoVitrine[]
+  const produtos = (data ?? []) as ProdutoVitrine[]
+  if (!buscando) return produtos
+
+  const consulta = params.busca!.trim()
+  return produtos
+    .map((p) => ({ p, score: pontuarBusca(consulta, p.nome, p.categoria) }))
+    .filter((r) => r.score > 0)
+    .sort(
+      (a, b) =>
+        b.score - a.score ||
+        b.p.created_at.localeCompare(a.p.created_at),
+    )
+    .slice(0, params.limite ?? 60)
+    .map((r) => r.p)
 }
 
 /** Categorias com contagem de produtos publicados (página /categorias). */
@@ -86,7 +104,7 @@ export async function listarCategoriasVitrine(): Promise<string[]> {
   return [...set].sort((a, b) => a.localeCompare(b))
 }
 
-const COLUNAS_DETALHE = `${COLUNAS_VITRINE}, peso_gramas, altura_cm, largura_cm, comprimento_cm, franquia_id`
+const COLUNAS_DETALHE = `${COLUNAS_VITRINE}, peso_gramas, altura_cm, largura_cm, comprimento_cm, franquia_id, selos`
 
 export async function obterProdutoPorSlug(
   slug: string,

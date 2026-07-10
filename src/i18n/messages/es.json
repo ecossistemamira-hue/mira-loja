@@ -34,6 +34,13 @@
     "vistos_recentemente": "Vistos recientemente",
     "mais_vendidos": "Más vendidos"
   },
+  "aviso_estoque": {
+    "titulo": "Avisáme cuando vuelva",
+    "placeholder": "tu@email.com",
+    "botao": "Quiero saber",
+    "confirmado": "¡Listo! Te avisamos por e-mail cuando este producto vuelva al stock.",
+    "erro": "No funcionó — revisá el e-mail e intentá de nuevo."
+  },
   "produto": {
     "sem_estoque": "Sin stock",
     "em_estoque": "En stock",

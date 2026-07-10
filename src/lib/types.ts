@@ -38,6 +38,8 @@ export type ProdutoDetalhe = ProdutoComFotos & {
   largura_cm: number | null
   comprimento_cm: number | null
   franquia_id: string
+  /** Selos de confiança editados pela franquia (ex.: "Original"). */
+  selos: string[]
   vendedor: FranquiaPublica | null
 }
 
