@@ -146,6 +146,7 @@
     "bairro": "Barrio",
     "cidade": "Ciudad",
     "retirada_dica": "Vas a retirar tu pedido en la franquicia vendedora. Te avisamos cuando esté listo.",
+    "erro_retirada_indisponivel": "Retiro no disponible para este carrito — elegí el envío.",
     "resumo": "Resumen",
     "vendedor": "Vendedor",
     "subtotal": "Subtotal",

@@ -23,6 +23,12 @@ export default async function CheckoutPage() {
   // Sem itens não há o que finalizar.
   if (totalItens === 0) redirect('/carrinho')
 
+  // Retirada só é oferecida se TODAS as franquias do carrinho aceitam
+  // receber no local (0096) — o método vale pro checkout inteiro.
+  const permiteRetirada = grupos.every(
+    (g) => g.franquia?.aceita_retirada ?? false,
+  )
+
   // Logado: pré-preenche com os dados da conta (RLS compradores_self).
   const supabase = await createAuthClient()
   const {
@@ -56,7 +62,7 @@ export default async function CheckoutPage() {
       <h1 className="mb-6 text-2xl font-extrabold tracking-tight">{t('titulo')}</h1>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        <CheckoutForm defaults={defaults} />
+        <CheckoutForm defaults={defaults} permiteRetirada={permiteRetirada} />
 
         {/* Resumo */}
         <aside className="lg:sticky lg:top-20 lg:self-start">

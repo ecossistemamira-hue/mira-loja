@@ -17,7 +17,11 @@ type Props = {
   avaliacao?: { media: number; total: number } | null
   /** Franquia vendedora (batch da página via mapaFranquiasPublicas). Texto,
    *  não link — o card inteiro já é um <Link> pra PDP. */
-  vendedor?: { nome: string; slug: string | null } | null
+  vendedor?: {
+    nome: string
+    slug: string | null
+    aceitaRetirada: boolean
+  } | null
 }
 
 export async function ProductCard({
@@ -122,12 +126,15 @@ export async function ProductCard({
           ) : (
             <span className="text-[12px] text-gray-400">{t('sem_preco')}</span>
           )}
-          {produto.permite_retirada && !semEstoque && (
-            <span className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
-              <Store className="size-3" />
-              {t('card_retiro')}
-            </span>
-          )}
+          {/* Retirada exige o produto permitir E a franquia ter balcão (0096) */}
+          {produto.permite_retirada &&
+            vendedor?.aceitaRetirada &&
+            !semEstoque && (
+              <span className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
+                <Store className="size-3" />
+                {t('card_retiro')}
+              </span>
+            )}
         </div>
       </div>
     </Link>

@@ -96,24 +96,38 @@ export async function listarOfertasVitrine(
     .slice(0, limite)
 }
 
-/** Vendedor por produto: mapa franquia_id → {nome, slug} pros cards. */
+/** Vendedor por produto: mapa franquia_id → dados leves pros cards. */
+export type VendedorCard = {
+  nome: string
+  slug: string | null
+  aceitaRetirada: boolean
+}
+
 export async function mapaFranquiasPublicas(
   ids: string[],
-): Promise<Map<string, { nome: string; slug: string | null }>> {
+): Promise<Map<string, VendedorCard>> {
   const unicos = [...new Set(ids)].filter(Boolean)
   if (unicos.length === 0) return new Map()
 
   const supabase = createLojaClient()
   const { data, error } = await supabase
     .from('franquias_publicas')
-    .select('id, nome_fantasia, slug')
+    .select('id, nome_fantasia, slug, aceita_retirada')
     .in('id', unicos)
   if (error || !data) return new Map()
 
   return new Map(
-    (data as { id: string; nome_fantasia: string; slug: string | null }[]).map(
-      (f) => [f.id, { nome: f.nome_fantasia, slug: f.slug }],
-    ),
+    (
+      data as {
+        id: string
+        nome_fantasia: string
+        slug: string | null
+        aceita_retirada: boolean
+      }[]
+    ).map((f) => [
+      f.id,
+      { nome: f.nome_fantasia, slug: f.slug, aceitaRetirada: f.aceita_retirada },
+    ]),
   )
 }
 
@@ -181,7 +195,7 @@ export async function obterProdutoPorSlug(
       .order('ordem', { ascending: true }),
     supabase
       .from('franquias_publicas')
-      .select('id, nome_fantasia, slug, cidade, pais, logo_url, moeda')
+      .select('id, nome_fantasia, slug, cidade, pais, logo_url, moeda, aceita_retirada')
       .eq('id', base.franquia_id)
       .maybeSingle(),
   ])
@@ -200,7 +214,7 @@ export async function obterFranquiaPorSlug(
   const supabase = createLojaClient()
   const { data, error } = await supabase
     .from('franquias_publicas')
-    .select('id, nome_fantasia, slug, cidade, pais, logo_url, moeda')
+    .select('id, nome_fantasia, slug, cidade, pais, logo_url, moeda, aceita_retirada')
     .eq('slug', slug)
     .maybeSingle()
   if (error || !data) {

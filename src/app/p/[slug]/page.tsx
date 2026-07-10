@@ -274,12 +274,14 @@ export default async function ProdutoPage({ params }: Props) {
                 {t('entrega_envio')}
               </span>
             )}
-            {produto.permite_retirada && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-50 px-3 py-1.5">
-                <Store className="size-3.5 text-gray-400" />
-                {t('entrega_retirada')}
-              </span>
-            )}
+            {/* Retirada: produto permite E a franquia tem balcão (0096) */}
+            {produto.permite_retirada &&
+              (produto.vendedor?.aceita_retirada ?? true) && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-50 px-3 py-1.5">
+                  <Store className="size-3.5 text-gray-400" />
+                  {t('entrega_retirada')}
+                </span>
+              )}
           </div>
 
           {/* Cotação AEX por cidade de destino (PY não usa CEP) */}

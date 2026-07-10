@@ -146,6 +146,7 @@
     "bairro": "Bairro",
     "cidade": "Cidade",
     "retirada_dica": "Você vai retirar seu pedido na franquia vendedora. Avisamos quando estiver pronto.",
+    "erro_retirada_indisponivel": "Retirada indisponível pra este carrinho — escolha o envio.",
     "resumo": "Resumo",
     "vendedor": "Vendedor",
     "subtotal": "Subtotal",

@@ -64,6 +64,16 @@ export async function criarPedidosDoCarrinho(
   const { grupos, totalItens } = await obterCarrinho()
   if (totalItens === 0) return { ok: false, error: 'carrinho_vazio' }
 
+  // Retirada exige que TODAS as franquias do carrinho aceitem receber no
+  // local (0096) — a UI já esconde a opção, aqui é defesa contra request
+  // forjada/carrinho alterado no meio do caminho.
+  if (
+    dados.metodoEntrega === 'retirada' &&
+    !grupos.every((g) => g.franquia?.aceita_retirada ?? false)
+  ) {
+    return { ok: false, error: 'retirada_indisponivel' }
+  }
+
   const svc = createServiceClient()
 
   // ── Fase 0: cupom (validação; o consumo atômico vem depois da reserva) ────

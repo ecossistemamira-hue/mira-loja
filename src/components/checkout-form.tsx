@@ -23,7 +23,14 @@ export type CheckoutDefaults = {
   documento?: string
 }
 
-export function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults }) {
+export function CheckoutForm({
+  defaults,
+  permiteRetirada = true,
+}: {
+  defaults?: CheckoutDefaults
+  /** false quando alguma franquia do carrinho não aceita retirada (0096). */
+  permiteRetirada?: boolean
+}) {
   const t = useTranslations('checkout')
   const router = useRouter()
   const [pending, start] = useTransition()
@@ -124,6 +131,9 @@ export function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults }) {
           setErro(t('erro_carrinho_vazio'))
         } else if (r.error === 'frete:peso_excede') {
           setErro(t('erro_frete_peso'))
+        } else if (r.error === 'retirada_indisponivel') {
+          setMetodo('envio')
+          setErro(t('erro_retirada_indisponivel'))
         } else if (r.error.startsWith('cupom:')) {
           setCupomAplicado(null)
           setErro(t('erro_cupom_finalizar'))
@@ -160,12 +170,14 @@ export function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults }) {
             icon={<Truck className="size-4" />}
             label={t('metodo_envio')}
           />
-          <OpcaoEntrega
-            ativo={metodo === 'retirada'}
-            onClick={() => setMetodo('retirada')}
-            icon={<Store className="size-4" />}
-            label={t('metodo_retirada')}
-          />
+          {permiteRetirada && (
+            <OpcaoEntrega
+              ativo={metodo === 'retirada'}
+              onClick={() => setMetodo('retirada')}
+              icon={<Store className="size-4" />}
+              label={t('metodo_retirada')}
+            />
+          )}
         </div>
 
         {metodo === 'envio' ? (

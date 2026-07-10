@@ -102,6 +102,11 @@ export default async function FranquiaPage({ params }: Props) {
                 key={p.id}
                 produto={p}
                 avaliacao={medias.get(p.id) ?? null}
+                vendedor={{
+                  nome: franquia.nome_fantasia,
+                  slug: franquia.slug,
+                  aceitaRetirada: franquia.aceita_retirada,
+                }}
               />
             ))}
           </div>

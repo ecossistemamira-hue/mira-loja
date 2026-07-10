@@ -53,6 +53,9 @@ export type FranquiaPublica = {
   pais: string
   logo_url: string | null
   moeda: string
+  /** Franquia recebe comprador no local? Desligado (franqueado sem balcão),
+   *  a loja esconde TODA oferta de retirada dos produtos dela. */
+  aceita_retirada: boolean
 }
 
 // Item do carrinho já resolvido com dados do produto (pra render).
