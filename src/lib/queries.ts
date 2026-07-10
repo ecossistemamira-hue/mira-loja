@@ -8,8 +8,8 @@ import type {
   ProdutoVitrine,
 } from '@/lib/types'
 
-const COLUNAS_VITRINE =
-  'id, nome, slug, descricao, categoria, preco_pyg, preco_promocional_pyg, imagem_url, estoque, estoque_reservado, permite_envio, permite_retirada, created_at'
+export const COLUNAS_VITRINE =
+  'id, nome, slug, descricao, categoria, franquia_id, preco_pyg, preco_promocional_pyg, imagem_url, estoque, estoque_reservado, permite_envio, permite_retirada, created_at'
 
 type ListarParams = {
   busca?: string
@@ -66,6 +66,57 @@ export async function listarProdutosVitrine(
     .map((r) => r.p)
 }
 
+/**
+ * Ofertas: produtos com preço promocional VÁLIDO (promo < cheio), ordenados
+ * pelo maior desconto. Alimenta a seção "Ofertas do dia" da home.
+ */
+export async function listarOfertasVitrine(
+  limite = 12,
+): Promise<ProdutoVitrine[]> {
+  const supabase = createLojaClient()
+  const { data, error } = await supabase
+    .from('produtos')
+    .select(COLUNAS_VITRINE)
+    .not('preco_promocional_pyg', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(60)
+  if (error) {
+    console.error('[loja.listarOfertasVitrine]', error)
+    return []
+  }
+
+  const desconto = (p: ProdutoVitrine) =>
+    p.preco_pyg && p.preco_promocional_pyg
+      ? 1 - Number(p.preco_promocional_pyg) / Number(p.preco_pyg)
+      : 0
+
+  return ((data ?? []) as ProdutoVitrine[])
+    .filter((p) => desconto(p) > 0)
+    .sort((a, b) => desconto(b) - desconto(a))
+    .slice(0, limite)
+}
+
+/** Vendedor por produto: mapa franquia_id → {nome, slug} pros cards. */
+export async function mapaFranquiasPublicas(
+  ids: string[],
+): Promise<Map<string, { nome: string; slug: string | null }>> {
+  const unicos = [...new Set(ids)].filter(Boolean)
+  if (unicos.length === 0) return new Map()
+
+  const supabase = createLojaClient()
+  const { data, error } = await supabase
+    .from('franquias_publicas')
+    .select('id, nome_fantasia, slug')
+    .in('id', unicos)
+  if (error || !data) return new Map()
+
+  return new Map(
+    (data as { id: string; nome_fantasia: string; slug: string | null }[]).map(
+      (f) => [f.id, { nome: f.nome_fantasia, slug: f.slug }],
+    ),
+  )
+}
+
 /** Categorias com contagem de produtos publicados (página /categorias). */
 export async function listarCategoriasComContagem(): Promise<
   { categoria: string; total: number }[]
@@ -104,7 +155,7 @@ export async function listarCategoriasVitrine(): Promise<string[]> {
   return [...set].sort((a, b) => a.localeCompare(b))
 }
 
-const COLUNAS_DETALHE = `${COLUNAS_VITRINE}, peso_gramas, altura_cm, largura_cm, comprimento_cm, franquia_id, selos`
+const COLUNAS_DETALHE = `${COLUNAS_VITRINE}, peso_gramas, altura_cm, largura_cm, comprimento_cm, selos`
 
 export async function obterProdutoPorSlug(
   slug: string,

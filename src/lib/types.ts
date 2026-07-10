@@ -8,6 +8,8 @@ export type ProdutoVitrine = {
   slug: string | null
   descricao: string | null
   categoria: string | null
+  /** Franquia vendedora — resolve nome/slug via `mapaFranquiasPublicas`. */
+  franquia_id: string
   // Marketplace PY vende só em guarani (preco_brl/preco_usd = legado no banco).
   preco_pyg: number | null
   // Quando < preco_pyg, vitrine mostra "de X por Y" e o carrinho cobra este.

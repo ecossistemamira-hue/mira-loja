@@ -6,7 +6,11 @@ import { ProductCard } from '@/components/product-card'
 import { listarMediasAvaliacoes } from '@/lib/avaliacoes'
 import { cn } from '@/lib/cn'
 import { precoVenda } from '@/lib/format'
-import { listarCategoriasVitrine, listarProdutosVitrine } from '@/lib/queries'
+import {
+  listarCategoriasVitrine,
+  listarProdutosVitrine,
+  mapaFranquiasPublicas,
+} from '@/lib/queries'
 
 export const metadata: Metadata = {
   title: 'Busca',
@@ -47,7 +51,10 @@ export default async function BuscaPage({ searchParams }: Props) {
     })
   }
 
-  const medias = await listarMediasAvaliacoes(produtos.map((p) => p.id))
+  const [medias, vendedores] = await Promise.all([
+    listarMediasAvaliacoes(produtos.map((p) => p.id)),
+    mapaFranquiasPublicas(produtos.map((p) => p.franquia_id)),
+  ])
 
   const titulo = categoria
     ? categoria
@@ -133,6 +140,7 @@ export default async function BuscaPage({ searchParams }: Props) {
                   key={p.id}
                   produto={p}
                   avaliacao={medias.get(p.id) ?? null}
+                  vendedor={vendedores.get(p.franquia_id) ?? null}
                 />
               ))}
             </div>

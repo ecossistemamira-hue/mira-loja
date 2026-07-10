@@ -67,12 +67,30 @@ export async function SiteFooter() {
           <span>
             © {new Date().getFullYear()} {t('direitos')}
           </span>
+          <span className="inline-flex items-center gap-2">
+            <BandeiraPy />
+            <span className="font-semibold text-gray-500">{t('hecho')}</span>
+          </span>
           <Link href="/" className="transition-colors hover:text-marca">
             {tSite('nome')}
           </Link>
         </div>
       </div>
     </footer>
+  )
+}
+
+/** Bandeirinha do Paraguai em CSS (3 faixas), como selo "Hecho en Paraguay". */
+function BandeiraPy() {
+  return (
+    <span
+      aria-hidden
+      className="inline-flex h-3 w-[18px] flex-col overflow-hidden rounded-[2px] ring-1 ring-gray-200"
+    >
+      <span className="flex-1 bg-[#D52B1E]" />
+      <span className="flex-1 bg-white" />
+      <span className="flex-1 bg-[#0038A8]" />
+    </span>
   )
 }
 

@@ -1,4 +1,4 @@
-import { Flame, Sparkles, Tag } from 'lucide-react'
+import { BadgePercent, Flame, Sparkles, Tag } from 'lucide-react'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 
@@ -9,7 +9,12 @@ import { ProductCard } from '@/components/product-card'
 import { VistosRecentemente } from '@/components/vistos-recentemente'
 import { listarMediasAvaliacoes } from '@/lib/avaliacoes'
 import { listarMaisVendidos } from '@/lib/mais-vendidos'
-import { listarCategoriasVitrine, listarProdutosVitrine } from '@/lib/queries'
+import {
+  listarCategoriasVitrine,
+  listarOfertasVitrine,
+  listarProdutosVitrine,
+  mapaFranquiasPublicas,
+} from '@/lib/queries'
 import type { ProdutoVitrine } from '@/lib/types'
 
 // Revalida a home a cada 5 min (ISR) — vitrine muda pouco, mas reflete novos
@@ -18,13 +23,16 @@ export const revalidate = 300
 
 export default async function HomePage() {
   const t = await getTranslations('home')
-  const [produtos, categorias, maisVendidos] = await Promise.all([
+  const [produtos, categorias, maisVendidos, ofertas] = await Promise.all([
     listarProdutosVitrine({ limite: 60 }),
     listarCategoriasVitrine(),
     listarMaisVendidos(12),
+    listarOfertasVitrine(12),
   ])
-  const medias = await listarMediasAvaliacoes([
-    ...new Set([...produtos, ...maisVendidos].map((p) => p.id)),
+  const todos = [...produtos, ...maisVendidos, ...ofertas]
+  const [medias, vendedores] = await Promise.all([
+    listarMediasAvaliacoes([...new Set(todos.map((p) => p.id))]),
+    mapaFranquiasPublicas(todos.map((p) => p.franquia_id)),
   ])
 
   const slides: SlideHero[] = [1, 2, 3].map((n) => ({
@@ -77,6 +85,26 @@ export default async function HomePage() {
         <EmptyState titulo={t('vazio_titulo')} dica={t('vazio_dica')} />
       ) : (
         <>
+          {/* Ofertas do dia (maiores descontos ativos) */}
+          {ofertas.length > 0 && (
+            <SecaoCarrossel
+              icone={<BadgePercent className="size-4" />}
+              titulo={t('ofertas_dia')}
+              verTodosHref="/buscar?ordem=menor_preco"
+              verTodosLabel={t('ver_todos')}
+            >
+              {ofertas.map((p) => (
+                <ProductCard
+                  key={p.id}
+                  produto={p}
+                  compacto
+                  avaliacao={medias.get(p.id) ?? null}
+                  vendedor={vendedores.get(p.franquia_id) ?? null}
+                />
+              ))}
+            </SecaoCarrossel>
+          )}
+
           {/* Novidades */}
           <SecaoCarrossel
             icone={<Sparkles className="size-4" />}
@@ -90,6 +118,7 @@ export default async function HomePage() {
                 produto={p}
                 compacto
                 avaliacao={medias.get(p.id) ?? null}
+                vendedor={vendedores.get(p.franquia_id) ?? null}
               />
             ))}
           </SecaoCarrossel>
@@ -108,6 +137,7 @@ export default async function HomePage() {
                   produto={p}
                   compacto
                   avaliacao={medias.get(p.id) ?? null}
+                  vendedor={vendedores.get(p.franquia_id) ?? null}
                 />
               ))}
             </SecaoCarrossel>
@@ -131,6 +161,7 @@ export default async function HomePage() {
                   produto={p}
                   compacto
                   avaliacao={medias.get(p.id) ?? null}
+                  vendedor={vendedores.get(p.franquia_id) ?? null}
                 />
               ))}
             </SecaoCarrossel>

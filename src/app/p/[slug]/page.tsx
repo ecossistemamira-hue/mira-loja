@@ -18,7 +18,11 @@ import { RegistrarVisita } from '@/components/vistos-recentemente'
 import { WishlistButton } from '@/components/wishlist-button'
 import { listarAvaliacoes, listarMediasAvaliacoes } from '@/lib/avaliacoes'
 import { estoqueDisponivel, precoExibicao, precoVenda } from '@/lib/format'
-import { listarProdutosVitrine, obterProdutoPorSlug } from '@/lib/queries'
+import {
+  listarProdutosVitrine,
+  mapaFranquiasPublicas,
+  obterProdutoPorSlug,
+} from '@/lib/queries'
 import type { ProdutoDetalhe } from '@/lib/types'
 
 export const revalidate = 300
@@ -129,9 +133,10 @@ export default async function ProdutoPage({ params }: Props) {
         .filter((p) => p.id !== produto.id)
         .slice(0, 8)
     : []
-  const mediasRelacionados = await listarMediasAvaliacoes(
-    relacionados.map((p) => p.id),
-  )
+  const [mediasRelacionados, vendedoresRelacionados] = await Promise.all([
+    listarMediasAvaliacoes(relacionados.map((p) => p.id)),
+    mapaFranquiasPublicas(relacionados.map((p) => p.franquia_id)),
+  ])
 
   return (
     <div className="mx-auto max-w-[1100px] px-4 py-6 sm:px-6">
@@ -379,6 +384,7 @@ export default async function ProdutoPage({ params }: Props) {
                 produto={p}
                 compacto
                 avaliacao={mediasRelacionados.get(p.id) ?? null}
+                vendedor={vendedoresRelacionados.get(p.franquia_id) ?? null}
               />
             ))}
           </CategoryCarousel>

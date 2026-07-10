@@ -42,6 +42,10 @@ function assinarStorage(cb: () => void) {
   window.addEventListener('storage', cb)
   return () => window.removeEventListener('storage', cb)
 }
+// Referência ESTÁVEL pro snapshot do servidor — `() => []` inline cria array
+// novo a cada chamada e o React acusa "getServerSnapshot should be cached".
+const VAZIO_SSR: ProdutoVisto[] = []
+const snapshotServidor = () => VAZIO_SSR
 
 /** Registra a visita ao produto (montar na PDP; não renderiza nada). */
 export function RegistrarVisita({ produto }: { produto: ProdutoVisto }) {
@@ -60,7 +64,11 @@ export function RegistrarVisita({ produto }: { produto: ProdutoVisto }) {
 /** Carrossel "vistos recentemente" (home). Some quando não há histórico. */
 export function VistosRecentemente({ excluirId }: { excluirId?: string }) {
   const t = useTranslations('home')
-  const todos = useSyncExternalStore(assinarStorage, snapshotVistos, () => [])
+  const todos = useSyncExternalStore(
+    assinarStorage,
+    snapshotVistos,
+    snapshotServidor,
+  )
   const vistos = todos.filter((p) => p.id !== excluirId)
 
   if (vistos.length === 0) return null

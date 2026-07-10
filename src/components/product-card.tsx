@@ -1,3 +1,4 @@
+import { Store } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
@@ -14,9 +15,17 @@ type Props = {
   compacto?: boolean
   /** Média/total de avaliações (batch da página via listarMediasAvaliacoes). */
   avaliacao?: { media: number; total: number } | null
+  /** Franquia vendedora (batch da página via mapaFranquiasPublicas). Texto,
+   *  não link — o card inteiro já é um <Link> pra PDP. */
+  vendedor?: { nome: string; slug: string | null } | null
 }
 
-export async function ProductCard({ produto, compacto = false, avaliacao }: Props) {
+export async function ProductCard({
+  produto,
+  compacto = false,
+  avaliacao,
+  vendedor,
+}: Props) {
   const t = await getTranslations('produto')
   const preco = precoExibicao(produto)
   const disponivel = estoqueDisponivel(produto)
@@ -91,6 +100,13 @@ export async function ProductCard({ produto, compacto = false, avaliacao }: Prop
           </span>
         )}
 
+        {vendedor && (
+          <span className="truncate text-[11px] text-gray-400">
+            {t('card_por')}{' '}
+            <span className="font-semibold text-gray-600">{vendedor.nome}</span>
+          </span>
+        )}
+
         <div className="mt-auto pt-1.5">
           {preco ? (
             <>
@@ -105,6 +121,12 @@ export async function ProductCard({ produto, compacto = false, avaliacao }: Prop
             </>
           ) : (
             <span className="text-[12px] text-gray-400">{t('sem_preco')}</span>
+          )}
+          {produto.permite_retirada && !semEstoque && (
+            <span className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
+              <Store className="size-3" />
+              {t('card_retiro')}
+            </span>
           )}
         </div>
       </div>

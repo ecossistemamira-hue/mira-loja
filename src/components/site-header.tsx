@@ -8,14 +8,17 @@ import { SearchBox } from '@/components/search-box'
 import { UserMenu } from '@/components/user-menu'
 import { WishlistHeaderLink } from '@/components/wishlist-header-link'
 import { contarItensCarrinho } from '@/lib/cart-queries'
+import { listarCategoriasComContagem } from '@/lib/queries'
 import { obterUsuarioLoja } from '@/lib/supabase-auth'
 
 export async function SiteHeader() {
   const t = await getTranslations()
-  const [itensCarrinho, usuario] = await Promise.all([
+  const [itensCarrinho, usuario, categorias] = await Promise.all([
     contarItensCarrinho(),
     obterUsuarioLoja(),
+    listarCategoriasComContagem(),
   ])
+  const categoriasBarra = categorias.slice(0, 8)
   const usuarioNome = usuario
     ? ((usuario.user_metadata?.nome_completo as string | undefined) ??
       (usuario.user_metadata?.full_name as string | undefined) ??
@@ -69,6 +72,32 @@ export async function SiteHeader() {
           <LocaleSwitcher />
         </div>
       </div>
+
+      {/* Barra de categorias — fica no header sticky, como nos marketplaces */}
+      {categoriasBarra.length >= 2 && (
+        <nav
+          aria-label={t('nav.categorias')}
+          className="border-t border-gray-100 bg-white"
+        >
+          <div className="scroll-oculto mx-auto flex max-w-[1400px] items-center gap-1 overflow-x-auto px-4 sm:px-6">
+            {categoriasBarra.map((cat) => (
+              <Link
+                key={cat.categoria}
+                href={`/buscar?categoria=${encodeURIComponent(cat.categoria)}`}
+                className="shrink-0 whitespace-nowrap px-2.5 py-2 text-[12.5px] font-medium text-gray-600 transition-colors hover:text-marca"
+              >
+                {cat.categoria}
+              </Link>
+            ))}
+            <Link
+              href="/categorias"
+              className="ml-auto shrink-0 whitespace-nowrap px-2.5 py-2 text-[12.5px] font-semibold text-marca hover:underline"
+            >
+              {t('nav.ver_todas_categorias')}
+            </Link>
+          </div>
+        </nav>
+      )}
     </header>
   )
 }

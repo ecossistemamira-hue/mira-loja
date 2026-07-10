@@ -1,10 +1,8 @@
 import 'server-only'
 
+import { COLUNAS_VITRINE } from '@/lib/queries'
 import { createLojaClient, createServiceClient } from '@/lib/supabase'
 import type { ProdutoVitrine } from '@/lib/types'
-
-const COLUNAS_VITRINE =
-  'id, nome, slug, descricao, categoria, preco_pyg, preco_promocional_pyg, imagem_url, estoque, estoque_reservado, permite_envio, permite_retirada, created_at'
 
 // Pedido conta como venda a partir do pagamento (inclui os já em logística).
 const STATUS_VENDIDO = [
