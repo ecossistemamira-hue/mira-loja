@@ -31,7 +31,8 @@
     "hero_titulo_3": "Sempre tem coisa nova",
     "hero_subtitulo_3": "As franquias publicam produtos novos toda semana. Salve seus favoritos com o coração.",
     "hero_cta_3": "Ver novidades",
-    "vistos_recentemente": "Vistos recentemente"
+    "vistos_recentemente": "Vistos recentemente",
+    "mais_vendidos": "Mais vendidos"
   },
   "produto": {
     "sem_estoque": "Sem estoque",
@@ -98,7 +99,8 @@
     "newsletter_placeholder": "seu@email.com",
     "newsletter_botao": "Assinar",
     "newsletter_ok": "Pronto! Você está na lista.",
-    "newsletter_erro": "E-mail inválido. Tente de novo."
+    "newsletter_erro": "E-mail inválido. Tente de novo.",
+    "ajuda_rastreio": "Rastrear pedido"
   },
   "carrinho": {
     "adicionar": "Adicionar ao carrinho",
@@ -156,7 +158,17 @@
     "cidade_placeholder": "Escolha sua cidade…",
     "frete_servico_aex": "AEX — entrega a domicílio",
     "frete_fonte": "Tarifa oficial AEX (origem Ciudad del Este).",
-    "erro_frete_peso": "Pedido acima de 30 kg: envio sob consulta — fale com a gente no WhatsApp."
+    "erro_frete_peso": "Pedido acima de 30 kg: envio sob consulta — fale com a gente no WhatsApp.",
+    "cupom_titulo": "Cupom de desconto",
+    "cupom_placeholder": "Digite o código",
+    "cupom_aplicar": "Aplicar",
+    "cupom_aplicado": "Cupom {codigo} aplicado",
+    "cupom_remover": "Remover cupom",
+    "cupom_erro_nao_encontrado": "Cupom não encontrado ou inativo.",
+    "cupom_erro_fora_validade": "Este cupom está fora do período de validade.",
+    "cupom_erro_esgotado": "Este cupom atingiu o limite de usos.",
+    "cupom_erro_nao_aplicavel": "Este cupom não vale para os itens do seu carrinho.",
+    "erro_cupom_finalizar": "O cupom deixou de ser válido. Remova ou aplique outro e tente de novo."
   },
   "favoritos": {
     "titulo": "Meus favoritos",
@@ -305,5 +317,28 @@
     "pago_corpo": "Estoque reservado até o pagamento",
     "atencion_titulo": "Atendimento humano",
     "atencion_corpo": "Fale com a gente pelo WhatsApp"
+  },
+  "rastreio": {
+    "titulo": "Rastrear pedido",
+    "subtitulo": "Acompanhe seu pedido com o código e o e-mail usados na compra.",
+    "campo_codigo": "Código do pedido",
+    "campo_email": "E-mail da compra",
+    "buscar": "Buscar",
+    "dica": "O código (MIRA-…) está no e-mail de confirmação do pedido.",
+    "nao_encontrado": "Não encontramos um pedido com esse código e e-mail. Confira os dados e tente de novo.",
+    "subtotal": "Subtotal",
+    "desconto": "Desconto",
+    "frete": "Frete",
+    "total": "Total",
+    "entrega_envio": "Envio pela AEX",
+    "entrega_retirada": "Retirada com o vendedor",
+    "vendedor": "Vendedor",
+    "timeline": "Histórico do pedido"
+  },
+  "franquia": {
+    "rotulo": "Vendedor oficial da rede Mira",
+    "verificada": "Franquia verificada",
+    "produtos_titulo": "Produtos ({n})",
+    "sem_produtos": "Este vendedor ainda não tem produtos publicados."
   }
 }

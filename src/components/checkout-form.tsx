@@ -1,11 +1,12 @@
 'use client'
 
-import { Loader2, Store, Truck } from 'lucide-react'
+import { Check, Loader2, Store, TicketPercent, Truck, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useMemo, useState, useTransition } from 'react'
 
 import { finalizarCheckout } from '@/app/checkout/checkout-actions'
+import { validarCupom } from '@/app/cupom-actions'
 import { cotarFreteCarrinho, type FreteCarrinhoResultado } from '@/app/frete-actions'
 import { CheckoutSchema } from '@/lib/checkout-schema'
 import { cn } from '@/lib/cn'
@@ -41,6 +42,36 @@ export function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults }) {
   const [referencia, setReferencia] = useState('')
   const [bairro, setBairro] = useState('')
 
+  // Cupom: digitado → validado no servidor → aplicado (código + desconto).
+  const [cupomInput, setCupomInput] = useState('')
+  const [cupomAplicado, setCupomAplicado] = useState<{
+    codigo: string
+    desconto: number
+  } | null>(null)
+  const [cupomErro, setCupomErro] = useState<string | null>(null)
+  const [validandoCupom, setValidandoCupom] = useState(false)
+
+  const aplicarCupom = () => {
+    if (!cupomInput.trim()) return
+    setCupomErro(null)
+    setValidandoCupom(true)
+    void validarCupom(cupomInput).then((r) => {
+      setValidandoCupom(false)
+      if (r.ok) {
+        setCupomAplicado({ codigo: r.codigo, desconto: r.descontoTotal })
+      } else {
+        setCupomAplicado(null)
+        setCupomErro(t(`cupom_erro_${r.error}`))
+      }
+    })
+  }
+
+  const removerCupom = () => {
+    setCupomAplicado(null)
+    setCupomInput('')
+    setCupomErro(null)
+  }
+
   const grupos = useMemo(() => cidadesPorDepartamento(), [])
   const cidadeSelecionada = cidadeId === '' ? null : obterCidade(cidadeId)
 
@@ -63,6 +94,7 @@ export function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults }) {
       email,
       telefone,
       documento,
+      cupom: cupomAplicado?.codigo ?? undefined,
       metodoEntrega: metodo,
       cidadeEntregaId: cidadeId === '' ? undefined : cidadeId,
       endereco:
@@ -92,6 +124,9 @@ export function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults }) {
           setErro(t('erro_carrinho_vazio'))
         } else if (r.error === 'frete:peso_excede') {
           setErro(t('erro_frete_peso'))
+        } else if (r.error.startsWith('cupom:')) {
+          setCupomAplicado(null)
+          setErro(t('erro_cupom_finalizar'))
         } else {
           setErro(t('erro_generico'))
         }
@@ -200,6 +235,66 @@ export function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults }) {
           </>
         ) : (
           <p className="text-[13px] text-gray-500">{t('retirada_dica')}</p>
+        )}
+      </section>
+
+      {/* Cupom de desconto */}
+      <section className="rounded-xl border border-gray-200 bg-white p-5">
+        <h2 className="mb-4 flex items-center gap-2 text-sm font-bold">
+          <TicketPercent className="size-4 text-gray-400" />
+          {t('cupom_titulo')}
+        </h2>
+        {cupomAplicado ? (
+          <div className="flex items-center justify-between gap-3 rounded-lg bg-emerald-50 px-4 py-2.5">
+            <span className="inline-flex min-w-0 items-center gap-2 text-[13px]">
+              <Check className="size-4 shrink-0 text-emerald-600" />
+              <span className="truncate font-semibold text-emerald-800">
+                {t('cupom_aplicado', { codigo: cupomAplicado.codigo })}
+              </span>
+              <span className="shrink-0 font-bold text-emerald-700">
+                − {formatarPreco(cupomAplicado.desconto)}
+              </span>
+            </span>
+            <button
+              type="button"
+              onClick={removerCupom}
+              aria-label={t('cupom_remover')}
+              className="shrink-0 rounded-full p-1 text-emerald-700 transition-colors hover:bg-emerald-100"
+            >
+              <X className="size-4" />
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="flex gap-2">
+              <input
+                value={cupomInput}
+                onChange={(e) => setCupomInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    aplicarCupom()
+                  }
+                }}
+                placeholder={t('cupom_placeholder')}
+                className="h-10 min-w-0 flex-1 rounded-lg border border-gray-300 px-3 font-mono text-[14px] uppercase outline-none focus:border-marca/40"
+              />
+              <button
+                type="button"
+                onClick={aplicarCupom}
+                disabled={validandoCupom || !cupomInput.trim()}
+                className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg border border-gray-300 px-4 text-[13px] font-semibold text-gray-700 transition-colors hover:border-marca/40 hover:text-marca disabled:opacity-50"
+              >
+                {validandoCupom && <Loader2 className="size-3.5 animate-spin" />}
+                {t('cupom_aplicar')}
+              </button>
+            </div>
+            {cupomErro && (
+              <p className="mt-2 text-[12.5px] font-medium text-red-600">
+                {cupomErro}
+              </p>
+            )}
+          </>
         )}
       </section>
 

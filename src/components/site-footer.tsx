@@ -39,6 +39,7 @@ export async function SiteFooter() {
         {/* Ajuda */}
         <ColunaFooter titulo={t('ajuda_titulo')}>
           <LinkFooter href="/faq">{t('ajuda_faq')}</LinkFooter>
+          <LinkFooter href="/rastreio">{t('ajuda_rastreio')}</LinkFooter>
           {WHATSAPP && (
             <a
               href={`https://wa.me/${WHATSAPP}`}

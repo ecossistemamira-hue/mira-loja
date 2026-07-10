@@ -1,4 +1,4 @@
-import { Sparkles, Tag } from 'lucide-react'
+import { Flame, Sparkles, Tag } from 'lucide-react'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 
@@ -8,6 +8,7 @@ import { HeroCarousel, type SlideHero } from '@/components/hero-carousel'
 import { ProductCard } from '@/components/product-card'
 import { VistosRecentemente } from '@/components/vistos-recentemente'
 import { listarMediasAvaliacoes } from '@/lib/avaliacoes'
+import { listarMaisVendidos } from '@/lib/mais-vendidos'
 import { listarCategoriasVitrine, listarProdutosVitrine } from '@/lib/queries'
 import type { ProdutoVitrine } from '@/lib/types'
 
@@ -17,11 +18,14 @@ export const revalidate = 300
 
 export default async function HomePage() {
   const t = await getTranslations('home')
-  const [produtos, categorias] = await Promise.all([
+  const [produtos, categorias, maisVendidos] = await Promise.all([
     listarProdutosVitrine({ limite: 60 }),
     listarCategoriasVitrine(),
+    listarMaisVendidos(12),
   ])
-  const medias = await listarMediasAvaliacoes(produtos.map((p) => p.id))
+  const medias = await listarMediasAvaliacoes([
+    ...new Set([...produtos, ...maisVendidos].map((p) => p.id)),
+  ])
 
   const slides: SlideHero[] = [1, 2, 3].map((n) => ({
     badge: t(`hero_badge_${n}`),
@@ -89,6 +93,25 @@ export default async function HomePage() {
               />
             ))}
           </SecaoCarrossel>
+
+          {/* Mais vendidos (agregado de pedidos pagos) */}
+          {maisVendidos.length > 0 && (
+            <SecaoCarrossel
+              icone={<Flame className="size-4" />}
+              titulo={t('mais_vendidos')}
+              verTodosHref="/buscar"
+              verTodosLabel={t('ver_todos')}
+            >
+              {maisVendidos.map((p) => (
+                <ProductCard
+                  key={p.id}
+                  produto={p}
+                  compacto
+                  avaliacao={medias.get(p.id) ?? null}
+                />
+              ))}
+            </SecaoCarrossel>
+          )}
 
           {/* Vistos recentemente (histórico local do visitante) */}
           <VistosRecentemente />

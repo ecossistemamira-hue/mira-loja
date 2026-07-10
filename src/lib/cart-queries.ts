@@ -84,7 +84,7 @@ export async function obterCarrinho(): Promise<CarrinhoResolvido> {
   const franquiaIds = [...new Set(itens.map((i) => i.franquiaId))]
   const { data: franquias } = await supabase
     .from('franquias_publicas')
-    .select('id, nome_fantasia, cidade, pais, logo_url, moeda')
+    .select('id, nome_fantasia, slug, cidade, pais, logo_url, moeda')
     .in('id', franquiaIds)
   const mapaFranquia = new Map<string, FranquiaPublica>(
     (franquias ?? []).map((f) => [f.id, f as FranquiaPublica]),

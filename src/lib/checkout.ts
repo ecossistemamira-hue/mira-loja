@@ -3,6 +3,7 @@ import 'server-only'
 import { lerCarrinhoId } from '@/lib/cart'
 import { obterCarrinho } from '@/lib/cart-queries'
 import type { CheckoutInput } from '@/lib/checkout-schema'
+import { validarCupomParaCarrinho, type CupomAplicado } from '@/lib/cupom'
 import {
   emailPagamentoConfirmado,
   emailPedidoRecebido,
@@ -64,6 +65,14 @@ export async function criarPedidosDoCarrinho(
   if (totalItens === 0) return { ok: false, error: 'carrinho_vazio' }
 
   const svc = createServiceClient()
+
+  // ── Fase 0: cupom (validação; o consumo atômico vem depois da reserva) ────
+  let cupom: CupomAplicado | null = null
+  if (dados.cupom) {
+    const r = await validarCupomParaCarrinho(dados.cupom, grupos)
+    if (!r.ok) return { ok: false, error: `cupom:${r.error}` }
+    cupom = r.cupom
+  }
 
   // ── Fase 1: reserva atômica de todos os itens ────────────────────────────
   const reservas: { produtoId: string; qtd: number }[] = []
@@ -143,6 +152,17 @@ export async function criarPedidosDoCarrinho(
     }
   }
 
+  // ── Fase 2.5: consome 1 uso do cupom (atômico — protege o último uso) ─────
+  if (cupom) {
+    const { data: consumiu, error: errCupom } = await svc.rpc('usar_cupom', {
+      p_cupom_id: cupom.cupomId,
+    })
+    if (errCupom || consumiu !== true) {
+      await liberarReservas(svc, reservas)
+      return { ok: false, error: 'cupom:esgotado' }
+    }
+  }
+
   // ── Fase 3: um pedido por franquia ────────────────────────────────────────
   const expiraEm = new Date(Date.now() + TTL_MINUTOS * 60_000).toISOString()
   const enderecoSnapshot =
@@ -181,6 +201,12 @@ export async function criarPedidosDoCarrinho(
       p_ano: ano,
     })
 
+    // Desconto do cupom pra ESTA franquia (0 quando não se aplica ao grupo).
+    const desconto = franquiaId
+      ? (cupom?.descontoPorFranquia[franquiaId] ?? 0)
+      : 0
+    const total = Math.max(0, subtotal - desconto) + frete
+
     const { data: pedido, error: errPedido } = await svc
       .from('pedidos')
       .insert({
@@ -190,9 +216,10 @@ export async function criarPedidosDoCarrinho(
         status: 'aguardando_pagamento',
         moeda,
         subtotal,
-        desconto: 0,
+        desconto,
+        cupom_id: desconto > 0 ? cupom?.cupomId : null,
         frete,
-        total: subtotal + frete,
+        total,
         metodo_entrega: dados.metodoEntrega,
         endereco_entrega: enderecoSnapshot,
         comprador_nome: dados.nome.trim(),
@@ -228,7 +255,7 @@ export async function criarPedidosDoCarrinho(
       pedido_id: pedido.id,
       gateway: 'manual',
       status: 'pending',
-      valor: subtotal + frete,
+      valor: total,
     })
 
     criados.push({

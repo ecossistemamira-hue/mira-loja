@@ -44,6 +44,7 @@ export type ProdutoDetalhe = ProdutoComFotos & {
 export type FranquiaPublica = {
   id: string
   nome_fantasia: string
+  slug: string | null
   cidade: string | null
   pais: string
   logo_url: string | null

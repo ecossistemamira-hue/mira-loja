@@ -13,6 +13,8 @@ const COLUNAS_VITRINE =
 type ListarParams = {
   busca?: string
   categoria?: string
+  /** Restringe à vitrine de uma franquia (página /f/[slug]). */
+  franquiaId?: string
   limite?: number
 }
 
@@ -31,6 +33,7 @@ export async function listarProdutosVitrine(
     .limit(params.limite ?? 60)
 
   if (params.categoria) q = q.eq('categoria', params.categoria)
+  if (params.franquiaId) q = q.eq('franquia_id', params.franquiaId)
   if (params.busca && params.busca.trim()) {
     // Escapa curingas do LIKE pra busca literal.
     const termo = params.busca.trim().replace(/[%_\\]/g, (m) => `\\${m}`)
@@ -109,7 +112,7 @@ export async function obterProdutoPorSlug(
       .order('ordem', { ascending: true }),
     supabase
       .from('franquias_publicas')
-      .select('id, nome_fantasia, cidade, pais, logo_url, moeda')
+      .select('id, nome_fantasia, slug, cidade, pais, logo_url, moeda')
       .eq('id', base.franquia_id)
       .maybeSingle(),
   ])
@@ -119,6 +122,37 @@ export async function obterProdutoPorSlug(
     fotos: fotos ?? [],
     vendedor: (vendedor as FranquiaPublica | null) ?? null,
   }
+}
+
+/** Franquia (vendedora) pelo slug — página pública /f/[slug]. */
+export async function obterFranquiaPorSlug(
+  slug: string,
+): Promise<FranquiaPublica | null> {
+  const supabase = createLojaClient()
+  const { data, error } = await supabase
+    .from('franquias_publicas')
+    .select('id, nome_fantasia, slug, cidade, pais, logo_url, moeda')
+    .eq('slug', slug)
+    .maybeSingle()
+  if (error || !data) {
+    if (error) console.error('[loja.obterFranquiaPorSlug]', error)
+    return null
+  }
+  return data as FranquiaPublica
+}
+
+/** Slugs das franquias ativas — sitemap das páginas /f/[slug]. */
+export async function listarSlugsFranquias(): Promise<string[]> {
+  const supabase = createLojaClient()
+  const { data, error } = await supabase
+    .from('franquias_publicas')
+    .select('slug')
+    .not('slug', 'is', null)
+    .limit(500)
+  if (error) return []
+  return (data ?? [])
+    .map((f) => (f as { slug: string | null }).slug)
+    .filter((s): s is string => !!s)
 }
 
 /** Slugs de todos os produtos publicados — alimenta o sitemap. */

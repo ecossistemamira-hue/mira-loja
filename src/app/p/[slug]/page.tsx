@@ -18,6 +18,7 @@ import { WishlistButton } from '@/components/wishlist-button'
 import { listarAvaliacoes, listarMediasAvaliacoes } from '@/lib/avaliacoes'
 import { estoqueDisponivel, precoExibicao, precoVenda } from '@/lib/format'
 import { listarProdutosVitrine, obterProdutoPorSlug } from '@/lib/queries'
+import type { ProdutoDetalhe } from '@/lib/types'
 
 export const revalidate = 300
 
@@ -269,35 +270,14 @@ export default async function ProdutoPage({ params }: Props) {
             />
           )}
 
-          {/* Vendido por (franquia da rede) */}
+          {/* Vendido por (franquia da rede) — linka pra vitrine da franquia */}
           {produto.vendedor && (
-            <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
-              <div className="flex min-w-0 items-center gap-3">
-                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-marca/10 text-marca">
-                  <Store className="size-5" />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-[10px] font-extrabold uppercase tracking-widest text-gray-400">
-                    {t('vendido_por')}
-                  </p>
-                  <p className="truncate text-sm font-semibold text-gray-900">
-                    {produto.vendedor.nome_fantasia}
-                  </p>
-                  {produto.vendedor.cidade && (
-                    <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-gray-500">
-                      <MapPin className="size-3" />
-                      {produto.vendedor.cidade}, {produto.vendedor.pais}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-blue-100 px-2.5 py-1 text-[10px] font-bold text-blue-700">
-                <ShieldCheck className="size-3.5" />
-                {t('franquia_verificada')}
-              </span>
-            </div>
+            <VendedorCard
+              vendedor={produto.vendedor}
+              rotulo={t('vendido_por')}
+              selo={t('franquia_verificada')}
+            />
           )}
-
 
           {/* Ação principal: quantidade + comprar agora + carrinho */}
           {!semEstoque && (
@@ -385,5 +365,58 @@ export default async function ProdutoPage({ params }: Props) {
         </section>
       )}
     </div>
+  )
+}
+
+function VendedorCard({
+  vendedor,
+  rotulo,
+  selo,
+}: {
+  vendedor: NonNullable<ProdutoDetalhe['vendedor']>
+  rotulo: string
+  selo: string
+}) {
+  const conteudo = (
+    <>
+      <div className="flex min-w-0 items-center gap-3">
+        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-marca/10 text-marca">
+          <Store className="size-5" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-[10px] font-extrabold uppercase tracking-widest text-gray-400">
+            {rotulo}
+          </p>
+          <p className="truncate text-sm font-semibold text-gray-900">
+            {vendedor.nome_fantasia}
+          </p>
+          {vendedor.cidade && (
+            <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-gray-500">
+              <MapPin className="size-3" />
+              {vendedor.cidade}, {vendedor.pais}
+            </p>
+          )}
+        </div>
+      </div>
+      <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-blue-100 px-2.5 py-1 text-[10px] font-bold text-blue-700">
+        <ShieldCheck className="size-3.5" />
+        {selo}
+      </span>
+    </>
+  )
+
+  const classes =
+    'mt-4 flex items-center justify-between gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm'
+
+  // Franquia sem slug (não deveria acontecer pós-migration 0094): card estático.
+  if (!vendedor.slug) return <div className={classes}>{conteudo}</div>
+
+  return (
+    <Link
+      href={`/f/${vendedor.slug}`}
+      className={`${classes} transition-colors hover:border-marca/30`}
+    >
+      {conteudo}
+    </Link>
   )
 }

@@ -20,6 +20,8 @@ export const CheckoutSchema = z
     telefone: z.string().max(30).optional().or(z.literal('')),
     documento: z.string().max(30).optional().or(z.literal('')),
     metodoEntrega: z.enum(['envio', 'retirada']),
+    // Código de cupom aplicado (revalidado + consumido no servidor).
+    cupom: z.string().max(40).optional().or(z.literal('')),
     // Cidade da tabela AEX (id); o frete é recalculado no servidor por ela.
     cidadeEntregaId: z.number().int().positive().optional(),
     endereco: EnderecoSchema.optional(),
