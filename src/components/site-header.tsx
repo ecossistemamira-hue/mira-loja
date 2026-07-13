@@ -1,30 +1,20 @@
-import { LayoutGrid, ShoppingCart } from 'lucide-react'
+import { LayoutGrid } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 
+import { HeaderContaCarrinho } from '@/components/header-conta-carrinho'
 import { LocaleSwitcher } from '@/components/locale-switcher'
 import { SearchBox } from '@/components/search-box'
-import { UserMenu } from '@/components/user-menu'
 import { WishlistHeaderLink } from '@/components/wishlist-header-link'
-import { contarItensCarrinho } from '@/lib/cart-queries'
 import { listarCategoriasComContagem } from '@/lib/queries'
-import { obterUsuarioLoja } from '@/lib/supabase-auth'
 
 export async function SiteHeader() {
   const t = await getTranslations()
-  const [itensCarrinho, usuario, categorias] = await Promise.all([
-    contarItensCarrinho(),
-    obterUsuarioLoja(),
-    listarCategoriasComContagem(),
-  ])
+  // Só dado PÚBLICO no server (e cacheado); carrinho/sessão viraram ilha
+  // client (HeaderContaCarrinho) — zero cookie/Auth no caminho do render.
+  const categorias = await listarCategoriasComContagem()
   const categoriasBarra = categorias.slice(0, 8)
-  const usuarioNome = usuario
-    ? ((usuario.user_metadata?.nome_completo as string | undefined) ??
-      (usuario.user_metadata?.full_name as string | undefined) ??
-      usuario.email ??
-      null)
-    : null
 
   return (
     <header className="sticky top-0 z-40 border-b border-gray-100 bg-white shadow-sm">
@@ -54,20 +44,7 @@ export async function SiteHeader() {
         <div className="flex shrink-0 items-center gap-1.5">
           <WishlistHeaderLink />
 
-          <Link
-            href="/carrinho"
-            className="relative grid size-9 place-items-center rounded-full text-gray-600 transition-colors hover:bg-gray-100 hover:text-marca"
-            aria-label={t('nav.carrinho')}
-          >
-            <ShoppingCart className="size-[18px]" />
-            {itensCarrinho > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 grid min-w-4 place-items-center rounded-full bg-marca px-1 text-[10px] font-bold leading-4 text-white">
-                {itensCarrinho}
-              </span>
-            )}
-          </Link>
-
-          <UserMenu usuarioNome={usuarioNome} />
+          <HeaderContaCarrinho />
 
           <LocaleSwitcher />
         </div>

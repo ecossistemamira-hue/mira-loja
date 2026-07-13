@@ -1,5 +1,8 @@
 import 'server-only'
 
+import { unstable_cache } from 'next/cache'
+import { cache } from 'react'
+
 import { pontuarBusca } from '@/lib/busca-fuzzy'
 import { createLojaClient } from '@/lib/supabase'
 import type {
@@ -7,6 +10,14 @@ import type {
   ProdutoDetalhe,
   ProdutoVitrine,
 } from '@/lib/types'
+
+// ─── Cache de dados (Data Cache) ────────────────────────────────────────────
+// As queries públicas usam o client ANON (sem cookie/sessão) — seguras de
+// cachear entre requests. Catálogo tolera ~1 min de atraso; o estoque real é
+// re-validado no checkout (reserva atômica). Páginas seguem dinâmicas (locale
+// via cookie), mas o custo de banco por request some.
+const TTL_CATALOGO = 60
+const TTL_LENTO = 300
 
 export const COLUNAS_VITRINE =
   'id, nome, slug, descricao, categoria, franquia_id, preco_pyg, preco_promocional_pyg, imagem_url, estoque, estoque_reservado, permite_envio, permite_retirada, created_at'
@@ -30,7 +41,7 @@ const MAX_CANDIDATOS_BUSCA = 500
  * puxamos o catálogo filtrado (pequeno) e rankeamos em JS com `pontuarBusca`
  * — "cajxa" acha "Caixa", "asuncion" acha "Asunción".
  */
-export async function listarProdutosVitrine(
+async function listarProdutosVitrineDireto(
   params: ListarParams = {},
 ): Promise<ProdutoVitrine[]> {
   const supabase = createLojaClient()
@@ -66,14 +77,29 @@ export async function listarProdutosVitrine(
     .map((r) => r.p)
 }
 
+const listarProdutosVitrineCacheada = unstable_cache(
+  listarProdutosVitrineDireto,
+  ['produtos-vitrine'],
+  { revalidate: TTL_CATALOGO },
+)
+
+export async function listarProdutosVitrine(
+  params: ListarParams = {},
+): Promise<ProdutoVitrine[]> {
+  // Busca livre NÃO entra no cache (cada termo viraria uma entrada); listagens
+  // fixas (home, categoria, franquia) saem do Data Cache.
+  return params.busca?.trim()
+    ? listarProdutosVitrineDireto(params)
+    : listarProdutosVitrineCacheada(params)
+}
+
 /**
  * Ofertas: produtos com preço promocional VÁLIDO (promo < cheio), ordenados
  * pelo maior desconto. Alimenta a seção "Ofertas do dia" da home.
  */
-export async function listarOfertasVitrine(
-  limite = 12,
-): Promise<ProdutoVitrine[]> {
-  const supabase = createLojaClient()
+export const listarOfertasVitrine = unstable_cache(
+  async function listarOfertasVitrine(limite = 12): Promise<ProdutoVitrine[]> {
+    const supabase = createLojaClient()
   const { data, error } = await supabase
     .from('produtos')
     .select(COLUNAS_VITRINE)
@@ -94,7 +120,10 @@ export async function listarOfertasVitrine(
     .filter((p) => desconto(p) > 0)
     .sort((a, b) => desconto(b) - desconto(a))
     .slice(0, limite)
-}
+  },
+  ['ofertas-vitrine'],
+  { revalidate: TTL_CATALOGO },
+)
 
 /** Vendedor por produto: mapa franquia_id → dados leves pros cards. */
 export type VendedorCard = {
@@ -103,21 +132,18 @@ export type VendedorCard = {
   aceitaRetirada: boolean
 }
 
-export async function mapaFranquiasPublicas(
-  ids: string[],
-): Promise<Map<string, VendedorCard>> {
-  const unicos = [...new Set(ids)].filter(Boolean)
-  if (unicos.length === 0) return new Map()
+// O Data Cache serializa em JSON — Map não sobrevive. Cacheamos os PARES e o
+// wrapper remonta o Map fora do cache.
+const paresFranquiasPublicas = unstable_cache(
+  async (unicos: string[]): Promise<Array<[string, VendedorCard]>> => {
+    const supabase = createLojaClient()
+    const { data, error } = await supabase
+      .from('franquias_publicas')
+      .select('id, nome_fantasia, slug, aceita_retirada')
+      .in('id', unicos)
+    if (error || !data) return []
 
-  const supabase = createLojaClient()
-  const { data, error } = await supabase
-    .from('franquias_publicas')
-    .select('id, nome_fantasia, slug, aceita_retirada')
-    .in('id', unicos)
-  if (error || !data) return new Map()
-
-  return new Map(
-    (
+    return (
       data as {
         id: string
         nome_fantasia: string
@@ -127,14 +153,25 @@ export async function mapaFranquiasPublicas(
     ).map((f) => [
       f.id,
       { nome: f.nome_fantasia, slug: f.slug, aceitaRetirada: f.aceita_retirada },
-    ]),
-  )
+    ])
+  },
+  ['franquias-publicas'],
+  { revalidate: TTL_LENTO },
+)
+
+export async function mapaFranquiasPublicas(
+  ids: string[],
+): Promise<Map<string, VendedorCard>> {
+  const unicos = [...new Set(ids)].filter(Boolean).sort()
+  if (unicos.length === 0) return new Map()
+  return new Map(await paresFranquiasPublicas(unicos))
 }
 
 /** Categorias com contagem de produtos publicados (página /categorias). */
-export async function listarCategoriasComContagem(): Promise<
-  { categoria: string; total: number }[]
-> {
+export const listarCategoriasComContagem = unstable_cache(
+  async function listarCategoriasComContagem(): Promise<
+    { categoria: string; total: number }[]
+  > {
   const supabase = createLojaClient()
   const { data, error } = await supabase
     .from('produtos')
@@ -150,7 +187,10 @@ export async function listarCategoriasComContagem(): Promise<
   return [...contagem.entries()]
     .map(([categoria, total]) => ({ categoria, total }))
     .sort((a, b) => b.total - a.total || a.categoria.localeCompare(b.categoria))
-}
+  },
+  ['categorias-contagem'],
+  { revalidate: TTL_LENTO },
+)
 
 /** Categorias distintas dos produtos publicados (pros filtros da vitrine). */
 export async function listarCategoriasVitrine(): Promise<string[]> {
@@ -171,9 +211,14 @@ export async function listarCategoriasVitrine(): Promise<string[]> {
 
 const COLUNAS_DETALHE = `${COLUNAS_VITRINE}, peso_gramas, altura_cm, largura_cm, comprimento_cm, selos`
 
-export async function obterProdutoPorSlug(
-  slug: string,
-): Promise<ProdutoDetalhe | null> {
+// cache() (por request): generateMetadata e o corpo da PDP pedem o MESMO
+// produto — sem isso são 6 round-trips em vez de 3. unstable_cache (entre
+// requests): a PDP inteira sai do Data Cache por TTL_CATALOGO.
+export const obterProdutoPorSlug = cache(
+  unstable_cache(
+    async function obterProdutoPorSlug(
+      slug: string,
+    ): Promise<ProdutoDetalhe | null> {
   const supabase = createLojaClient()
   const { data: produto, error } = await supabase
     .from('produtos')
@@ -205,24 +250,32 @@ export async function obterProdutoPorSlug(
     fotos: fotos ?? [],
     vendedor: (vendedor as FranquiaPublica | null) ?? null,
   }
-}
+    },
+    ['produto-por-slug'],
+    { revalidate: TTL_CATALOGO },
+  ),
+)
 
 /** Franquia (vendedora) pelo slug — página pública /f/[slug]. */
-export async function obterFranquiaPorSlug(
-  slug: string,
-): Promise<FranquiaPublica | null> {
-  const supabase = createLojaClient()
-  const { data, error } = await supabase
-    .from('franquias_publicas')
-    .select('id, nome_fantasia, slug, cidade, pais, logo_url, moeda, aceita_retirada')
-    .eq('slug', slug)
-    .maybeSingle()
-  if (error || !data) {
-    if (error) console.error('[loja.obterFranquiaPorSlug]', error)
-    return null
-  }
-  return data as FranquiaPublica
-}
+export const obterFranquiaPorSlug = unstable_cache(
+  async function obterFranquiaPorSlug(
+    slug: string,
+  ): Promise<FranquiaPublica | null> {
+    const supabase = createLojaClient()
+    const { data, error } = await supabase
+      .from('franquias_publicas')
+      .select('id, nome_fantasia, slug, cidade, pais, logo_url, moeda, aceita_retirada')
+      .eq('slug', slug)
+      .maybeSingle()
+    if (error || !data) {
+      if (error) console.error('[loja.obterFranquiaPorSlug]', error)
+      return null
+    }
+    return data as FranquiaPublica
+  },
+  ['franquia-por-slug'],
+  { revalidate: TTL_LENTO },
+)
 
 /** Slugs das franquias ativas — sitemap das páginas /f/[slug]. */
 export async function listarSlugsFranquias(): Promise<string[]> {

@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 
 import { definirQuantidade, removerItem } from '@/app/cart-actions'
+import { notificarHeaderInfo } from '@/components/header-conta-carrinho'
 import { formatarPreco, precoDoItem } from '@/lib/format'
 import type { ItemCarrinho } from '@/lib/types'
 
@@ -22,6 +23,7 @@ export function CartItemRow({ item }: { item: ItemCarrinho }) {
     start(async () => {
       await definirQuantidade(item.itemId, novaQtd)
       router.refresh()
+      notificarHeaderInfo()
     })
   }
 
@@ -29,6 +31,7 @@ export function CartItemRow({ item }: { item: ItemCarrinho }) {
     start(async () => {
       await removerItem(item.itemId)
       router.refresh()
+      notificarHeaderInfo()
     })
   }
 

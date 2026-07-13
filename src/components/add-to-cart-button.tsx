@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { useState, useTransition } from 'react'
 
 import { adicionarAoCarrinho } from '@/app/cart-actions'
+import { notificarHeaderInfo } from '@/components/header-conta-carrinho'
 
 /** Botão simples (mantido pra usos fora da PDP). */
 export function AddToCartButton({
@@ -26,6 +27,7 @@ export function AddToCartButton({
       if (!r.ok) return
       setOk(true)
       router.refresh()
+      notificarHeaderInfo()
       setTimeout(() => setOk(false), 1800)
     })
   }
@@ -77,6 +79,7 @@ export function CompraBox({
       if (!r.ok) return
       setOk(true)
       router.refresh()
+      notificarHeaderInfo()
       setTimeout(() => setOk(false), 1800)
     })
   }

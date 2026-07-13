@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { unstable_cache } from 'next/cache'
+
 import { COLUNAS_VITRINE } from '@/lib/queries'
 import { createLojaClient, createServiceClient } from '@/lib/supabase'
 import type { ProdutoVitrine } from '@/lib/types'
@@ -22,9 +24,8 @@ const STATUS_VENDIDO = [
  * pedido vaza: daqui só saem ids/quantidades, e os produtos em si voltam a
  * passar pela RLS pública `produtos_publico` via anon.
  */
-export async function listarMaisVendidos(
-  limite = 12,
-): Promise<ProdutoVitrine[]> {
+export const listarMaisVendidos = unstable_cache(
+  async function listarMaisVendidos(limite = 12): Promise<ProdutoVitrine[]> {
   const svc = createServiceClient()
   const { data, error } = await svc
     .from('pedido_itens')
@@ -69,4 +70,9 @@ export async function listarMaisVendidos(
   return ranking
     .map((id) => porId.get(id))
     .filter((p): p is ProdutoVitrine => !!p)
-}
+  },
+  ['mais-vendidos'],
+  // Ranking de vendas muda devagar — 5 min de cache poupa a query mais cara
+  // da home (agregado via service role) em toda visita.
+  { revalidate: 300 },
+)
