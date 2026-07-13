@@ -24,10 +24,19 @@ export function ProductGallery({ nome, fotos, fallbackUrl }: Props) {
   const [lightbox, setLightbox] = useState(false)
   // Zoom do lightbox: guarda A FOTO em que o zoom foi ativado — trocar de foto
   // desativa sozinho (sem setState em effect, que o lint do React 19 barra).
-  const [zoomEm, setZoomEm] = useState<{ i: number; origem: string } | null>(
-    null,
-  )
+  const [zoomEm, setZoomEm] = useState<{
+    i: number
+    origem: string
+    escala: number
+  } | null>(null)
   const toqueX = useRef<number | null>(null)
+  // Pinch em andamento: distância/escala do início do gesto. `foiPinch` impede
+  // que o touchend de um pinch conte como swipe de troca de foto.
+  const pinch = useRef<{ dist: number; escala: number } | null>(null)
+  const foiPinch = useRef(false)
+  // Estado (não ref): zera a transition durante o gesto — animar cada frame
+  // do pinch com 200ms deixaria o zoom "borrachudo".
+  const [pinchAndo, setPinchAndo] = useState(false)
 
   const zoomAtivo = lightbox && zoomEm?.i === ativa
 
@@ -36,12 +45,29 @@ export function ProductGallery({ nome, fotos, fallbackUrl }: Props) {
     setZoomEm(null)
   }
 
-  const origemDoEvento = (e: React.MouseEvent<HTMLElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    const x = ((e.clientX - rect.left) / rect.width) * 100
-    const y = ((e.clientY - rect.top) / rect.height) * 100
+  const origemPercentual = (
+    el: HTMLElement,
+    clientX: number,
+    clientY: number,
+  ) => {
+    const rect = el.getBoundingClientRect()
+    const x = ((clientX - rect.left) / rect.width) * 100
+    const y = ((clientY - rect.top) / rect.height) * 100
     return `${x.toFixed(1)}% ${y.toFixed(1)}%`
   }
+
+  const origemDoEvento = (e: React.MouseEvent<HTMLElement>) =>
+    origemPercentual(e.currentTarget, e.clientX, e.clientY)
+
+  const distanciaPinch = (t: React.TouchList) =>
+    Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY)
+
+  const centroPinch = (el: HTMLElement, t: React.TouchList) =>
+    origemPercentual(
+      el,
+      (t[0].clientX + t[1].clientX) / 2,
+      (t[0].clientY + t[1].clientY) / 2,
+    )
 
   const total = urls.length
   const anterior = useCallback(
@@ -81,10 +107,21 @@ export function ProductGallery({ nome, fotos, fallbackUrl }: Props) {
   // Swipe no mobile (imagem principal e lightbox). Com zoom ativo o swipe
   // não troca de foto (o gesto vira "explorar a imagem").
   const onTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length > 1) {
+      foiPinch.current = true
+      return
+    }
+    foiPinch.current = false
     toqueX.current = e.touches[0].clientX
   }
   const onTouchEnd = (e: React.TouchEvent) => {
-    if (toqueX.current == null || total < 2 || zoomAtivo) return
+    if (
+      toqueX.current == null ||
+      total < 2 ||
+      zoomAtivo ||
+      foiPinch.current
+    )
+      return
     const delta = e.changedTouches[0].clientX - toqueX.current
     if (Math.abs(delta) > 40) (delta > 0 ? anterior : proxima)()
     toqueX.current = null
@@ -190,17 +227,67 @@ export function ProductGallery({ nome, fotos, fallbackUrl }: Props) {
             <div
               className={cn(
                 // absolute (não h-full): o pai é flex-1 e o 100% colapsaria.
-                'absolute inset-x-4 top-0 bottom-4 overflow-hidden',
+                // touch-none: sem ele o browser "come" o pinch (zoom da página).
+                'absolute inset-x-4 top-0 bottom-4 touch-none overflow-hidden',
                 zoomAtivo ? 'cursor-zoom-out' : 'cursor-zoom-in',
               )}
               onClick={(e) =>
                 setZoomEm(
-                  zoomAtivo ? null : { i: ativa, origem: origemDoEvento(e) },
+                  zoomAtivo
+                    ? null
+                    : { i: ativa, origem: origemDoEvento(e), escala: 2.2 },
                 )
               }
               onMouseMove={(e) => {
                 if (zoomAtivo)
-                  setZoomEm({ i: ativa, origem: origemDoEvento(e) })
+                  setZoomEm({
+                    i: ativa,
+                    origem: origemDoEvento(e),
+                    escala: zoomEm?.escala ?? 2.2,
+                  })
+              }}
+              onTouchStart={(e) => {
+                if (e.touches.length === 2) {
+                  pinch.current = {
+                    dist: distanciaPinch(e.touches),
+                    escala: zoomAtivo ? (zoomEm?.escala ?? 1) : 1,
+                  }
+                  setPinchAndo(true)
+                }
+              }}
+              onTouchMove={(e) => {
+                if (e.touches.length === 2 && pinch.current) {
+                  const escala = Math.min(
+                    4,
+                    pinch.current.escala *
+                      (distanciaPinch(e.touches) / pinch.current.dist),
+                  )
+                  // Voltou pro tamanho natural → sai do modo zoom.
+                  if (escala <= 1.05) setZoomEm(null)
+                  else
+                    setZoomEm({
+                      i: ativa,
+                      origem: centroPinch(e.currentTarget, e.touches),
+                      escala,
+                    })
+                } else if (e.touches.length === 1 && zoomAtivo) {
+                  // Um dedo com zoom ativo = passear pela imagem (como o mouse).
+                  setZoomEm({
+                    i: ativa,
+                    origem: origemPercentual(
+                      e.currentTarget,
+                      e.touches[0].clientX,
+                      e.touches[0].clientY,
+                    ),
+                    escala: zoomEm?.escala ?? 2.2,
+                  })
+                }
+              }}
+              onTouchEnd={(e) => {
+                if (e.touches.length < 2) {
+                  pinch.current = null
+                  setPinchAndo(false)
+                }
               }}
             >
               <Image
@@ -211,11 +298,16 @@ export function ProductGallery({ nome, fotos, fallbackUrl }: Props) {
                 sizes="100vw"
                 className={cn(
                   // transition-transform só anima o scale — transform-origin
-                  // (o "passeio" do mouse) muda instantâneo, como deve.
+                  // (o "passeio" do mouse/dedo) muda instantâneo, como deve.
                   'object-contain transition-transform duration-200',
-                  zoomAtivo && 'scale-[2.2]',
                 )}
-                style={{ transformOrigin: zoomEm?.origem ?? '50% 50%' }}
+                style={{
+                  transformOrigin: zoomEm?.origem ?? '50% 50%',
+                  // Tailwind v4: scale-[x] vira a propriedade CSS `scale`;
+                  // aqui a escala é dinâmica (clique 2.2, pinch 1–4).
+                  scale: zoomAtivo ? String(zoomEm?.escala ?? 2.2) : '1',
+                  transitionDuration: pinchAndo ? '0ms' : undefined,
+                }}
               />
             </div>
             {total > 1 && (
