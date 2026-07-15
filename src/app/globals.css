@@ -10,17 +10,24 @@
   --color-marca-hover: #7d1a2b;
   --color-marca-50: #faeef0;
   --color-marca-escuro: #4a0c1a;
+  /* Vinho quase-preto do hero/rodapé — mais fundo que o marca-escuro. */
+  --color-vinho-noite: #3d0a15;
+  /* Ouro guaraní — estrelas, selos de destaque. Nunca em texto corrido. */
+  --color-oro: #d9a441;
   --color-acento: #ff0a0a;
+  /* Fundo da página — off-white quente, casa com o vinho sem esfriar. */
+  --color-fundo: #faf7f4;
 }
 
 :root {
   --background: #ffffff;
-  --foreground: #2c303a;
+  --foreground: #292326;
+  --fundo: #faf7f4;
 }
 
 html {
   color: var(--foreground);
-  background: #fafafa;
+  background: var(--fundo);
   scroll-behavior: smooth;
 }
 

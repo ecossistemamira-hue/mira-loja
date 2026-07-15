@@ -20,7 +20,7 @@ export function StarRating({
           style={{ width: tamanho, height: tamanho }}
           className={
             n <= Math.round(nota)
-              ? 'fill-amber-400 text-amber-400'
+              ? 'fill-oro text-oro'
               : 'fill-gray-200 text-gray-200'
           }
         />

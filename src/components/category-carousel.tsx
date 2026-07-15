@@ -49,7 +49,7 @@ export function CategoryCarousel({ children }: { children: React.ReactNode }) {
       {/* Setas flutuantes com fade lateral */}
       <div
         className={cn(
-          'pointer-events-none absolute inset-y-0 left-0 flex items-center bg-gradient-to-r from-white via-white/70 to-transparent pr-6 transition-opacity',
+          'pointer-events-none absolute inset-y-0 left-0 flex items-center bg-gradient-to-r from-fundo via-fundo/70 to-transparent pr-6 transition-opacity',
           podeEsq ? 'opacity-100' : 'opacity-0',
         )}
       >
@@ -65,7 +65,7 @@ export function CategoryCarousel({ children }: { children: React.ReactNode }) {
       </div>
       <div
         className={cn(
-          'pointer-events-none absolute inset-y-0 right-0 flex items-center bg-gradient-to-l from-white via-white/70 to-transparent pl-6 transition-opacity',
+          'pointer-events-none absolute inset-y-0 right-0 flex items-center bg-gradient-to-l from-fundo via-fundo/70 to-transparent pl-6 transition-opacity',
           podeDir ? 'opacity-100' : 'opacity-0',
         )}
       >

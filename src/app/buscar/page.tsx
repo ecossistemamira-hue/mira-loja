@@ -76,7 +76,7 @@ export default async function BuscaPage({ searchParams }: Props) {
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-bold tracking-tight">{titulo}</h1>
+        <h1 className="font-display text-xl font-bold tracking-tight">{titulo}</h1>
 
         {/* Ordenação */}
         <nav className="flex items-center gap-1.5 text-[12.5px]">

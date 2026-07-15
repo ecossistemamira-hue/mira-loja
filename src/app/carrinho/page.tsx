@@ -23,7 +23,7 @@ export default async function CarrinhoPage() {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 text-center">
         <ShoppingCart className="mx-auto size-10 text-gray-300" />
-        <h1 className="mt-4 text-xl font-bold">{t('vazio_titulo')}</h1>
+        <h1 className="font-display mt-4 text-xl font-bold">{t('vazio_titulo')}</h1>
         <p className="mt-1 text-[13px] text-gray-500">{t('vazio_dica')}</p>
         <Link
           href="/"
@@ -87,7 +87,7 @@ export default async function CarrinhoPage() {
       <div className="mt-6 flex justify-end">
         <Link
           href="/checkout"
-          className="inline-flex h-12 items-center justify-center rounded-xl px-8 text-[15px] font-semibold text-white transition-[filter] hover:brightness-95"
+          className="inline-flex h-12 items-center justify-center rounded-full px-8 text-[15px] font-semibold text-white transition-[filter] hover:brightness-95"
           style={{ background: '#a02237' }}
         >
           {t('ir_checkout')}

@@ -1,15 +1,17 @@
-import { BadgePercent, Flame, Sparkles, Tag } from 'lucide-react'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 
 import { BeneficiosBar } from '@/components/beneficios-bar'
 import { CategoryCarousel } from '@/components/category-carousel'
-import { HeroCarousel, type SlideHero } from '@/components/hero-carousel'
+import { FaixaBanners } from '@/components/faixa-banners'
+import { HeroBanners } from '@/components/hero-banners'
+import { HeroFallback } from '@/components/hero-fallback'
 import { ProductCard } from '@/components/product-card'
 import { VistosRecentemente } from '@/components/vistos-recentemente'
 import { listarMediasAvaliacoes } from '@/lib/avaliacoes'
 import { listarMaisVendidos } from '@/lib/mais-vendidos'
 import {
+  listarBannersLoja,
   listarCategoriasVitrine,
   listarOfertasVitrine,
   listarProdutosVitrine,
@@ -18,30 +20,27 @@ import {
 import type { ProdutoVitrine } from '@/lib/types'
 
 // Revalida a home a cada 5 min (ISR) — vitrine muda pouco, mas reflete novos
-// produtos publicados sem rebuild.
+// produtos publicados (e banners do gestor) sem rebuild.
 export const revalidate = 300
 
 export default async function HomePage() {
   const t = await getTranslations('home')
-  const [produtos, categorias, maisVendidos, ofertas] = await Promise.all([
-    listarProdutosVitrine({ limite: 60 }),
-    listarCategoriasVitrine(),
-    listarMaisVendidos(12),
-    listarOfertasVitrine(12),
-  ])
+  const [produtos, categorias, maisVendidos, ofertas, banners] =
+    await Promise.all([
+      listarProdutosVitrine({ limite: 60 }),
+      listarCategoriasVitrine(),
+      listarMaisVendidos(12),
+      listarOfertasVitrine(12),
+      listarBannersLoja(),
+    ])
   const todos = [...produtos, ...maisVendidos, ...ofertas]
   const [medias, vendedores] = await Promise.all([
     listarMediasAvaliacoes([...new Set(todos.map((p) => p.id))]),
     mapaFranquiasPublicas(todos.map((p) => p.franquia_id)),
   ])
 
-  const slides: SlideHero[] = [1, 2, 3].map((n) => ({
-    badge: t(`hero_badge_${n}`),
-    titulo: t(`hero_titulo_${n}`),
-    subtitulo: t(`hero_subtitulo_${n}`),
-    cta: t(`hero_cta_${n}`),
-    href: '/buscar',
-  }))
+  const heroBanners = banners.filter((b) => b.posicao === 'loja_hero')
+  const faixaBanners = banners.filter((b) => b.posicao === 'loja_faixa')
 
   // Agrupa por categoria preservando a ordem (mais recente primeiro); seções
   // só pra categorias com 2+ produtos, no máximo 4 seções.
@@ -59,27 +58,16 @@ export default async function HomePage() {
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6">
-      <HeroCarousel slides={slides} />
+      {/* Hero: banners do gestor (Vendas → Banners da loja) ou o padrão */}
+      {heroBanners.length > 0 ? (
+        <HeroBanners banners={heroBanners} />
+      ) : (
+        <HeroFallback />
+      )}
 
-      {/* Barra de confiança */}
       <div className="mt-5">
         <BeneficiosBar />
       </div>
-
-      {/* Pills de categorias */}
-      {categorias.length > 0 && (
-        <div className="scroll-oculto mt-5 flex gap-2 overflow-x-auto pb-1">
-          {categorias.map((cat) => (
-            <Link
-              key={cat}
-              href={`/buscar?categoria=${encodeURIComponent(cat)}`}
-              className="shrink-0 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-[13px] font-medium text-gray-700 transition-colors hover:border-marca hover:bg-marca/5 hover:text-marca"
-            >
-              {cat}
-            </Link>
-          ))}
-        </div>
-      )}
 
       {produtos.length === 0 ? (
         <EmptyState titulo={t('vazio_titulo')} dica={t('vazio_dica')} />
@@ -87,9 +75,9 @@ export default async function HomePage() {
         <>
           {/* Ofertas do dia (maiores descontos ativos) */}
           {ofertas.length > 0 && (
-            <SecaoCarrossel
-              icone={<BadgePercent className="size-4" />}
+            <Secao
               titulo={t('ofertas_dia')}
+              destaque
               verTodosHref="/buscar?ordem=menor_preco"
               verTodosLabel={t('ver_todos')}
             >
@@ -102,12 +90,14 @@ export default async function HomePage() {
                   vendedor={vendedores.get(p.franquia_id) ?? null}
                 />
               ))}
-            </SecaoCarrossel>
+            </Secao>
           )}
 
+          {/* Faixa promocional do gestor (posição loja_faixa) */}
+          <FaixaBanners banners={faixaBanners} />
+
           {/* Novidades */}
-          <SecaoCarrossel
-            icone={<Sparkles className="size-4" />}
+          <Secao
             titulo={t('recentes')}
             verTodosHref="/buscar"
             verTodosLabel={t('ver_todos')}
@@ -121,12 +111,11 @@ export default async function HomePage() {
                 vendedor={vendedores.get(p.franquia_id) ?? null}
               />
             ))}
-          </SecaoCarrossel>
+          </Secao>
 
           {/* Mais vendidos (agregado de pedidos pagos) */}
           {maisVendidos.length > 0 && (
-            <SecaoCarrossel
-              icone={<Flame className="size-4" />}
+            <Secao
               titulo={t('mais_vendidos')}
               verTodosHref="/buscar"
               verTodosLabel={t('ver_todos')}
@@ -140,7 +129,7 @@ export default async function HomePage() {
                   vendedor={vendedores.get(p.franquia_id) ?? null}
                 />
               ))}
-            </SecaoCarrossel>
+            </Secao>
           )}
 
           {/* Vistos recentemente (histórico local do visitante) */}
@@ -148,9 +137,8 @@ export default async function HomePage() {
 
           {/* Uma seção por categoria relevante */}
           {secoesCategorias.map(([categoria, lista]) => (
-            <SecaoCarrossel
+            <Secao
               key={categoria}
-              icone={<Tag className="size-4" />}
               titulo={categoria}
               verTodosHref={`/buscar?categoria=${encodeURIComponent(categoria)}`}
               verTodosLabel={t('ver_todos')}
@@ -164,43 +152,71 @@ export default async function HomePage() {
                   vendedor={vendedores.get(p.franquia_id) ?? null}
                 />
               ))}
-            </SecaoCarrossel>
+            </Secao>
           ))}
+
+          {/* Convite pra explorar categorias — fecha a página com direção */}
+          {categorias.length > 0 && (
+            <nav
+              aria-label={t('explorar_categorias')}
+              className="mt-10 border-t border-gray-200/70 pt-6"
+            >
+              <div className="scroll-oculto flex gap-2 overflow-x-auto pb-1">
+                {categorias.map((cat) => (
+                  <Link
+                    key={cat}
+                    href={`/buscar?categoria=${encodeURIComponent(cat)}`}
+                    className="shrink-0 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-[13px] font-medium text-gray-700 transition-colors hover:border-marca hover:text-marca"
+                  >
+                    {cat}
+                  </Link>
+                ))}
+              </div>
+            </nav>
+          )}
         </>
       )}
     </div>
   )
 }
 
-function SecaoCarrossel({
-  icone,
+/**
+ * Seção aberta da home — título em display com o "ponto" carmim da casa, sem
+ * caixa em volta (a página respira; o card do produto já é a moldura).
+ */
+function Secao({
   titulo,
+  destaque = false,
   verTodosHref,
   verTodosLabel,
   children,
 }: {
-  icone: React.ReactNode
   titulo: string
+  /** Ofertas ganham o ponto em ouro — único acento fora do carmim. */
+  destaque?: boolean
   verTodosHref: string
   verTodosLabel: string
   children: React.ReactNode
 }) {
   return (
-    <section className="mt-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <span className="grid size-9 place-items-center rounded-xl bg-marca/10 text-marca">
-            {icone}
-          </span>
-          <h2 className="font-display text-[17px] font-bold text-gray-900">
-            {titulo}
-          </h2>
-        </div>
+    <section className="mt-9">
+      <div className="mb-3.5 flex items-baseline justify-between gap-3">
+        <h2 className="font-display flex items-baseline gap-2 text-[19px] font-bold text-gray-900">
+          {titulo}
+          <span
+            aria-hidden
+            className={
+              destaque
+                ? 'inline-block size-1.5 rounded-full bg-oro'
+                : 'inline-block size-1.5 rounded-full bg-marca'
+            }
+          />
+        </h2>
         <Link
           href={verTodosHref}
-          className="shrink-0 text-xs font-semibold text-marca hover:underline"
+          className="shrink-0 text-[12.5px] font-semibold text-marca hover:underline"
         >
-          {verTodosLabel}
+          {verTodosLabel} →
         </Link>
       </div>
       <CategoryCarousel>{children}</CategoryCarousel>

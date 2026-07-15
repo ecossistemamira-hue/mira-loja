@@ -28,7 +28,7 @@ export default async function CategoriasPage() {
       </div>
 
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">{t('titulo')}</h1>
+        <h1 className="font-display text-3xl font-bold text-gray-900">{t('titulo')}</h1>
         <p className="mt-1.5 text-sm text-gray-600">{t('subtitulo')}</p>
       </div>
 

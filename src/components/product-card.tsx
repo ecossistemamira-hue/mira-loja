@@ -39,21 +39,21 @@ export async function ProductCard({
     <Link
       href={`/p/${produto.slug ?? produto.id}`}
       className={cn(
-        'group relative flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white',
-        'transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-lg',
+        'group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-white',
+        'transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-[0_10px_30px_-12px_rgb(74_12_26_/_0.18)]',
         compacto && 'w-52 shrink-0',
       )}
     >
-      {/* Imagem — fundo degradê + object-contain com zoom no hover */}
-      <div className="relative flex h-44 items-center justify-center bg-gradient-to-b from-gray-50 to-white px-6 pb-2 pt-5">
+      {/* Imagem em protagonismo — fundo branco limpo, zoom sutil no hover */}
+      <div className="relative flex h-48 items-center justify-center bg-white px-5 pb-2 pt-5">
         {produto.imagem_url ? (
-          <div className="relative h-32 w-full">
+          <div className="relative h-36 w-full">
             <Image
               src={produto.imagem_url}
               alt={produto.nome}
               fill
               sizes="(max-width: 640px) 50vw, 208px"
-              className="object-contain transition-transform duration-300 group-hover:scale-[1.07]"
+              className="object-contain transition-transform duration-300 group-hover:scale-[1.06]"
             />
           </div>
         ) : (
@@ -61,12 +61,12 @@ export async function ProductCard({
         )}
 
         {semEstoque ? (
-          <span className="absolute left-2.5 top-2.5 rounded-full bg-gray-900/80 px-2 py-0.5 text-[10px] font-bold text-white">
+          <span className="absolute left-0 top-3 bg-gray-900/85 py-1 pl-2.5 pr-2 text-[10px] font-bold text-white [clip-path:polygon(0_0,100%_0,calc(100%-6px)_50%,100%_100%,0_100%)]">
             {t('sem_estoque')}
           </span>
         ) : (
           preco?.descontoPct != null && (
-            <span className="absolute left-2.5 top-2.5 rounded-full bg-marca px-2 py-0.5 text-[10.5px] font-black text-white">
+            <span className="absolute left-0 top-3 bg-marca py-1 pl-2.5 pr-3 font-display text-[11px] font-bold text-white [clip-path:polygon(0_0,100%_0,calc(100%-7px)_50%,100%_100%,0_100%)]">
               -{preco.descontoPct}%
             </span>
           )
@@ -86,9 +86,9 @@ export async function ProductCard({
       </div>
 
       {/* Info */}
-      <div className="flex flex-1 flex-col gap-1 border-t border-gray-50 px-4 pb-4 pt-3">
+      <div className="flex flex-1 flex-col gap-1 border-t border-gray-100/80 px-4 pb-4 pt-3">
         {produto.categoria && (
-          <span className="text-[10px] font-extrabold uppercase tracking-widest text-gray-400">
+          <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400">
             {produto.categoria}
           </span>
         )}
@@ -119,7 +119,12 @@ export async function ProductCard({
                   {preco.textoAntigo}
                 </span>
               )}
-              <span className="font-display text-[17px] font-black text-marca">
+              <span
+                className={cn(
+                  'font-display text-[17.5px] font-bold tracking-tight',
+                  preco.textoAntigo ? 'text-marca' : 'text-gray-900',
+                )}
+              >
                 {preco.texto}
               </span>
             </>
@@ -150,7 +155,7 @@ export function ProductCardSkeleton({ compacto = false }: { compacto?: boolean }
         compacto && 'w-52 shrink-0',
       )}
     >
-      <div className="h-44 bg-gray-100" />
+      <div className="h-48 bg-gray-100" />
       <div className="flex flex-col gap-2 px-4 pb-4 pt-3">
         <div className="h-2.5 w-16 rounded bg-gray-100" />
         <div className="h-3.5 w-full rounded bg-gray-100" />

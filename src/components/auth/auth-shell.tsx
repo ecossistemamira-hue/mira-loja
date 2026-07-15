@@ -58,4 +58,4 @@ export const INPUT_AUTH =
   'h-11 rounded-lg border border-gray-200 bg-gray-50 px-3.5 text-[14px] outline-none transition-colors focus:border-marca/40 focus:bg-white'
 
 export const BOTAO_AUTH =
-  'inline-flex h-11 w-full items-center justify-center rounded-xl bg-marca text-[14px] font-bold text-white transition-colors hover:bg-marca-hover disabled:opacity-60'
+  'inline-flex h-11 w-full items-center justify-center rounded-full bg-marca text-[14px] font-bold text-white transition-colors hover:bg-marca-hover disabled:opacity-60'

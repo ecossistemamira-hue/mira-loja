@@ -37,7 +37,7 @@ export function AddToCartButton({
       type="button"
       onClick={adicionar}
       disabled={pending || desabilitado}
-      className="inline-flex h-12 items-center justify-center gap-2 rounded-xl px-6 text-[15px] font-semibold text-white transition-[filter] hover:brightness-95 disabled:opacity-60"
+      className="inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-[15px] font-semibold text-white transition-[filter] hover:brightness-95 disabled:opacity-60"
       style={{ background: '#a02237' }}
     >
       {pending ? (
@@ -95,7 +95,7 @@ export function CompraBox({
   return (
     <div className="flex flex-wrap items-center gap-3">
       {/* Quantidade */}
-      <div className="inline-flex h-12 items-center rounded-xl border border-gray-300">
+      <div className="inline-flex h-12 items-center rounded-full border border-gray-300">
         <button
           type="button"
           onClick={() => setQtd((q) => Math.max(1, q - 1))}
@@ -123,7 +123,7 @@ export function CompraBox({
         type="button"
         onClick={comprarAgora}
         disabled={pending || indo}
-        className="inline-flex h-12 items-center justify-center gap-2 rounded-xl px-6 text-[15px] font-semibold text-white transition-[filter] hover:brightness-95 disabled:opacity-60"
+        className="inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-[15px] font-semibold text-white transition-[filter] hover:brightness-95 disabled:opacity-60"
         style={{ background: '#a02237' }}
       >
         {indo ? <Loader2 className="size-4 animate-spin" /> : <Zap className="size-4" />}
@@ -134,7 +134,7 @@ export function CompraBox({
         type="button"
         onClick={adicionar}
         disabled={pending || indo}
-        className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border-2 border-marca/70 px-5 text-[14px] font-semibold text-marca transition-colors hover:bg-marca-50 disabled:opacity-60"
+        className="inline-flex h-12 items-center justify-center gap-2 rounded-full border-2 border-marca/70 px-5 text-[14px] font-semibold text-marca transition-colors hover:bg-marca-50 disabled:opacity-60"
       >
         {pending ? (
           <Loader2 className="size-4 animate-spin" />

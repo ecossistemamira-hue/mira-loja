@@ -320,7 +320,7 @@ export function CheckoutForm({
         type="button"
         onClick={enviar}
         disabled={pending}
-        className="inline-flex h-12 items-center justify-center gap-2 rounded-xl px-6 text-[15px] font-semibold text-white transition-[filter] hover:brightness-95 disabled:opacity-60"
+        className="inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-[15px] font-semibold text-white transition-[filter] hover:brightness-95 disabled:opacity-60"
         style={{ background: '#a02237' }}
       >
         {pending && <Loader2 className="size-4 animate-spin" />}

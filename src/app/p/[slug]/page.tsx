@@ -183,7 +183,7 @@ export default async function ProdutoPage({ params }: Props) {
               {produto.categoria}
             </span>
           )}
-          <h1 className="mt-1 text-3xl font-bold leading-tight tracking-tight">
+          <h1 className="font-display mt-1 text-3xl font-bold leading-tight tracking-tight">
             {produto.nome}
           </h1>
 
@@ -228,12 +228,12 @@ export default async function ProdutoPage({ params }: Props) {
                     <span className="text-[15px] text-gray-400 line-through">
                       {preco.textoAntigo}
                     </span>
-                    <span className="rounded-full bg-marca px-2 py-0.5 text-[11px] font-black text-white">
+                    <span className="bg-marca py-0.5 pl-2 pr-2.5 font-display text-[11px] font-bold text-white [clip-path:polygon(0_0,100%_0,calc(100%-6px)_50%,100%_100%,0_100%)]">
                       -{preco.descontoPct}%
                     </span>
                   </div>
                 )}
-                <span className="font-display text-4xl font-black text-marca">
+                <span className="font-display text-4xl font-bold tracking-tight text-marca">
                   {preco.texto}
                 </span>
               </>
@@ -326,7 +326,7 @@ export default async function ProdutoPage({ params }: Props) {
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-gray-200 px-5 text-[14px] font-semibold text-gray-700 transition-colors hover:border-marca/40 hover:text-marca"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-gray-200 px-5 text-[14px] font-semibold text-gray-700 transition-colors hover:border-marca/40 hover:text-marca"
                 >
                   {t('comprar_whatsapp')}
                 </a>
@@ -375,9 +375,10 @@ export default async function ProdutoPage({ params }: Props) {
 
       {/* Mais desta categoria */}
       {relacionados.length > 0 && (
-        <section className="mt-8 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-          <h2 className="mb-4 font-display text-[17px] font-bold text-gray-900">
+        <section className="mt-9">
+          <h2 className="mb-3.5 flex items-baseline gap-2 font-display text-[19px] font-bold text-gray-900">
             {t('relacionados')}
+            <span aria-hidden className="inline-block size-1.5 rounded-full bg-marca" />
           </h2>
           <CategoryCarousel>
             {relacionados.map((p) => (

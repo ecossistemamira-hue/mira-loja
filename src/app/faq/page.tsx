@@ -23,7 +23,7 @@ export default async function FaqPage() {
         <span className="mx-auto mb-3 grid size-12 place-items-center rounded-2xl bg-marca/10 text-marca">
           <HelpCircle className="size-6" />
         </span>
-        <h1 className="text-3xl font-bold tracking-tight">{t('titulo')}</h1>
+        <h1 className="font-display text-3xl font-bold tracking-tight">{t('titulo')}</h1>
         <p className="mt-1.5 text-sm text-gray-500">{t('subtitulo')}</p>
       </div>
 
@@ -53,7 +53,7 @@ export default async function FaqPage() {
           <Link
             href={`https://wa.me/${WHATSAPP}`}
             target="_blank"
-            className="mt-3 inline-flex h-10 items-center rounded-xl bg-marca px-5 text-[13px] font-bold text-white transition-colors hover:bg-marca-hover"
+            className="mt-3 inline-flex h-10 items-center rounded-full bg-marca px-5 text-[13px] font-bold text-white transition-colors hover:bg-marca-hover"
           >
             {t('falar_whatsapp')}
           </Link>

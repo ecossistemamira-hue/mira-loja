@@ -61,7 +61,7 @@ export async function SiteHeader() {
               <Link
                 key={cat.categoria}
                 href={`/buscar?categoria=${encodeURIComponent(cat.categoria)}`}
-                className="shrink-0 whitespace-nowrap px-2.5 py-2 text-[12.5px] font-medium text-gray-600 transition-colors hover:text-marca"
+                className="shrink-0 whitespace-nowrap px-2.5 py-2 text-[12.5px] font-medium text-gray-600 underline-offset-[10px] transition-colors hover:text-marca hover:underline hover:decoration-marca hover:decoration-2"
               >
                 {cat.categoria}
               </Link>

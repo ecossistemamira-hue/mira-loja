@@ -167,6 +167,42 @@ export async function mapaFranquiasPublicas(
   return new Map(await paresFranquiasPublicas(unicos))
 }
 
+// ─── Banners da loja (CMS em /vendas/banners do gestor) ─────────────────────
+
+export type BannerLoja = {
+  id: string
+  titulo: string
+  subtitulo: string | null
+  imagem_url: string | null
+  link_url: string | null
+  link_texto: string | null
+  posicao: 'loja_hero' | 'loja_faixa'
+  ordem: number
+}
+
+/**
+ * Banners geridos pela matriz em site_banners (posições loja_*). A RLS
+ * pública já limita a ativos e não deletados. Hero sem imagem não presta —
+ * filtramos no wrapper.
+ */
+export const listarBannersLoja = unstable_cache(
+  async function listarBannersLoja(): Promise<BannerLoja[]> {
+    const supabase = createLojaClient()
+    const { data, error } = await supabase
+      .from('site_banners')
+      .select('id, titulo, subtitulo, imagem_url, link_url, link_texto, posicao, ordem')
+      .in('posicao', ['loja_hero', 'loja_faixa'])
+      .order('ordem', { ascending: true })
+    if (error) {
+      console.error('[loja.listarBannersLoja]', error)
+      return []
+    }
+    return ((data ?? []) as BannerLoja[]).filter((b) => !!b.imagem_url)
+  },
+  ['banners-loja'],
+  { revalidate: TTL_LENTO },
+)
+
 /** Categorias com contagem de produtos publicados (página /categorias). */
 export const listarCategoriasComContagem = unstable_cache(
   async function listarCategoriasComContagem(): Promise<

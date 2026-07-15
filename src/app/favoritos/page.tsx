@@ -17,7 +17,7 @@ export default function FavoritosPage() {
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6">
-      <h1 className="mb-5 flex items-center gap-2 text-xl font-bold tracking-tight">
+      <h1 className="font-display mb-5 flex items-center gap-2 text-xl font-bold tracking-tight">
         <Heart className="size-5 text-marca" fill="currentColor" />
         {t('titulo')}
       </h1>
@@ -33,7 +33,7 @@ export default function FavoritosPage() {
           </p>
           <Link
             href="/"
-            className="mt-5 inline-flex h-10 items-center rounded-xl bg-marca px-5 text-[13px] font-bold text-white transition-colors hover:bg-marca-hover"
+            className="mt-5 inline-flex h-10 items-center rounded-full bg-marca px-5 text-[13px] font-bold text-white transition-colors hover:bg-marca-hover"
           >
             {t('explorar')}
           </Link>

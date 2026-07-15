@@ -57,7 +57,7 @@ export default async function ContaPage() {
 
   return (
     <div className="mx-auto max-w-[1000px] px-4 py-6 sm:px-6">
-      <h1 className="mb-6 text-2xl font-bold tracking-tight">{t('titulo')}</h1>
+      <h1 className="font-display mb-6 text-2xl font-bold tracking-tight">{t('titulo')}</h1>
 
       <div className="flex flex-col gap-5">
         {/* Dados */}
@@ -101,7 +101,7 @@ export default async function ContaPage() {
               <p className="text-[13px] text-gray-500">{t('sem_pedidos')}</p>
               <Link
                 href="/"
-                className="mt-3 inline-flex h-9 items-center rounded-lg bg-marca px-4 text-[12px] font-bold text-white transition-colors hover:bg-marca-hover"
+                className="mt-3 inline-flex h-9 items-center rounded-full bg-marca px-4 text-[12px] font-bold text-white transition-colors hover:bg-marca-hover"
               >
                 {t('ir_comprar')}
               </Link>

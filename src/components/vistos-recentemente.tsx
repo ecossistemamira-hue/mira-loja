@@ -74,9 +74,10 @@ export function VistosRecentemente({ excluirId }: { excluirId?: string }) {
   if (vistos.length === 0) return null
 
   return (
-    <section className="mt-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-      <h2 className="mb-4 font-display text-[17px] font-bold text-gray-900">
+    <section className="mt-9">
+      <h2 className="mb-3.5 flex items-baseline gap-2 font-display text-[19px] font-bold text-gray-900">
         {t('vistos_recentemente')}
+        <span aria-hidden className="inline-block size-1.5 rounded-full bg-marca" />
       </h2>
       <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-1">
         {vistos.map((p) => (

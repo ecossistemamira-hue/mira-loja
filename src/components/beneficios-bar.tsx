@@ -1,7 +1,10 @@
 import { MessageCircle, ShieldCheck, Store, Truck } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 
-/** Barra de confiança (padrão de marketplace): entrega, retiro, pagamento, atendimento. */
+/**
+ * Barra de confiança: um painel único e quieto, itens separados por
+ * hairlines — informação de serviço, não quatro cartões disputando atenção.
+ */
 export async function BeneficiosBar() {
   const t = await getTranslations('beneficios')
 
@@ -13,17 +16,12 @@ export async function BeneficiosBar() {
   ]
 
   return (
-    <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <section className="grid grid-cols-2 rounded-2xl border border-gray-100 bg-white py-1 lg:grid-cols-4 lg:divide-x lg:divide-gray-100">
       {itens.map(({ icone: Icone, titulo, corpo }) => (
-        <div
-          key={titulo}
-          className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white px-4 py-3 shadow-sm"
-        >
-          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-marca/10 text-marca">
-            <Icone className="size-5" />
-          </span>
+        <div key={titulo} className="flex items-center gap-3 px-4 py-3">
+          <Icone className="size-[18px] shrink-0 text-marca" strokeWidth={2.2} />
           <span className="min-w-0">
-            <span className="block truncate text-[13px] font-bold text-gray-900">
+            <span className="block truncate text-[12.5px] font-bold text-gray-900">
               {titulo}
             </span>
             <span className="block truncate text-[11.5px] text-gray-500">

@@ -66,7 +66,7 @@ export function AvisoEstoque({ produtoId, emailInicial }: Props) {
           onClick={enviar}
           disabled={pendente || !email.trim()}
           className={cn(
-            'inline-flex h-10 shrink-0 items-center gap-2 rounded-lg bg-marca px-4 text-[13px] font-bold text-white transition-opacity',
+            'inline-flex h-10 shrink-0 items-center gap-2 rounded-full bg-marca px-4 text-[13px] font-bold text-white transition-opacity',
             'hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50',
           )}
         >

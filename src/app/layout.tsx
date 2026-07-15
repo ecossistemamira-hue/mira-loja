@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, Outfit } from 'next/font/google'
+import { Bricolage_Grotesque, Inter } from 'next/font/google'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getTranslations } from 'next-intl/server'
 
@@ -15,10 +15,11 @@ const inter = Inter({
   weight: ['400', '500', '600', '700'],
 })
 
-const outfit = Outfit({
+// Display com personalidade de mercado — títulos, preços e o ₲ do hero.
+const bricolage = Bricolage_Grotesque({
   variable: '--font-display',
   subsets: ['latin'],
-  weight: ['500', '600', '700', '800', '900'],
+  weight: ['500', '600', '700', '800'],
 })
 
 export const viewport: Viewport = {
@@ -52,7 +53,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${inter.variable} ${outfit.variable} h-full antialiased`}
+      className={`${inter.variable} ${bricolage.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">

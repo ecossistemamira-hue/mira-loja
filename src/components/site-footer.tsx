@@ -11,8 +11,8 @@ export async function SiteFooter() {
   const tSite = await getTranslations('site')
 
   return (
-    <footer className="border-t border-gray-100 bg-gray-50">
-      <div className="mx-auto grid max-w-[1400px] gap-8 px-6 py-10 sm:grid-cols-2 lg:grid-cols-4">
+    <footer className="mt-10 border-t border-gray-200/70 bg-white">
+      <div className="mx-auto grid max-w-[1400px] gap-8 px-6 py-12 sm:grid-cols-2 lg:grid-cols-4">
         {/* Marca */}
         <div className="flex flex-col gap-3">
           <Image
@@ -62,16 +62,17 @@ export async function SiteFooter() {
         </ColunaFooter>
       </div>
 
-      <div className="border-t border-gray-100">
-        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-2 px-6 py-4 text-xs text-gray-400">
+      {/* Faixa final em vinho — assinatura da casa */}
+      <div className="bg-vinho-noite">
+        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-2 px-6 py-4 text-xs text-white/55">
           <span>
             © {new Date().getFullYear()} {t('direitos')}
           </span>
           <span className="inline-flex items-center gap-2">
             <BandeiraPy />
-            <span className="font-semibold text-gray-500">{t('hecho')}</span>
+            <span className="font-semibold text-white/75">{t('hecho')}</span>
           </span>
-          <Link href="/" className="transition-colors hover:text-marca">
+          <Link href="/" className="text-white/55 transition-colors hover:text-white">
             {tSite('nome')}
           </Link>
         </div>
@@ -85,7 +86,7 @@ function BandeiraPy() {
   return (
     <span
       aria-hidden
-      className="inline-flex h-3 w-[18px] flex-col overflow-hidden rounded-[2px] ring-1 ring-gray-200"
+      className="inline-flex h-3 w-[18px] flex-col overflow-hidden rounded-[2px] ring-1 ring-white/20"
     >
       <span className="flex-1 bg-[#D52B1E]" />
       <span className="flex-1 bg-white" />

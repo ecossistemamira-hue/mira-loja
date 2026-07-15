@@ -85,7 +85,7 @@ export function DadosForm({ nome, email, telefone, documento }: Props) {
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex h-10 w-fit items-center rounded-xl bg-marca px-5 text-[13px] font-bold text-white transition-colors hover:bg-marca-hover disabled:opacity-60"
+        className="inline-flex h-10 w-fit items-center rounded-full bg-marca px-5 text-[13px] font-bold text-white transition-colors hover:bg-marca-hover disabled:opacity-60"
       >
         {pending ? '…' : t('salvar')}
       </button>
