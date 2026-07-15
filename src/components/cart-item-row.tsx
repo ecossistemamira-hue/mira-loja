@@ -2,11 +2,10 @@
 
 import { Loader2, Minus, Plus, Trash2 } from 'lucide-react'
 import Image from 'next/image'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 
 import { definirQuantidade, removerItem } from '@/app/cart-actions'
+import { Link, useRouter } from '@/i18n/navigation'
 import { notificarHeaderInfo } from '@/components/header-conta-carrinho'
 import { formatarPreco, precoDoItem } from '@/lib/format'
 import type { ItemCarrinho } from '@/lib/types'

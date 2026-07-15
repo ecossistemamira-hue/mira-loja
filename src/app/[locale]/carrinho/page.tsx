@@ -1,0 +1,103 @@
+import { ShoppingCart, Store } from 'lucide-react'
+import type { Metadata } from 'next'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
+
+import { CartItemRow } from '@/components/cart-item-row'
+import { Link } from '@/i18n/navigation'
+import { obterCarrinho } from '@/lib/cart-queries'
+import { formatarPreco, subtotalItens } from '@/lib/format'
+
+export const metadata: Metadata = {
+  title: 'Carrinho',
+  robots: { index: false },
+}
+
+// Carrinho depende do cookie do usuário — sempre dinâmico.
+export const dynamic = 'force-dynamic'
+
+type Props = { params: Promise<{ locale: string }> }
+
+export default async function CarrinhoPage({ params }: Props) {
+  const { locale } = await params
+  setRequestLocale(locale)
+
+  const t = await getTranslations('carrinho')
+  const { grupos, totalItens } = await obterCarrinho()
+
+  if (totalItens === 0) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-16 text-center">
+        <ShoppingCart className="mx-auto size-10 text-gray-300" />
+        <h1 className="font-display mt-4 text-xl font-bold">{t('vazio_titulo')}</h1>
+        <p className="mt-1 text-[13px] text-gray-500">{t('vazio_dica')}</p>
+        <Link
+          href="/"
+          className="mt-6 inline-flex h-10 items-center rounded-lg px-5 text-sm font-semibold text-white"
+          style={{ background: '#a02237' }}
+        >
+          {t('continuar_comprando')}
+        </Link>
+      </div>
+    )
+  }
+
+  return (
+    <div className="mx-auto max-w-3xl px-4 py-8">
+      <h1 className="mb-1 text-2xl font-extrabold tracking-tight">
+        {t('titulo')}
+      </h1>
+      <p className="mb-6 text-[13px] text-gray-500">
+        {t('n_itens', { n: totalItens })} · {t('aviso_grupos')}
+      </p>
+
+      <div className="flex flex-col gap-4">
+        {grupos.map((grupo, i) => {
+          const subtotal = subtotalItens(grupo.itens)
+          return (
+            <section
+              key={grupo.franquia?.id ?? i}
+              className="rounded-xl border border-gray-200 bg-white"
+            >
+              <header className="flex items-center gap-2 border-b border-gray-100 px-4 py-3">
+                <Store className="size-4 text-gray-400" />
+                <span className="text-[13px] font-semibold">
+                  {grupo.franquia?.nome_fantasia ?? t('vendedor')}
+                </span>
+                {grupo.franquia?.cidade && (
+                  <span className="text-[12px] text-gray-400">
+                    · {grupo.franquia.cidade}
+                  </span>
+                )}
+              </header>
+
+              <div className="divide-y divide-gray-100 px-4">
+                {grupo.itens.map((item) => (
+                  <CartItemRow key={item.itemId} item={item} />
+                ))}
+              </div>
+
+              <footer className="flex items-center justify-between border-t border-gray-100 px-4 py-3">
+                <span className="text-[13px] text-gray-500">
+                  {t('subtotal_vendedor')}
+                </span>
+                <span className="text-[15px] font-bold">
+                  {formatarPreco(subtotal)}
+                </span>
+              </footer>
+            </section>
+          )
+        })}
+      </div>
+
+      <div className="mt-6 flex justify-end">
+        <Link
+          href="/checkout"
+          className="inline-flex h-12 items-center justify-center rounded-full px-8 text-[15px] font-semibold text-white transition-[filter] hover:brightness-95"
+          style={{ background: '#a02237' }}
+        >
+          {t('ir_checkout')}
+        </Link>
+      </div>
+    </div>
+  )
+}

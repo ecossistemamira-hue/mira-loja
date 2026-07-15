@@ -1,11 +1,11 @@
 'use client'
 
 import { Check, Loader2, Store, TicketPercent, Truck, X } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useMemo, useState, useTransition } from 'react'
 
-import { finalizarCheckout } from '@/app/checkout/checkout-actions'
+import { finalizarCheckout } from '@/app/checkout-actions'
+import { useRouter } from '@/i18n/navigation'
 import { validarCupom } from '@/app/cupom-actions'
 import { cotarFreteCarrinho, type FreteCarrinhoResultado } from '@/app/frete-actions'
 import { CheckoutSchema } from '@/lib/checkout-schema'

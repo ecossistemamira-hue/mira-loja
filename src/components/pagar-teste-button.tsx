@@ -1,11 +1,11 @@
 'use client'
 
 import { Check, Loader2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useTransition } from 'react'
 
-import { pagarTeste } from '@/app/checkout/checkout-actions'
+import { pagarTeste } from '@/app/checkout-actions'
+import { useRouter } from '@/i18n/navigation'
 
 export function PagarTesteButton({ pedidoId }: { pedidoId: string }) {
   const t = useTranslations('checkout')

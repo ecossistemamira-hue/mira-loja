@@ -1,10 +1,9 @@
 'use client'
 
 import { useLocale } from 'next-intl'
-import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 
-import { definirLocale } from '@/app/actions'
+import { usePathname, useRouter } from '@/i18n/navigation'
 import { cn } from '@/lib/cn'
 
 // Bandeiras como no OfertasParaguai — ES (Paraguai) primeiro, mercado principal.
@@ -15,14 +14,19 @@ const OPCOES = [
 
 export function LocaleSwitcher() {
   const locale = useLocale()
+  // usePathname/useRouter do next-intl: o idioma vive na URL (es sem prefixo,
+  // pt sob /pt) — trocar é só re-navegar pra MESMA rota com outro locale.
+  const pathname = usePathname()
   const router = useRouter()
   const [pending, start] = useTransition()
 
-  const trocar = (valor: string) => {
+  const trocar = (valor: (typeof OPCOES)[number]['valor']) => {
     if (valor === locale) return
-    start(async () => {
-      await definirLocale(valor)
-      router.refresh()
+    start(() => {
+      // Preserva a query atual (ex.: /buscar?q=...) lendo no clique — evitar
+      // useSearchParams aqui mantém as páginas estáticas sem Suspense extra.
+      const query = window.location.search
+      router.replace(`${pathname}${query}`, { locale: valor })
     })
   }
 

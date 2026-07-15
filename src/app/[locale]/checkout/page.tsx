@@ -1,0 +1,107 @@
+import { ChevronLeft } from 'lucide-react'
+import type { Metadata } from 'next'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
+
+import { CheckoutForm } from '@/components/checkout-form'
+import { Link, redirect } from '@/i18n/navigation'
+import { obterCarrinho } from '@/lib/cart-queries'
+import { createAuthClient } from '@/lib/supabase-auth'
+import { formatarPreco, precoDoItem, subtotalItens } from '@/lib/format'
+
+export const metadata: Metadata = {
+  title: 'Checkout',
+  robots: { index: false },
+}
+
+export const dynamic = 'force-dynamic'
+
+type PageProps = { params: Promise<{ locale: string }> }
+
+export default async function CheckoutPage({ params }: PageProps) {
+  const { locale } = await params
+  setRequestLocale(locale)
+
+  const t = await getTranslations('checkout')
+  const { grupos, totalItens } = await obterCarrinho()
+
+  // Sem itens não há o que finalizar.
+  if (totalItens === 0) redirect({ href: '/carrinho', locale })
+
+  // Retirada só é oferecida se TODAS as franquias do carrinho aceitam
+  // receber no local (0096) — o método vale pro checkout inteiro.
+  const permiteRetirada = grupos.every(
+    (g) => g.franquia?.aceita_retirada ?? false,
+  )
+
+  // Logado: pré-preenche com os dados da conta (RLS compradores_self).
+  const supabase = await createAuthClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  let defaults: { nome?: string; email?: string; telefone?: string; documento?: string } | undefined
+  if (user) {
+    const { data: comprador } = await supabase
+      .from('compradores')
+      .select('nome, email, telefone, documento')
+      .eq('auth_user_id', user.id)
+      .maybeSingle()
+    defaults = {
+      nome: comprador?.nome ?? (user.user_metadata?.nome_completo as string | undefined),
+      email: comprador?.email ?? user.email ?? undefined,
+      telefone: comprador?.telefone ?? undefined,
+      documento: comprador?.documento ?? undefined,
+    }
+  }
+
+  return (
+    <div className="mx-auto max-w-4xl px-4 py-8">
+      <Link
+        href="/carrinho"
+        className="mb-4 inline-flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-marca"
+      >
+        <ChevronLeft className="size-3.5" />
+        {t('voltar_carrinho')}
+      </Link>
+
+      <h1 className="mb-6 text-2xl font-extrabold tracking-tight">{t('titulo')}</h1>
+
+      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+        <CheckoutForm defaults={defaults} permiteRetirada={permiteRetirada} />
+
+        {/* Resumo */}
+        <aside className="lg:sticky lg:top-20 lg:self-start">
+          <div className="rounded-xl border border-gray-200 bg-white p-5">
+            <h2 className="mb-3 text-sm font-bold">{t('resumo')}</h2>
+            <div className="flex flex-col gap-3">
+              {grupos.map((grupo, i) => {
+                const subtotal = subtotalItens(grupo.itens)
+                return (
+                  <div key={grupo.franquia?.id ?? i} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                    <div className="mb-1 text-[12px] font-semibold text-gray-500">
+                      {grupo.franquia?.nome_fantasia ?? t('vendedor')}
+                    </div>
+                    {grupo.itens.map((it) => (
+                      <div key={it.itemId} className="flex justify-between gap-2 text-[13px]">
+                        <span className="min-w-0 truncate text-gray-600">
+                          {it.quantidade}× {it.nome}
+                        </span>
+                        <span className="shrink-0 font-medium">
+                          {formatarPreco((precoDoItem(it) ?? 0) * it.quantidade)}
+                        </span>
+                      </div>
+                    ))}
+                    <div className="mt-1.5 flex justify-between text-[13px] font-bold">
+                      <span>{t('subtotal')}</span>
+                      <span>{formatarPreco(subtotal)}</span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            <p className="mt-3 text-[12px] text-gray-400">{t('frete_aviso')}</p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  )
+}

@@ -66,6 +66,7 @@ export async function adicionarAoCarrinho(
   }
 
   revalidatePath('/carrinho')
+  revalidatePath('/pt/carrinho')
   return { ok: true }
 }
 
@@ -88,6 +89,7 @@ export async function definirQuantidade(
   if (error) return { ok: false, error: ERRO }
 
   revalidatePath('/carrinho')
+  revalidatePath('/pt/carrinho')
   return { ok: true }
 }
 
@@ -104,5 +106,6 @@ export async function removerItem(itemId: string): Promise<Resultado> {
   if (error) return { ok: false, error: ERRO }
 
   revalidatePath('/carrinho')
+  revalidatePath('/pt/carrinho')
   return { ok: true }
 }

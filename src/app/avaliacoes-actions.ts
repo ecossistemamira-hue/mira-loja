@@ -98,7 +98,10 @@ export async function enviarAvaliacao(
     return { ok: false, error: 'falha' }
   }
 
-  if (produto.slug) revalidatePath(`/p/${produto.slug}`)
+  if (produto.slug) {
+    revalidatePath(`/p/${produto.slug}`)
+    revalidatePath(`/pt/p/${produto.slug}`)
+  }
   return { ok: true, compraVerificada }
 }
 

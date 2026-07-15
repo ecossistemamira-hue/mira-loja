@@ -7,7 +7,7 @@ import { useState, useTransition } from 'react'
 import {
   rastrearPedido,
   type PedidoRastreado,
-} from '@/app/rastreio/actions'
+} from '@/app/rastreio-actions'
 import { ESTILO_STATUS } from '@/components/conta/status-estilo'
 import { cn } from '@/lib/cn'
 import { formatarPreco } from '@/lib/format'

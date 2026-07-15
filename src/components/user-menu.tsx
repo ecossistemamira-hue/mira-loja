@@ -1,7 +1,7 @@
 'use client'
 
 import { LogOut, Package, UserRound } from 'lucide-react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState } from 'react'
 

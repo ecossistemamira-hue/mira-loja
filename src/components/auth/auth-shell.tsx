@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 
 /** Casca visual das telas de auth: card centrado com o logo. */
 export function AuthShell({

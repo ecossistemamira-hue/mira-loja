@@ -1,9 +1,8 @@
 'use client'
 
 import { ShoppingCart } from 'lucide-react'
-import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { usePathname } from 'next/navigation'
+import { Link, usePathname } from '@/i18n/navigation'
 import { useEffect, useState } from 'react'
 
 import { UserMenu } from '@/components/user-menu'

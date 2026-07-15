@@ -1,8 +1,13 @@
 'use server'
 
+import { getLocale } from 'next-intl/server'
 import { revalidatePath } from 'next/cache'
+// redirect do next/navigation: só pra URL EXTERNA do OAuth (o do next-intl
+// localizaria o href). Navegação interna usa o redirect de @/i18n/navigation.
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
+
+import { redirect as redirectLocalizado } from '@/i18n/navigation'
 
 import { createAuthClient } from '@/lib/supabase-auth'
 import { createServiceClient } from '@/lib/supabase'
@@ -99,7 +104,7 @@ export async function sair(): Promise<void> {
   const supabase = await createAuthClient()
   await supabase.auth.signOut()
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirectLocalizado({ href: '/', locale: await getLocale() })
 }
 
 export async function recuperarSenha(email: string): Promise<AuthResult> {
@@ -157,6 +162,7 @@ export async function atualizarMeusDados(input: {
   if (error) return { ok: false, error: ERRO_GENERICO }
 
   revalidatePath('/conta')
+  revalidatePath('/pt/conta')
   return { ok: true }
 }
 

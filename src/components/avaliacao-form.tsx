@@ -1,12 +1,11 @@
 'use client'
 
 import { CheckCircle2, Loader2, Star } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState, useTransition } from 'react'
 
 import { enviarAvaliacao, obterMinhaAvaliacao } from '@/app/avaliacoes-actions'
+import { Link, useRouter } from '@/i18n/navigation'
 import { cn } from '@/lib/cn'
 import { createBrowserSupabase } from '@/lib/supabase-browser'
 

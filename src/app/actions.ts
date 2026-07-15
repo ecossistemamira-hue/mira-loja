@@ -1,22 +1,9 @@
 'use server'
 
-import { cookies } from 'next/headers'
 import { getLocale } from 'next-intl/server'
 import { z } from 'zod'
 
-import { LOCALE_COOKIE, isLocale } from '@/i18n/request'
 import { createServiceClient } from '@/lib/supabase'
-
-/** Troca o idioma da vitrine gravando o cookie de locale (1 ano). */
-export async function definirLocale(valor: string): Promise<void> {
-  if (!isLocale(valor)) return
-  const store = await cookies()
-  store.set(LOCALE_COOKIE, valor, {
-    path: '/',
-    maxAge: 60 * 60 * 24 * 365,
-    sameSite: 'lax',
-  })
-}
 
 /**
  * Inscreve um e-mail na newsletter (loja_newsletter, migration 0087).

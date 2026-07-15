@@ -2,7 +2,7 @@
 
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { cn } from '@/lib/cn'
