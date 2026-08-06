@@ -84,15 +84,15 @@ export function SearchBox({ className }: { className?: string }) {
           }}
           onFocus={() => sugestoes.length > 0 && setAberto(true)}
           placeholder={t('placeholder_busca')}
-          className="h-10 w-full rounded-full border border-gray-200 bg-gray-50/80 pl-4.5 pr-11 text-[13px] outline-none transition-colors focus:border-marca/50 focus:bg-white"
+          className="h-11 w-full rounded-[10px] border border-[#CBD5E1] bg-white pl-4 pr-14 text-[14px] outline-none transition-colors focus:border-marca"
           aria-label={t('buscar')}
         />
         <button
           type="submit"
           aria-label={t('buscar')}
-          className="absolute right-1 top-1 grid size-8 place-items-center rounded-full bg-marca text-white transition-colors hover:bg-marca-hover"
+          className="absolute right-0 top-0 grid h-full w-12 place-items-center rounded-r-[10px] bg-marca text-white transition-colors hover:bg-marca-hover"
         >
-          <Search className="size-4" />
+          <Search className="size-[18px]" />
         </button>
       </form>
 

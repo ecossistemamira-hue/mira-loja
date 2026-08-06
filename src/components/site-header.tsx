@@ -1,13 +1,15 @@
-import { LayoutGrid } from 'lucide-react'
-import Image from 'next/image'
+import { Menu } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
 import { getTranslations } from 'next-intl/server'
 
 import { HeaderContaCarrinho } from '@/components/header-conta-carrinho'
 import { LocaleSwitcher } from '@/components/locale-switcher'
 import { SearchBox } from '@/components/search-box'
+import { ShoppyLogo } from '@/components/shoppy-logo'
 import { WishlistHeaderLink } from '@/components/wishlist-header-link'
 import { listarCategoriasComContagem } from '@/lib/queries'
+
+const MIRAFRANQUICIA_URL = 'https://mirafranquicia.com'
 
 export async function SiteHeader() {
   const t = await getTranslations()
@@ -17,64 +19,80 @@ export async function SiteHeader() {
   const categoriasBarra = categorias.slice(0, 8)
 
   return (
-    <header className="sticky top-0 z-40 border-b border-gray-100 bg-white shadow-sm">
-      <div className="mx-auto flex max-w-[1400px] items-center gap-3 px-4 py-2.5 sm:gap-5 sm:px-6">
-        <Link href="/" className="flex shrink-0 items-center" aria-label={t('site.nome')}>
-          {/* Logo Ofertas Paraguai (486x211) */}
-          <Image
-            src="/logo-horizontal.png"
-            alt={t('site.nome')}
-            width={486}
-            height={211}
-            priority
-            className="h-11 w-auto"
-          />
-        </Link>
-
-        <Link
-          href="/categorias"
-          className="hidden shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-[13px] font-semibold text-gray-700 transition-colors hover:bg-marca/5 hover:text-marca md:inline-flex"
-        >
-          <LayoutGrid className="size-4" />
-          {t('nav.categorias')}
-        </Link>
-
-        <SearchBox className="min-w-0 flex-1 sm:mx-auto sm:max-w-xl" />
-
-        <div className="flex shrink-0 items-center gap-1.5">
-          <WishlistHeaderLink />
-
-          <HeaderContaCarrinho />
-
-          <LocaleSwitcher />
+    <>
+      {/* Barra de anúncio — rola junto com a página; só o header é sticky */}
+      <div className="bg-noite text-[12.5px] text-[#E2E8F0]">
+        <div className="mx-auto flex max-w-[1220px] flex-wrap items-center justify-center gap-x-2 gap-y-0.5 px-4 py-2 text-center">
+          <span className="font-semibold text-white">
+            {t('home.anuncio_destaque')}
+          </span>
+          <span aria-hidden className="hidden text-[#475569] sm:inline">
+            |
+          </span>
+          <span className="hidden sm:inline">{t('home.anuncio_texto')}</span>
+          <Link
+            href="/buscar?ordem=menor_preco"
+            className="ml-1.5 font-semibold text-marca-claro hover:underline"
+          >
+            {t('home.anuncio_link')}
+          </Link>
         </div>
       </div>
 
-      {/* Barra de categorias — fica no header sticky, como nos marketplaces */}
-      {categoriasBarra.length >= 2 && (
+      <header className="sticky top-0 z-40 border-b border-[#E2E8F0] bg-white">
+        <div className="mx-auto flex max-w-[1220px] items-center gap-3 px-4 py-3 sm:gap-6">
+          <Link href="/" className="flex shrink-0 items-center" aria-label={t('site.nome')}>
+            {/* No mobile o wordmark some e fica só a sacola — espaço pra busca */}
+            <ShoppyLogo className="[&>span:last-child]:hidden sm:[&>span:last-child]:inline" />
+          </Link>
+
+          <SearchBox className="min-w-0 flex-1 sm:mx-auto sm:max-w-2xl" />
+
+          <div className="flex shrink-0 items-center gap-1">
+            <WishlistHeaderLink />
+
+            <HeaderContaCarrinho />
+
+            <LocaleSwitcher />
+          </div>
+        </div>
+
+        {/* Linha 2 — nav de categorias, como nos marketplaces */}
         <nav
           aria-label={t('nav.categorias')}
-          className="border-t border-gray-100 bg-white"
+          className="border-t border-[#F1F5F9] bg-white"
         >
-          <div className="scroll-oculto mx-auto flex max-w-[1400px] items-center gap-1 overflow-x-auto px-4 sm:px-6">
+          <div className="scroll-oculto mx-auto flex max-w-[1220px] items-center overflow-x-auto px-4">
+            <Link
+              href="/categorias"
+              className="flex shrink-0 items-center gap-2 whitespace-nowrap py-2.5 pr-3 text-[13.5px] font-semibold text-noite transition-colors hover:text-marca"
+            >
+              <Menu className="size-[17px]" />
+              {t('nav.todas_categorias')}
+            </Link>
+            {categoriasBarra.length > 0 && (
+              <span aria-hidden className="mx-2 h-4 w-px shrink-0 bg-[#E2E8F0]" />
+            )}
             {categoriasBarra.map((cat) => (
               <Link
                 key={cat.categoria}
                 href={`/buscar?categoria=${encodeURIComponent(cat.categoria)}`}
-                className="shrink-0 whitespace-nowrap px-2.5 py-2 text-[12.5px] font-medium text-gray-600 underline-offset-[10px] transition-colors hover:text-marca hover:underline hover:decoration-marca hover:decoration-2"
+                className="shrink-0 whitespace-nowrap px-2.5 py-2.5 text-[13.5px] font-medium text-[#475569] transition-colors hover:text-marca"
               >
                 {cat.categoria}
               </Link>
             ))}
-            <Link
-              href="/categorias"
-              className="ml-auto shrink-0 whitespace-nowrap px-2.5 py-2 text-[12.5px] font-semibold text-marca hover:underline"
+            <a
+              href={MIRAFRANQUICIA_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-auto shrink-0 whitespace-nowrap py-2.5 pl-3 text-[13.5px] font-semibold text-marca hover:text-marca-hover"
             >
-              {t('nav.ver_todas_categorias')}
-            </Link>
+              {t('nav.vender')}
+            </a>
           </div>
         </nav>
-      )}
-    </header>
+      </header>
+    </>
   )
 }

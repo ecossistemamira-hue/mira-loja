@@ -11,7 +11,7 @@ export default async function NotFound() {
       <Link
         href="/"
         className="mt-4 inline-flex h-10 items-center rounded-lg px-5 text-sm font-semibold text-white"
-        style={{ background: '#a02237' }}
+        style={{ background: '#087F5B' }}
       >
         {t('voltar')}
       </Link>

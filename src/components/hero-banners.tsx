@@ -116,17 +116,17 @@ export function HeroBanners({ banners }: { banners: BannerLoja[] }) {
             type="button"
             onClick={() => setAtual((a) => (a - 1 + total) % total)}
             aria-label="Anterior"
-            className="absolute left-3 top-1/2 grid size-9 -translate-y-1/2 place-items-center rounded-full bg-black/25 text-white backdrop-blur-sm transition-colors hover:bg-black/45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+            className="absolute left-3.5 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-white/95 text-noite shadow-[0_2px_8px_rgba(0,0,0,.2)] transition-colors hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
           >
-            <ChevronLeft className="size-4" />
+            <ChevronLeft className="size-[17px]" strokeWidth={2.4} />
           </button>
           <button
             type="button"
             onClick={avancar}
             aria-label="Siguiente"
-            className="absolute right-3 top-1/2 grid size-9 -translate-y-1/2 place-items-center rounded-full bg-black/25 text-white backdrop-blur-sm transition-colors hover:bg-black/45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+            className="absolute right-3.5 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-white/95 text-noite shadow-[0_2px_8px_rgba(0,0,0,.2)] transition-colors hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
           >
-            <ChevronRight className="size-4" />
+            <ChevronRight className="size-[17px]" strokeWidth={2.4} />
           </button>
 
           <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-1.5">

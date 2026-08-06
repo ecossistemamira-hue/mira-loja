@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: 'Instrument Sans', system-ui, sans-serif; background: #F5F6F8; color: #0F172A; -webkit-font-smoothing: antialiased; }
+  a { color: #087F5B; text-decoration: none; }
+  a:hover { color: #066649; }
+  input, select, button { font-family: inherit; }
+  ::-webkit-scrollbar { height: 10px; width: 10px; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; background: #F5F6F8; padding-bottom: 40px;">
+
+  <!-- announcement -->
+  <div style="background: #0F172A; color: #E2E8F0; font-size: 12.5px;">
+    <div style="max-width: 1220px; margin: 0 auto; padding: 8px 16px; display: flex; align-items: center; gap: 8px; justify-content: center;">
+      <span style="font-weight: 600; color: #fff;">Mega Ofertas até 40% OFF</span>
+      <span style="color: #475569;">|</span>
+      <span>Frete grátis em compras a partir de ₲ 300.000</span>
+      <a href="#" style="color: #5EEAD4; font-weight: 600; margin-left: 6px;">Ver ofertas →</a>
+    </div>
+  </div>
+
+  <!-- header -->
+  <header style="background: #fff; border-bottom: 1px solid #E2E8F0;">
+    <div style="max-width: 1220px; margin: 0 auto; padding: 14px 16px; display: grid; grid-template-columns: 170px minmax(0, 1fr) minmax(0, auto); gap: 24px; align-items: center;">
+      <a href="#" style="display: flex; align-items: center; gap: 9px;">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#087F5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        <span style="font-weight: 700; font-size: 22px; letter-spacing: -.5px; color: #0F172A;">shoppy</span>
+      </a>
+      <form onSubmit="{{ onSearch }}" style="display: flex; align-items: center; background: #fff; border: 1px solid #CBD5E1; border-radius: 10px; overflow: hidden; height: 44px;" style-focus="border-color: #087F5B;">
+        <input placeholder="Buscar produtos, marcas e muito mais…" style="flex: 1; border: none; outline: none; padding: 0 16px; font-size: 14.5px; color: #0F172A; background: transparent;">
+        <button type="submit" title="Buscar" style="border: none; background: #087F5B; color: #fff; width: 52px; height: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center;" style-hover="background: #066649;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        </button>
+      </form>
+      <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+        <a href="#" style="display: flex; align-items: center; gap: 9px; color: #0F172A; padding: 8px 12px; border-radius: 10px;" style-hover="background: #F1F5F9;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"></path></svg>
+          <span style="display: flex; flex-direction: column; line-height: 1.2; font-size: 12px; color: #64748B;">Olá, entre<strong style="font-size: 13px; color: #0F172A;">Conta e pedidos</strong></span>
+        </a>
+        <a href="#" title="Favoritos" style="display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 10px; color: #334155;" style-hover="background: #F1F5F9;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.5-1.5 3-3.3 3-5.5A4.5 4.5 0 0 0 17.5 4c-1.8 0-3 .9-3.9 2.1L12 7.6l-1.6-1.5C9.5 4.9 8.3 4 6.5 4A4.5 4.5 0 0 0 2 8.5c0 2.2 1.5 4 3 5.5l7 7Z"></path></svg>
+        </a>
+        <button onClick="{{ noop }}" title="Carrinho" style="position: relative; display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 10px; background: none; border: none; color: #334155; cursor: pointer;" style-hover="background: #F1F5F9;">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.6"></circle><circle cx="17.5" cy="20" r="1.6"></circle><path d="M2.5 3.5h2.5l2.3 12.2a1.8 1.8 0 0 0 1.8 1.5h8.3a1.8 1.8 0 0 0 1.8-1.4L21 8H6"></path></svg>
+          <span style="position: absolute; top: 2px; right: 0; min-width: 17px; height: 17px; padding: 0 4px; background: #087F5B; color: #fff; border: 1.5px solid #fff; border-radius: 17px; font-size: 10.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center;">{{ cartCount }}</span>
+        </button>
+      </div>
+    </div>
+    <nav style="border-top: 1px solid #F1F5F9;">
+      <div style="max-width: 1220px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none;">
+        <a href="#" style="display: flex; align-items: center; gap: 8px; color: #0F172A; font-weight: 600; font-size: 13.5px; padding: 11px 12px 11px 0; white-space: nowrap;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"></path></svg>
+          Todas as categorias
+        </a>
+        <span style="width: 1px; height: 16px; background: #E2E8F0; margin: 0 8px;"></span>
+        <sc-for list="{{ navItems }}" as="nav" hint-placeholder-count="7">
+          <a href="#" style="color: #475569; font-size: 13.5px; font-weight: 500; padding: 11px 11px; white-space: nowrap;" style-hover="color: #087F5B;">{{ nav.label }}</a>
+        </sc-for>
+        <a href="#" style="margin-left: auto; color: #087F5B; font-weight: 600; font-size: 13.5px; padding: 11px 0 11px 11px; white-space: nowrap;">Venda na Shoppy</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section style="max-width: 1220px; margin: 20px auto 0; padding: 0 16px;">
+    <div style="position: relative; border-radius: 14px; overflow: hidden; height: 300px; box-shadow: 0 1px 3px rgba(15,23,42,.08);">
+      <div style="display: flex; height: 100%; transition: transform .5s ease; transform: {{ heroTransform }};">
+        <sc-for list="{{ slides }}" as="sl" hint-placeholder-count="3">
+          <div style="flex: 0 0 100%; background: {{ sl.bg }}; display: flex; align-items: center;">
+            <div style="width: 100%; padding: 0 64px; display: grid; grid-template-columns: 1fr 360px; gap: 30px; align-items: center;">
+              <div style="color: #fff;">
+                <span style="font-size: 11.5px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: rgba(255,255,255,.65);">{{ sl.tag }}</span>
+                <h1 style="font-weight: 700; font-size: 36px; line-height: 1.08; letter-spacing: -1px; margin: 10px 0 10px;">{{ sl.title }}</h1>
+                <p style="font-size: 15px; color: rgba(255,255,255,.78); margin: 0 0 22px; max-width: 430px; line-height: 1.55;">{{ sl.sub }}</p>
+                <button onClick="{{ noop }}" style="background: #fff; color: {{ sl.cta }}; border: none; padding: 12px 24px; border-radius: 9px; font-weight: 600; font-size: 14px; cursor: pointer;">{{ sl.btn }}</button>
+              </div>
+              <div style="height: 220px; border-radius: 12px; background: rgba(255,255,255,.1); border: 1px dashed rgba(255,255,255,.35); display: flex; align-items: center; justify-content: center;">
+                <span style="font-family: monospace; font-size: 11.5px; color: rgba(255,255,255,.75); background: rgba(0,0,0,.2); padding: 4px 10px; border-radius: 4px;">{{ sl.ph }}</span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <button onClick="{{ prevSlide }}" title="Anterior" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(255,255,255,.95); color: #0F172A; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.2); display: flex; align-items: center; justify-content: center;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"></path></svg>
+      </button>
+      <button onClick="{{ nextSlide }}" title="Próximo" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(255,255,255,.95); color: #0F172A; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.2); display: flex; align-items: center; justify-content: center;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"></path></svg>
+      </button>
+      <div style="position: absolute; bottom: 16px; left: 0; right: 0; display: flex; justify-content: center; gap: 7px;">
+        <sc-for list="{{ dots }}" as="d" hint-placeholder-count="3">
+          <button onClick="{{ d.go }}" style="width: {{ d.w }}; height: 6px; border-radius: 6px; border: none; padding: 0; cursor: pointer; background: {{ d.bg }}; transition: all .3s;"></button>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- BENEFÍCIOS -->
+  <section style="max-width: 1220px; margin: 16px auto 24px; padding: 0 16px;">
+    <div style="background: #fff; border: 1px solid #E2E8F0; border-radius: 14px; display: grid; grid-template-columns: repeat(4, 1fr); overflow: hidden;">
+      <sc-for list="{{ benefits }}" as="b" hint-placeholder-count="4">
+        <div style="padding: 18px 22px; display: flex; align-items: center; gap: 13px; border-right: 1px solid #F1F5F9;">
+          <span style="width: 42px; height: 42px; border-radius: 11px; background: #E6F4EF; color: #087F5B; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <sc-if value="{{ b.isCard }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M2 10h20"></path></svg></sc-if>
+            <sc-if value="{{ b.isTruck }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 17H5V6h9v11Zm0-8h4l3 3v5h-2"></path><circle cx="7.5" cy="17.5" r="1.8"></circle><circle cx="16.5" cy="17.5" r="1.8"></circle></svg></sc-if>
+            <sc-if value="{{ b.isShield }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Z"></path><path d="m9 12 2 2 4-4"></path></svg></sc-if>
+            <sc-if value="{{ b.isWallet }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7H4a2 2 0 0 1 0-4h14v4"></path><path d="M4 7v12a2 2 0 0 0 2 2h14V7"></path><path d="M16 14h2"></path></svg></sc-if>
+          </span>
+          <span style="display: flex; flex-direction: column; gap: 2px;">
+            <strong style="font-size: 13.5px; color: #0F172A;">{{ b.title }}</strong>
+            <span style="font-size: 12px; color: #64748B; line-height: 1.35;">{{ b.sub }}</span>
+          </span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- OFERTAS DO DIA -->
+  <section style="max-width: 1220px; margin: 0 auto 24px; padding: 0 16px;">
+    <div style="background: #fff; border: 1px solid #E2E8F0; border-radius: 14px; padding: 22px;">
+      <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px; flex-wrap: wrap;">
+        <h2 style="font-weight: 700; font-size: 19px; letter-spacing: -.3px; margin: 0; color: #0F172A;">Ofertas do dia</h2>
+        <span style="display: inline-flex; align-items: center; gap: 7px; background: #FEF2F2; padding: 5px 11px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: #991B1B;">
+          Termina em <span style="font-weight: 700; font-variant-numeric: tabular-nums; color: #DC2626;">{{ countdown }}</span>
+        </span>
+        <a href="#" style="margin-left: auto; font-size: 13.5px; font-weight: 600;">Ver todas as ofertas →</a>
+      </div>
+      <div style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px;">
+        <sc-for list="{{ deals }}" as="p" hint-placeholder-count="6">
+          <div style="flex: 0 0 195px; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; background: #fff; cursor: pointer;" style-hover="border-color: #94A3B8; box-shadow: 0 4px 14px rgba(15,23,42,.08);">
+            <div style="position: relative; height: 140px; background: {{ p.ph }}; display: flex; align-items: center; justify-content: center;">
+              <span style="font-family: monospace; font-size: 10.5px; color: rgba(15,23,42,.45); background: rgba(255,255,255,.7); padding: 2px 7px; border-radius: 4px;">{{ p.phLabel }}</span>
+              <span style="position: absolute; top: 10px; left: 10px; background: #DC2626; color: #fff; font-size: 11.5px; font-weight: 700; padding: 3px 7px; border-radius: 6px;">-{{ p.discount }}%</span>
+            </div>
+            <div style="padding: 12px; display: flex; flex-direction: column; gap: 4px;">
+              <span style="font-size: 11.5px; color: #94A3B8; text-decoration: line-through;">₲ {{ p.oldFmt }}</span>
+              <span style="font-weight: 700; font-size: 18px; color: #0F172A; letter-spacing: -.2px;">₲ {{ p.priceFmt }}</span>
+              <span style="font-size: 12.5px; color: #475569; line-height: 1.35; height: 33px; overflow: hidden;">{{ p.title }}</span>
+              <span style="font-size: 12px; font-weight: 600; color: #087F5B;">Frete grátis</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORIAS -->
+  <section style="max-width: 1220px; margin: 0 auto 24px; padding: 0 16px;">
+    <div style="background: #fff; border: 1px solid #E2E8F0; border-radius: 14px; padding: 22px;">
+      <h2 style="font-weight: 700; font-size: 19px; letter-spacing: -.3px; margin: 0 0 16px; color: #0F172A;">Explore por categoria</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 10px;">
+        <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="10">
+          <a href="#" style="display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 14px 8px; border-radius: 12px; text-align: center; color: #334155; border: 1px solid transparent;" style-hover="border-color: #E2E8F0; background: #F8FAFC; color: #087F5B;">
+            <span style="width: 54px; height: 54px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px; background: #F1F5F9; color: #0F172A;">{{ cat.initial }}</span>
+            <span style="font-size: 12.5px; font-weight: 600;">{{ cat.label }}</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIS VENDIDOS -->
+  <section style="max-width: 1220px; margin: 0 auto 24px; padding: 0 16px;">
+    <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px;">
+      <h2 style="font-weight: 700; font-size: 19px; letter-spacing: -.3px; margin: 0; color: #0F172A;">Mais vendidos</h2>
+      <a href="#" style="font-size: 13.5px; font-weight: 600;">Ver mais →</a>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(228px, 1fr)); gap: 14px;">
+      <sc-for list="{{ products }}" as="p" hint-placeholder-count="10">
+        <div style="background: #fff; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer;" style-hover="border-color: #94A3B8; box-shadow: 0 6px 18px rgba(15,23,42,.08);">
+          <div style="position: relative; height: 200px; background: {{ p.ph }}; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #F1F5F9;">
+            <span style="font-family: monospace; font-size: 10.5px; color: rgba(15,23,42,.45); background: rgba(255,255,255,.7); padding: 2px 7px; border-radius: 4px;">{{ p.phLabel }}</span>
+            <sc-if value="{{ p.hasDiscount }}" hint-placeholder-val="{{ true }}">
+              <span style="position: absolute; top: 10px; left: 10px; background: #DC2626; color: #fff; font-size: 11.5px; font-weight: 700; padding: 3px 7px; border-radius: 6px;">-{{ p.discount }}%</span>
+            </sc-if>
+            <button onClick="{{ p.toggleFav }}" title="Favoritar" style="position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 50%; border: 1px solid #E2E8F0; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; color: {{ p.favColor }};">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="{{ p.favFill }}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.5-1.5 3-3.3 3-5.5A4.5 4.5 0 0 0 17.5 4c-1.8 0-3 .9-3.9 2.1L12 7.6l-1.6-1.5C9.5 4.9 8.3 4 6.5 4A4.5 4.5 0 0 0 2 8.5c0 2.2 1.5 4 3 5.5l7 7Z"></path></svg>
+            </button>
+          </div>
+          <div style="padding: 14px; display: flex; flex-direction: column; gap: 5px; flex: 1;">
+            <span style="font-size: 13.5px; color: #334155; line-height: 1.35; height: 36px; overflow: hidden;">{{ p.title }}</span>
+            <span style="display: flex; align-items: center; gap: 5px; font-size: 12px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2l-6.1 3.4 1.4-6.8L2.2 9.1l6.9-.8L12 2z"></path></svg>
+              <span style="color: #0F172A; font-weight: 600;">{{ p.rating }}</span>
+              <span style="color: #94A3B8;">({{ p.reviews }})</span>
+              <span style="color: #CBD5E1;">·</span>
+              <a href="#" style="font-size: 12px; color: #64748B;" style-hover="color: #087F5B;">{{ p.seller }}</a>
+            </span>
+            <sc-if value="{{ p.hasDiscount }}" hint-placeholder-val="{{ true }}">
+              <span style="font-size: 11.5px; color: #94A3B8; text-decoration: line-through; margin-top: 3px;">₲ {{ p.oldFmt }}</span>
+            </sc-if>
+            <span style="font-weight: 700; font-size: 20px; color: #0F172A; letter-spacing: -.3px;">₲ {{ p.priceFmt }}</span>
+            <sc-if value="{{ showCuotas }}" hint-placeholder-val="{{ true }}">
+              <span style="font-size: 12.5px; color: #64748B;">ou 12x ₲ {{ p.cuotaFmt }} sem juros</span>
+            </sc-if>
+            <sc-if value="{{ p.frete }}" hint-placeholder-val="{{ true }}">
+              <span style="font-size: 12px; font-weight: 600; color: #087F5B;">Frete grátis <sc-if value="{{ p.fast }}" hint-placeholder-val="{{ true }}"><span style="color: #94A3B8; font-weight: 500;">· chega amanhã</span></sc-if></span>
+            </sc-if>
+            <button onClick="{{ p.add }}" style="margin-top: 8px; background: #087F5B; color: #fff; border: none; padding: 10px; border-radius: 9px; font-weight: 600; font-size: 13.5px; cursor: pointer;" style-hover="background: #066649;">Adicionar ao carrinho</button>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- BANNER VENDEDOR -->
+  <section style="max-width: 1220px; margin: 0 auto 24px; padding: 0 16px;">
+    <div style="border-radius: 14px; overflow: hidden; background: #0F172A; display: grid; grid-template-columns: 1fr 300px;">
+      <div style="padding: 34px 40px; color: #fff; display: flex; flex-direction: column; justify-content: center;">
+        <span style="font-size: 11.5px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: #5EEAD4;">Para vendedores</span>
+        <h2 style="font-weight: 700; font-size: 27px; letter-spacing: -.7px; margin: 8px 0; line-height: 1.15;">Transforme seu estoque em vendas</h2>
+        <p style="font-size: 14px; color: #94A3B8; margin: 0 0 18px; max-width: 460px; line-height: 1.55;">Anuncie grátis, alcance compradores no país inteiro e receba com segurança. Você só paga quando vende.</p>
+        <div>
+          <button onClick="{{ noop }}" style="background: #087F5B; color: #fff; border: none; padding: 12px 24px; border-radius: 9px; font-weight: 600; font-size: 14px; cursor: pointer;" style-hover="background: #066649;">Começar a vender</button>
+        </div>
+      </div>
+      <div style="background: rgba(255,255,255,.05); border-left: 1px dashed rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; min-height: 180px;">
+        <span style="font-family: monospace; font-size: 11px; color: rgba(255,255,255,.6); background: rgba(0,0,0,.25); padding: 4px 9px; border-radius: 4px;">foto: vendedor</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer style="background: #fff; border-top: 1px solid #E2E8F0; margin-top: 34px;">
+    <div style="max-width: 1220px; margin: 0 auto; padding: 32px 16px 20px; display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 28px;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#087F5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          <span style="font-weight: 700; font-size: 18px; color: #0F172A;">shoppy</span>
+        </div>
+        <p style="font-size: 12.5px; line-height: 1.6; color: #64748B; max-width: 250px; margin: 0;">Compre e venda com segurança, em guaraníes, com entrega para todo o país.</p>
+        <div style="display: flex; align-items: center; gap: 7px; margin-top: 14px; color: #334155;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+          <span style="font-size: 12px; font-weight: 600;">Compra 100% protegida</span>
+        </div>
+      </div>
+      <sc-for list="{{ footerCols }}" as="col" hint-placeholder-count="3">
+        <div>
+          <strong style="display: block; font-size: 13px; color: #0F172A; margin-bottom: 11px;">{{ col.title }}</strong>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <sc-for list="{{ col.links }}" as="lnk" hint-placeholder-count="4">
+              <a href="#" style="color: #64748B; font-size: 12.5px;" style-hover="color: #087F5B;">{{ lnk }}</a>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="border-top: 1px solid #F1F5F9;">
+      <div style="max-width: 1220px; margin: 0 auto; padding: 14px 16px; font-size: 11.5px; color: #94A3B8; display: flex; gap: 16px; flex-wrap: wrap;">
+        <span>© 2026 Shoppy S.A.</span>
+        <a href="#" style="color: #94A3B8;">Termos e condições</a>
+        <a href="#" style="color: #94A3B8;">Privacidade</a>
+        <span style="margin-left: auto;">Pagamentos: Visa · Mastercard · Tigo Money · Zimple</span>
+      </div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1280, &quot;height&quot;: 1600}, &quot;showCuotas&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Funcionalidades&quot;}, &quot;fastDeliveryBadges&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Funcionalidades&quot;}}">
+class Component extends DCLogic {
+  state = { cartCount: 0, favs: {}, secs: 8 * 3600 + 42 * 60 + 15, slide: 0 };
+
+  componentDidMount() {
+    this.timer = setInterval(() => {
+      this.setState(s => ({ secs: s.secs > 0 ? s.secs - 1 : 24 * 3600 }));
+    }, 1000);
+    this.auto = setInterval(() => this.setState(s => ({ slide: (s.slide + 1) % 3 })), 6000);
+  }
+  componentWillUnmount() { clearInterval(this.timer); clearInterval(this.auto); }
+
+  fmt(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+  pad(n) { return String(n).padStart(2, '0'); }
+
+  data() {
+    return [
+      { id: 'a', title: 'Smartphone Galaxy A55 5G 256GB', seller: 'Celulares Este', rating: '4.9', reviews: '3.2mil', price: 2150000, old: 2690000, discount: 20, frete: true, fast: true, ph: '#EEF1F6', phLabel: 'foto: celular' },
+      { id: 'b', title: 'Perfume importado Eau de Parfum 100ml', seller: 'Perfumería Este', rating: '4.8', reviews: '980', price: 385000, old: 520000, discount: 26, frete: true, fast: false, ph: '#F6F0EF', phLabel: 'foto: perfume' },
+      { id: 'c', title: 'Smart TV 55" 4K UHD LED', seller: 'MegaHome', rating: '4.7', reviews: '1.5mil', price: 3290000, old: 3990000, discount: 18, frete: true, fast: false, ph: '#EFF2F5', phLabel: 'foto: smart tv' },
+      { id: 'd', title: 'Notebook 15.6" Core i5 16GB SSD 512GB', seller: 'TechEste', rating: '4.9', reviews: '620', price: 5450000, old: 6200000, discount: 12, frete: true, fast: true, ph: '#F1F3F6', phLabel: 'foto: notebook' },
+      { id: 'e', title: 'Kit Tereré Guampa + Bombilla de alpaca', seller: 'Artesanía Guaraní', rating: '5.0', reviews: '2.1mil', price: 245000, old: 320000, discount: 23, frete: true, fast: true, ph: '#EEF4F1', phLabel: 'foto: kit tereré' },
+      { id: 'f', title: 'Tênis esportivo unissex leve', seller: 'Moda Central', rating: '4.6', reviews: '450', price: 420000, old: 560000, discount: 25, frete: false, fast: false, ph: '#F5F3EF', phLabel: 'foto: tênis' },
+      { id: 'g', title: 'Fone Bluetooth com cancelamento de ruído', seller: 'TechEste', rating: '4.7', reviews: '1.1mil', price: 190000, old: 250000, discount: 24, frete: true, fast: true, ph: '#F0F2F6', phLabel: 'foto: fone' },
+      { id: 'h', title: 'Erva Mate para Tereré 1kg (pack 3un)', seller: 'Yerbería Ñande', rating: '4.9', reviews: '3.4mil', price: 65000, old: 85000, discount: 24, frete: false, fast: false, ph: '#F0F4EC', phLabel: 'foto: erva mate' },
+      { id: 'i', title: 'Cafeteira elétrica programável 1.5L', seller: 'MegaHome', rating: '4.5', reviews: '300', price: 780000, old: 950000, discount: 18, frete: true, fast: false, ph: '#F5F2ED', phLabel: 'foto: cafeteira' },
+      { id: 'j', title: 'Smartwatch com GPS e monitor cardíaco', seller: 'TechEste', rating: '4.8', reviews: '870', price: 640000, old: 890000, discount: 28, frete: true, fast: true, ph: '#EEF1F6', phLabel: 'foto: smartwatch' },
+    ];
+  }
+
+  renderVals() {
+    const showCuotas = this.props.showCuotas ?? true;
+    const showFast = this.props.fastDeliveryBadges ?? true;
+
+    const products = this.data().map(p => ({
+      ...p,
+      priceFmt: this.fmt(p.price),
+      oldFmt: this.fmt(p.old),
+      cuotaFmt: this.fmt(p.price / 12),
+      hasDiscount: p.discount > 0,
+      fast: p.fast && showFast,
+      favColor: this.state.favs[p.id] ? '#DC2626' : '#94A3B8',
+      favFill: this.state.favs[p.id] ? '#DC2626' : 'none',
+      toggleFav: (e) => { e.stopPropagation(); this.setState(s => ({ favs: { ...s.favs, [p.id]: !s.favs[p.id] } })); },
+      add: () => this.setState(s => ({ cartCount: s.cartCount + 1 })),
+    }));
+
+    const slides = [
+      { bg: 'linear-gradient(105deg, #066649, #0A8F68)', tag: 'Mega Ofertas', title: 'Tudo que você precisa, com até 40% OFF', sub: 'Eletrônicos, perfumes, moda e muito mais — com frete grátis para todo o país.', btn: 'Ver ofertas', cta: '#066649', ph: 'banner: ofertas' },
+      { bg: 'linear-gradient(105deg, #1E293B, #334155)', tag: 'Tecnologia', title: 'Os eletrônicos mais buscados', sub: 'Celulares, notebooks e TVs com garantia, cuotas sem juros e entrega rápida.', btn: 'Explorar tecnologia', cta: '#1E293B', ph: 'banner: tecnologia' },
+      { bg: 'linear-gradient(105deg, #6B4226, #8A5A33)', tag: 'Casa & Cozinha', title: 'Sua casa nova por menos', sub: 'Eletrodomésticos, deco e utilidades com até 35% OFF nesta semana.', btn: 'Ver seleção', cta: '#6B4226', ph: 'banner: casa' },
+    ];
+
+    const h = Math.floor(this.state.secs / 3600);
+    const m = Math.floor((this.state.secs % 3600) / 60);
+    const s = this.state.secs % 60;
+
+    return {
+      cartCount: this.state.cartCount,
+      countdown: `${this.pad(h)}:${this.pad(m)}:${this.pad(s)}`,
+      products,
+      deals: products.filter(p => p.discount >= 20).slice(0, 6),
+      showCuotas,
+      slides,
+      heroTransform: `translateX(-${this.state.slide * 100}%)`,
+      dots: slides.map((_, i) => ({
+        go: () => this.setState({ slide: i }),
+        bg: i === this.state.slide ? '#fff' : 'rgba(255,255,255,.45)',
+        w: i === this.state.slide ? '20px' : '6px',
+      })),
+      prevSlide: () => this.setState(s2 => ({ slide: (s2.slide + 2) % 3 })),
+      nextSlide: () => this.setState(s2 => ({ slide: (s2.slide + 1) % 3 })),
+      noop: (e) => { if (e && e.preventDefault) e.preventDefault(); },
+      onSearch: (e) => e.preventDefault(),
+      navItems: [
+        { label: 'Ofertas' }, { label: 'Cupons' }, { label: 'Supermercado' },
+        { label: 'Eletrônicos' }, { label: 'Moda' }, { label: 'Casa & Deco' }, { label: 'Esportes' }, { label: 'Beleza' },
+      ],
+      benefits: [
+        { isCard: true, title: 'Cuotas sem juros', sub: 'Em até 12x nos principais cartões' },
+        { isTruck: true, title: 'Frete grátis', sub: 'A partir de ₲ 300.000' },
+        { isShield: true, title: 'Compra protegida', sub: 'Devolução grátis em até 30 dias' },
+        { isWallet: true, title: 'Tigo Money e Zimple', sub: 'Pague com sua carteira digital' },
+      ],
+      categories: [
+        { label: 'Eletrônicos', initial: 'E' }, { label: 'Celulares', initial: 'C' },
+        { label: 'Perfumes', initial: 'P' }, { label: 'Importados', initial: 'I' },
+        { label: 'Moda', initial: 'M' }, { label: 'Casa & Deco', initial: 'D' },
+        { label: 'Tereré & Erva', initial: 'T' }, { label: 'Esportes', initial: 'S' },
+        { label: 'Beleza', initial: 'B' }, { label: 'Ver tudo', initial: '+' },
+      ],
+      footerCols: [
+        { title: 'Comprar', links: ['Ofertas do dia', 'Categorias', 'Importados', 'Como comprar', 'Meios de pagamento'] },
+        { title: 'Vender', links: ['Vender na Shoppy', 'Central do vendedor', 'Reputação', 'Taxas'] },
+        { title: 'Ajuda', links: ['Central de ajuda', 'Rastrear pedido', 'Devoluções', 'Fale conosco'] },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

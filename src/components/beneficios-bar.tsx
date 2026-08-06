@@ -2,8 +2,9 @@ import { MessageCircle, ShieldCheck, Store, Truck } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 
 /**
- * Barra de confiança: um painel único e quieto, itens separados por
- * hairlines — informação de serviço, não quatro cartões disputando atenção.
+ * Card de confiança do design Shoppy: 4 colunas com divisórias, ícone num
+ * quadradinho esmeralda-claro — informação de serviço real (AEX, retirada,
+ * estoque reservado, WhatsApp), sem promessa que a loja não cumpre.
  */
 export async function BeneficiosBar() {
   const t = await getTranslations('beneficios')
@@ -16,15 +17,17 @@ export async function BeneficiosBar() {
   ]
 
   return (
-    <section className="grid grid-cols-2 rounded-2xl border border-gray-100 bg-white py-1 lg:grid-cols-4 lg:divide-x lg:divide-gray-100">
+    <section className="grid grid-cols-1 overflow-hidden rounded-[14px] border border-[#E2E8F0] bg-white sm:grid-cols-2 sm:divide-x sm:divide-[#F1F5F9] lg:grid-cols-4">
       {itens.map(({ icone: Icone, titulo, corpo }) => (
-        <div key={titulo} className="flex items-center gap-3 px-4 py-3">
-          <Icone className="size-[18px] shrink-0 text-marca" strokeWidth={2.2} />
+        <div key={titulo} className="flex items-center gap-3.5 px-5 py-4">
+          <span className="grid size-[42px] shrink-0 place-items-center rounded-[11px] bg-marca-50 text-marca">
+            <Icone className="size-5" strokeWidth={2} />
+          </span>
           <span className="min-w-0">
-            <span className="block truncate text-[12.5px] font-bold text-gray-900">
+            <span className="block truncate text-[13.5px] font-semibold text-noite">
               {titulo}
             </span>
-            <span className="block truncate text-[11.5px] text-gray-500">
+            <span className="block truncate text-[12px] leading-snug text-[#64748B]">
               {corpo}
             </span>
           </span>

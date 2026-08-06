@@ -52,10 +52,9 @@ export function WishlistButton({ item, variante = 'card', className }: Props) {
       aria-label={ativo ? t('remover') : t('adicionar')}
       aria-pressed={ativo}
       className={cn(
-        'grid size-8 place-items-center rounded-lg bg-white/90 shadow-sm backdrop-blur transition-all',
-        ativo
-          ? 'text-marca opacity-100'
-          : 'text-gray-400 opacity-0 hover:text-marca group-hover:opacity-100',
+        // Círculo branco sempre visível, coração vermelho quando ativo (Shoppy)
+        'grid size-8 place-items-center rounded-full border border-[#E2E8F0] bg-white transition-all',
+        ativo ? 'text-acento' : 'text-[#94A3B8] hover:text-acento',
         className,
       )}
     >

@@ -16,7 +16,7 @@ export default function FavoritosPage() {
   const { itens, pronto, remover } = useWishlist()
 
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className="mx-auto max-w-[1220px] px-4 py-6 sm:px-6">
       <h1 className="font-display mb-5 flex items-center gap-2 text-xl font-bold tracking-tight">
         <Heart className="size-5 text-marca" fill="currentColor" />
         {t('titulo')}

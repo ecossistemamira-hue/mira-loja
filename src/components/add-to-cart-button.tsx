@@ -38,7 +38,7 @@ export function AddToCartButton({
       onClick={adicionar}
       disabled={pending || desabilitado}
       className="inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-[15px] font-semibold text-white transition-[filter] hover:brightness-95 disabled:opacity-60"
-      style={{ background: '#a02237' }}
+      style={{ background: '#087F5B' }}
     >
       {pending ? (
         <Loader2 className="size-4 animate-spin" />
@@ -124,7 +124,7 @@ export function CompraBox({
         onClick={comprarAgora}
         disabled={pending || indo}
         className="inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-[15px] font-semibold text-white transition-[filter] hover:brightness-95 disabled:opacity-60"
-        style={{ background: '#a02237' }}
+        style={{ background: '#087F5B' }}
       >
         {indo ? <Loader2 className="size-4 animate-spin" /> : <Zap className="size-4" />}
         {t('comprar_agora')}

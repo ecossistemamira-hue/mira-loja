@@ -33,7 +33,7 @@ export default async function CarrinhoPage({ params }: Props) {
         <Link
           href="/"
           className="mt-6 inline-flex h-10 items-center rounded-lg px-5 text-sm font-semibold text-white"
-          style={{ background: '#a02237' }}
+          style={{ background: '#087F5B' }}
         >
           {t('continuar_comprando')}
         </Link>
@@ -93,7 +93,7 @@ export default async function CarrinhoPage({ params }: Props) {
         <Link
           href="/checkout"
           className="inline-flex h-12 items-center justify-center rounded-full px-8 text-[15px] font-semibold text-white transition-[filter] hover:brightness-95"
-          style={{ background: '#a02237' }}
+          style={{ background: '#087F5B' }}
         >
           {t('ir_checkout')}
         </Link>

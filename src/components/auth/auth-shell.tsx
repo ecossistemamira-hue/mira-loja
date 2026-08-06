@@ -1,5 +1,6 @@
-import Image from 'next/image'
 import { Link } from '@/i18n/navigation'
+
+import { ShoppyLogo } from '@/components/shoppy-logo'
 
 /** Casca visual das telas de auth: card centrado com o logo. */
 export function AuthShell({
@@ -14,13 +15,7 @@ export function AuthShell({
   return (
     <div className="mx-auto flex min-h-[70vh] w-full max-w-md flex-col justify-center px-4 py-10">
       <Link href="/" className="mb-6 self-center">
-        <Image
-          src="/logo-horizontal.png"
-          alt=""
-          width={486}
-          height={211}
-          className="h-14 w-auto"
-        />
+        <ShoppyLogo iconSize={34} textSize={26} />
       </Link>
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm sm:p-8">
         <h1 className="text-xl font-bold tracking-tight text-gray-900">

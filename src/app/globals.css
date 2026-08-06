@@ -2,27 +2,30 @@
 
 @theme inline {
   --font-sans: var(--font-sans);
-  --font-display: var(--font-display);
+  /* Display = a própria Instrument Sans; classes font-display seguem válidas. */
+  --font-display: var(--font-sans);
 
-  /* Marca da loja — carmim/vinho herdado do design OfertasParaguai.
+  /* Marca Shoppy — esmeralda + neutros slate (design handoff Shoppy Home).
      Tints (bg-marca/5, /10…) saem de graça no Tailwind v4 via color-mix. */
-  --color-marca: #a02237;
-  --color-marca-hover: #7d1a2b;
-  --color-marca-50: #faeef0;
-  --color-marca-escuro: #4a0c1a;
-  /* Vinho quase-preto do hero/rodapé — mais fundo que o marca-escuro. */
-  --color-vinho-noite: #3d0a15;
-  /* Ouro guaraní — estrelas, selos de destaque. Nunca em texto corrido. */
-  --color-oro: #d9a441;
-  --color-acento: #ff0a0a;
-  /* Fundo da página — off-white quente, casa com o vinho sem esfriar. */
-  --color-fundo: #faf7f4;
+  --color-marca: #087f5b;
+  --color-marca-hover: #066649;
+  --color-marca-50: #e6f4ef;
+  --color-marca-escuro: #05543f;
+  /* Esmeralda clara — só sobre fundos escuros (announcement, banner vendedor). */
+  --color-marca-claro: #5eead4;
+  /* Slate quase-preto do announcement/banner vendedor/rodapé. */
+  --color-noite: #0f172a;
+  /* Âmbar das estrelas e selos de destaque. Nunca em texto corrido. */
+  --color-oro: #f59e0b;
+  --color-acento: #dc2626;
+  /* Fundo da página — cinza-azulado frio do design Shoppy. */
+  --color-fundo: #f5f6f8;
 }
 
 :root {
   --background: #ffffff;
-  --foreground: #292326;
-  --fundo: #faf7f4;
+  --foreground: #0f172a;
+  --fundo: #f5f6f8;
 }
 
 html {
@@ -35,7 +38,7 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
 }
 
-/* Títulos na fonte display, tracking apertado — assinatura do design. */
+/* Títulos na mesma família (Instrument Sans), tracking apertado. */
 h1,
 h2,
 h3,
@@ -46,8 +49,8 @@ h5 {
 }
 
 ::selection {
-  background: rgb(160 34 55 / 0.15);
-  color: #7d1a2b;
+  background: rgb(8 127 91 / 0.15);
+  color: #066649;
 }
 
 /* Scroll horizontal sem barra visível (carrosséis, pills). */

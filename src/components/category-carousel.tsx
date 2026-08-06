@@ -9,7 +9,14 @@ import { cn } from '@/lib/cn'
  * Trilho horizontal com setas flutuantes (estilo OfertasParaguai). Os cards
  * chegam como children server-rendered — este shell só cuida do scroll.
  */
-export function CategoryCarousel({ children }: { children: React.ReactNode }) {
+export function CategoryCarousel({
+  children,
+  emCard = false,
+}: {
+  children: React.ReactNode
+  /** Dentro de card branco o fade lateral vira branco (fora, cor da página). */
+  emCard?: boolean
+}) {
   const trilhoRef = useRef<HTMLDivElement>(null)
   const [podeEsq, setPodeEsq] = useState(false)
   const [podeDir, setPodeDir] = useState(false)
@@ -49,7 +56,9 @@ export function CategoryCarousel({ children }: { children: React.ReactNode }) {
       {/* Setas flutuantes com fade lateral */}
       <div
         className={cn(
-          'pointer-events-none absolute inset-y-0 left-0 flex items-center bg-gradient-to-r from-fundo via-fundo/70 to-transparent pr-6 transition-opacity',
+          'pointer-events-none absolute inset-y-0 left-0 flex items-center bg-gradient-to-r pr-6 transition-opacity',
+          emCard ? 'from-white via-white/70' : 'from-fundo via-fundo/70',
+          'to-transparent',
           podeEsq ? 'opacity-100' : 'opacity-0',
         )}
       >
@@ -65,7 +74,9 @@ export function CategoryCarousel({ children }: { children: React.ReactNode }) {
       </div>
       <div
         className={cn(
-          'pointer-events-none absolute inset-y-0 right-0 flex items-center bg-gradient-to-l from-fundo via-fundo/70 to-transparent pl-6 transition-opacity',
+          'pointer-events-none absolute inset-y-0 right-0 flex items-center bg-gradient-to-l pl-6 transition-opacity',
+          emCard ? 'from-white via-white/70' : 'from-fundo via-fundo/70',
+          'to-transparent',
           podeDir ? 'opacity-100' : 'opacity-0',
         )}
       >

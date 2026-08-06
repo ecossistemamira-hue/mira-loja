@@ -39,8 +39,8 @@ export async function ProductCard({
     <Link
       href={`/p/${produto.slug ?? produto.id}`}
       className={cn(
-        'group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-white',
-        'transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-[0_10px_30px_-12px_rgb(74_12_26_/_0.18)]',
+        'group relative flex flex-col overflow-hidden rounded-xl border border-[#E2E8F0] bg-white',
+        'transition-all duration-200 hover:border-[#94A3B8] hover:shadow-[0_6px_18px_rgba(15,23,42,.08)]',
         compacto && 'w-52 shrink-0',
       )}
     >
@@ -61,12 +61,12 @@ export async function ProductCard({
         )}
 
         {semEstoque ? (
-          <span className="absolute left-0 top-3 bg-gray-900/85 py-1 pl-2.5 pr-2 text-[10px] font-bold text-white [clip-path:polygon(0_0,100%_0,calc(100%-6px)_50%,100%_100%,0_100%)]">
+          <span className="absolute left-2.5 top-2.5 rounded-md bg-noite/85 px-1.5 py-1 text-[10.5px] font-bold text-white">
             {t('sem_estoque')}
           </span>
         ) : (
           preco?.descontoPct != null && (
-            <span className="absolute left-0 top-3 bg-marca py-1 pl-2.5 pr-3 font-display text-[11px] font-bold text-white [clip-path:polygon(0_0,100%_0,calc(100%-7px)_50%,100%_100%,0_100%)]">
+            <span className="absolute left-2.5 top-2.5 rounded-md bg-acento px-1.5 py-0.5 text-[11.5px] font-bold text-white">
               -{preco.descontoPct}%
             </span>
           )
@@ -119,12 +119,8 @@ export async function ProductCard({
                   {preco.textoAntigo}
                 </span>
               )}
-              <span
-                className={cn(
-                  'font-display text-[17.5px] font-bold tracking-tight',
-                  preco.textoAntigo ? 'text-marca' : 'text-gray-900',
-                )}
-              >
+              {/* Preço sempre em slate — o desconto já fala pelo badge/riscado */}
+              <span className="text-[17.5px] font-bold tracking-tight text-noite">
                 {preco.texto}
               </span>
             </>
@@ -135,7 +131,7 @@ export async function ProductCard({
           {produto.permite_retirada &&
             vendedor?.aceitaRetirada &&
             !semEstoque && (
-              <span className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
+              <span className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-marca">
                 <Store className="size-3" />
                 {t('card_retiro')}
               </span>

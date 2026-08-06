@@ -1,6 +1,6 @@
 {
   "site": {
-    "nome": "Ofertas Paraguai",
+    "nome": "Shoppy",
     "tagline": "Tu marketplace de confianza en Paraguay"
   },
   "nav": {
@@ -10,19 +10,21 @@
     "carrinho": "Carrito",
     "ver_todos_resultados": "Ver todos los resultados para \"{termo}\"",
     "categorias": "Categorías",
-    "ver_todas_categorias": "Ver todas →"
+    "ver_todas_categorias": "Ver todas →",
+    "todas_categorias": "Todas las categorías",
+    "vender": "Vendé en Shoppy"
   },
   "home": {
-    "hero_titulo": "Productos de la red Mira",
-    "hero_subtitulo": "Descubrí lo que las franquicias Mira están vendiendo.",
+    "hero_titulo": "Productos de vendedores oficiales",
+    "hero_subtitulo": "Descubrí lo que los vendedores oficiales de Shoppy están publicando.",
     "recentes": "Novedades",
     "categorias": "Categorías",
     "vazio_titulo": "Todavía no hay productos",
     "vazio_dica": "Pronto vas a encontrar acá los productos publicados por las franquicias.",
     "ver_todos": "Ver todos",
-    "hero_badge_1": "Red Mira",
-    "hero_titulo_1": "Productos de las franquicias Mira",
-    "hero_subtitulo_1": "Comprá directo de quien lo hace — cada producto lo vende una franquicia de la red, con envío o retiro.",
+    "hero_badge_1": "Shoppy",
+    "hero_titulo_1": "Todo lo que buscás, de vendedores oficiales",
+    "hero_subtitulo_1": "Cada producto lo vende una franquicia oficial de la red — con envío AEX a todo Paraguay o retiro gratis.",
     "hero_cta_1": "Explorar productos",
     "hero_badge_2": "Frontera",
     "hero_titulo_2": "De Paraguay y de Brasil",
@@ -35,7 +37,15 @@
     "vistos_recentemente": "Vistos recientemente",
     "explorar_categorias": "Explorar categorías",
     "mais_vendidos": "Más vendidos",
-    "ofertas_dia": "Ofertas del día"
+    "ofertas_dia": "Ofertas del día",
+    "anuncio_destaque": "Ofertas del día",
+    "anuncio_texto": "Envíos AEX a todo Paraguay y retiro gratis en la franquicia",
+    "anuncio_link": "Ver ofertas →",
+    "ofertas_termina": "Termina en",
+    "vend_eyebrow": "Para vendedores",
+    "vend_titulo": "Transformá tu stock en ventas",
+    "vend_texto": "Sumate a la red de franquicias y vendé en Shoppy: publicás tus productos, llegás a compradores de todo el país y la red te acompaña.",
+    "vend_cta": "Quiero saber más"
   },
   "aviso_estoque": {
     "titulo": "Avisáme cuando vuelva",
@@ -91,10 +101,10 @@
     "ordem_maior_preco": "Mayor precio"
   },
   "rodape": {
-    "direitos": "Red de franquicias Mira",
+    "direitos": "Shoppy · Red de franquicias Mira",
     "hecho": "Hecho en Paraguay",
     "idioma": "Idioma",
-    "tagline": "Tu marketplace de confianza en Paraguay — productos vendidos por las franquicias de la red Mira.",
+    "tagline": "Tu marketplace de confianza en Paraguay — comprá y vendé en guaraníes, con entrega a todo el país.",
     "nav_titulo": "Tienda",
     "nav_inicio": "Inicio",
     "nav_buscar": "Buscar productos",
@@ -113,7 +123,9 @@
     "newsletter_botao": "Suscribirme",
     "newsletter_ok": "¡Listo! Estás en la lista.",
     "newsletter_erro": "E-mail inválido. Probá de nuevo.",
-    "ajuda_rastreio": "Rastrear pedido"
+    "ajuda_rastreio": "Rastrear pedido",
+    "pago_selo": "Compra protegida — stock reservado hasta el pago",
+    "vender_link": "Vendé en Shoppy"
   },
   "carrinho": {
     "adicionar": "Agregar al carrito",
@@ -278,8 +290,8 @@
   "faq": {
     "titulo": "Preguntas frecuentes",
     "subtitulo": "Todo lo que necesitás saber para comprar tranquilo.",
-    "q1": "¿Cómo funciona Ofertas Paraguai?",
-    "r1": "Somos el marketplace de la red de franquicias Mira: cada producto lo vende una franquicia de la red. Comprás online y la franquicia envía o retirás en la tienda.",
+    "q1": "¿Cómo funciona Shoppy?",
+    "r1": "Shoppy es el marketplace de la red de franquicias Mira: cada producto lo vende una franquicia de la red. Comprás online y la franquicia envía o retirás en la tienda.",
     "q2": "¿Cuáles son las formas de entrega?",
     "r2": "Depende del producto: envío a domicilio, retiro gratis en la franquicia vendedora, o ambos. Las opciones aparecen en la página del producto y en el checkout.",
     "q3": "¿Cómo pago mi pedido?",

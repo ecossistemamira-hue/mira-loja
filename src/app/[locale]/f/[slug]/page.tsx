@@ -48,7 +48,7 @@ export default async function FranquiaPage({ params }: Props) {
   const medias = await listarMediasAvaliacoes(produtos.map((p) => p.id))
 
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className="mx-auto max-w-[1220px] px-4 py-6 sm:px-6">
       {/* Cabeçalho do vendedor */}
       <section className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
         <div className="flex flex-wrap items-center gap-4">

@@ -4,7 +4,7 @@ import { getTranslations } from 'next-intl/server'
 
 /**
  * Padrão inspirado no ñandutí (renda paraguaia): rosetas de pontos em duas
- * coroas, repetidas como textura sutil sobre o vinho profundo do hero.
+ * coroas, repetidas como textura sutil sobre o esmeralda profundo do hero.
  */
 const NANDUTI = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='84' viewBox='0 0 84 84'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Ccircle cx='42' cy='42' r='2.6'/%3E%3Ccircle cx='58' cy='42' r='1.7'/%3E%3Ccircle cx='26' cy='42' r='1.7'/%3E%3Ccircle cx='42' cy='58' r='1.7'/%3E%3Ccircle cx='42' cy='26' r='1.7'/%3E%3Ccircle cx='53.3' cy='53.3' r='1.7'/%3E%3Ccircle cx='30.7' cy='30.7' r='1.7'/%3E%3Ccircle cx='53.3' cy='30.7' r='1.7'/%3E%3Ccircle cx='30.7' cy='53.3' r='1.7'/%3E%3Ccircle cx='70' cy='42' r='1'/%3E%3Ccircle cx='14' cy='42' r='1'/%3E%3Ccircle cx='42' cy='70' r='1'/%3E%3Ccircle cx='42' cy='14' r='1'/%3E%3Ccircle cx='61.8' cy='61.8' r='1'/%3E%3Ccircle cx='22.2' cy='22.2' r='1'/%3E%3Ccircle cx='61.8' cy='22.2' r='1'/%3E%3Ccircle cx='22.2' cy='61.8' r='1'/%3E%3C/g%3E%3C/svg%3E")`
 
@@ -19,8 +19,7 @@ export async function HeroFallback() {
     <section
       className="relative overflow-hidden rounded-2xl text-white"
       style={{
-        background:
-          'linear-gradient(120deg, #3d0a15 0%, #6e1526 48%, #a02237 100%)',
+        background: 'linear-gradient(105deg, #05543f 0%, #066649 48%, #0a8f68 100%)',
       }}
     >
       <div

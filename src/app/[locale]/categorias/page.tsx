@@ -23,7 +23,7 @@ export default async function CategoriasPage({ params }: Props) {
   const categorias = await listarCategoriasComContagem()
 
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6">
+    <div className="mx-auto max-w-[1220px] px-4 py-6 sm:px-6">
       {/* Breadcrumb */}
       <div className="mb-4 text-[13px] text-gray-500">
         <Link href="/" className="transition-colors hover:text-marca">

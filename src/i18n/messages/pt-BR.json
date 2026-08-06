@@ -1,6 +1,6 @@
 {
   "site": {
-    "nome": "Ofertas Paraguai",
+    "nome": "Shoppy",
     "tagline": "Seu marketplace de confiança no Paraguai"
   },
   "nav": {
@@ -10,19 +10,21 @@
     "carrinho": "Carrinho",
     "ver_todos_resultados": "Ver todos os resultados para \"{termo}\"",
     "categorias": "Categorias",
-    "ver_todas_categorias": "Ver todas →"
+    "ver_todas_categorias": "Ver todas →",
+    "todas_categorias": "Todas as categorias",
+    "vender": "Venda na Shoppy"
   },
   "home": {
-    "hero_titulo": "Produtos da rede Mira",
-    "hero_subtitulo": "Descubra o que as franquias Mira estão vendendo.",
+    "hero_titulo": "Produtos de vendedores oficiais",
+    "hero_subtitulo": "Descubra o que os vendedores oficiais da Shoppy estão publicando.",
     "recentes": "Novidades",
     "categorias": "Categorias",
     "vazio_titulo": "Ainda não há produtos",
     "vazio_dica": "Em breve você encontra aqui os produtos publicados pelas franquias.",
     "ver_todos": "Ver todos",
-    "hero_badge_1": "Rede Mira",
-    "hero_titulo_1": "Produtos das franquias Mira",
-    "hero_subtitulo_1": "Compre direto de quem faz — cada produto é vendido por uma franquia da rede, com envio ou retirada.",
+    "hero_badge_1": "Shoppy",
+    "hero_titulo_1": "Tudo que você procura, de vendedores oficiais",
+    "hero_subtitulo_1": "Cada produto é vendido por uma franquia oficial da rede — com envio AEX pra todo o Paraguai ou retirada grátis.",
     "hero_cta_1": "Explorar produtos",
     "hero_badge_2": "Fronteira",
     "hero_titulo_2": "Do Paraguai e do Brasil",
@@ -35,7 +37,15 @@
     "vistos_recentemente": "Vistos recentemente",
     "explorar_categorias": "Explorar categorias",
     "mais_vendidos": "Mais vendidos",
-    "ofertas_dia": "Ofertas do dia"
+    "ofertas_dia": "Ofertas do dia",
+    "anuncio_destaque": "Ofertas do dia",
+    "anuncio_texto": "Envio AEX pra todo o Paraguai e retirada grátis na franquia",
+    "anuncio_link": "Ver ofertas →",
+    "ofertas_termina": "Termina em",
+    "vend_eyebrow": "Para vendedores",
+    "vend_titulo": "Transforme seu estoque em vendas",
+    "vend_texto": "Entre pra rede de franquias e venda na Shoppy: você publica seus produtos, alcança compradores no país inteiro e a rede te acompanha.",
+    "vend_cta": "Quero saber mais"
   },
   "aviso_estoque": {
     "titulo": "Avise-me quando voltar",
@@ -91,10 +101,10 @@
     "ordem_maior_preco": "Maior preço"
   },
   "rodape": {
-    "direitos": "Rede de franquias Mira",
+    "direitos": "Shoppy · Rede de franquias Mira",
     "hecho": "Hecho en Paraguay",
     "idioma": "Idioma",
-    "tagline": "Seu marketplace de confiança no Paraguai — produtos vendidos pelas franquias da rede Mira.",
+    "tagline": "Seu marketplace de confiança no Paraguai — compre e venda em guaranis, com entrega pro país todo.",
     "nav_titulo": "Loja",
     "nav_inicio": "Início",
     "nav_buscar": "Buscar produtos",
@@ -113,7 +123,9 @@
     "newsletter_botao": "Assinar",
     "newsletter_ok": "Pronto! Você está na lista.",
     "newsletter_erro": "E-mail inválido. Tente de novo.",
-    "ajuda_rastreio": "Rastrear pedido"
+    "ajuda_rastreio": "Rastrear pedido",
+    "pago_selo": "Compra protegida — estoque reservado até o pagamento",
+    "vender_link": "Venda na Shoppy"
   },
   "carrinho": {
     "adicionar": "Adicionar ao carrinho",
@@ -278,8 +290,8 @@
   "faq": {
     "titulo": "Perguntas frequentes",
     "subtitulo": "Tudo o que você precisa saber pra comprar com tranquilidade.",
-    "q1": "Como funciona a Ofertas Paraguai?",
-    "r1": "Somos o marketplace da rede de franquias Mira: cada produto é vendido por uma franquia da rede. Você compra online e a franquia envia ou você retira na loja.",
+    "q1": "Como funciona a Shoppy?",
+    "r1": "A Shoppy é o marketplace da rede de franquias Mira: cada produto é vendido por uma franquia da rede. Você compra online e a franquia envia ou você retira na loja.",
     "q2": "Quais são as formas de entrega?",
     "r2": "Depende do produto: envio a domicílio, retirada grátis na franquia vendedora, ou os dois. As opções aparecem na página do produto e no checkout.",
     "q3": "Como pago meu pedido?",

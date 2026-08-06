@@ -70,7 +70,7 @@ export function RastreioForm() {
             onClick={buscar}
             disabled={pending}
             className="inline-flex h-10 items-center justify-center gap-2 self-end rounded-lg px-5 text-[14px] font-semibold text-white transition-[filter] hover:brightness-95 disabled:opacity-60"
-            style={{ background: '#a02237' }}
+            style={{ background: '#087F5B' }}
           >
             {pending ? (
               <Loader2 className="size-4 animate-spin" />

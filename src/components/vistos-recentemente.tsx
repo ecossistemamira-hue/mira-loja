@@ -74,17 +74,16 @@ export function VistosRecentemente({ excluirId }: { excluirId?: string }) {
   if (vistos.length === 0) return null
 
   return (
-    <section className="mt-9">
-      <h2 className="mb-3.5 flex items-baseline gap-2 font-display text-[19px] font-bold text-gray-900">
+    <section className="mt-6 rounded-[14px] border border-[#E2E8F0] bg-white p-5 sm:p-[22px]">
+      <h2 className="mb-4 text-[19px] font-bold tracking-[-0.3px] text-noite">
         {t('vistos_recentemente')}
-        <span aria-hidden className="inline-block size-1.5 rounded-full bg-marca" />
       </h2>
       <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-1">
         {vistos.map((p) => (
           <Link
             key={p.id}
             href={`/p/${p.slug ?? p.id}`}
-            className="group w-40 shrink-0 overflow-hidden rounded-xl border border-gray-100 bg-white transition-all hover:-translate-y-0.5 hover:shadow-md"
+            className="group w-40 shrink-0 overflow-hidden rounded-xl border border-[#E2E8F0] bg-white transition-all hover:border-[#94A3B8] hover:shadow-[0_4px_14px_rgba(15,23,42,.08)]"
           >
             <div className="relative flex h-28 items-center justify-center bg-gradient-to-b from-gray-50 to-white p-3">
               {p.imagemUrl ? (
@@ -106,7 +105,7 @@ export function VistosRecentemente({ excluirId }: { excluirId?: string }) {
                 {p.nome}
               </p>
               {p.precoTexto && (
-                <p className="mt-1 font-display text-[13.5px] font-black text-marca">
+                <p className="mt-1 text-[13.5px] font-bold text-noite">
                   {p.precoTexto}
                 </p>
               )}

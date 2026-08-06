@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Bricolage_Grotesque, Inter } from 'next/font/google'
+import { Instrument_Sans } from 'next/font/google'
 import { notFound } from 'next/navigation'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
@@ -11,17 +11,12 @@ import { WishlistProvider } from '@/lib/wishlist'
 
 import '../globals.css'
 
-const inter = Inter({
+// Instrument Sans em tudo — assinatura do design Shoppy (títulos = mesma
+// família em bold; --font-display continua existindo pra quem referencia).
+const instrument = Instrument_Sans({
   variable: '--font-sans',
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
-})
-
-// Display com personalidade de mercado — títulos, preços e o ₲ do hero.
-const bricolage = Bricolage_Grotesque({
-  variable: '--font-display',
-  subsets: ['latin'],
-  weight: ['500', '600', '700', '800'],
 })
 
 export const viewport: Viewport = {
@@ -68,7 +63,7 @@ export default async function RootLayout({ children, params }: Props) {
   return (
     <html
       lang={locale}
-      className={`${inter.variable} ${bricolage.variable} h-full antialiased`}
+      className={`${instrument.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">

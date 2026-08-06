@@ -20,7 +20,7 @@ function obterCliente(): Resend | null {
 }
 
 const FROM =
-  process.env.RESEND_FROM_EMAIL || 'Ofertas Paraguai <no-reply@mirafranquicia.com>'
+  process.env.RESEND_FROM_EMAIL || 'Shoppy <no-reply@mirafranquicia.com>'
 
 async function enviar(to: string, subject: string, html: string) {
   const resend = obterCliente()
@@ -35,8 +35,8 @@ async function enviar(to: string, subject: string, html: string) {
 
 function layout(titulo: string, corpo: string): string {
   return `<div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;color:#111827">
-    <div style="background:#a02237;color:#fff;padding:20px 24px;border-radius:12px 12px 0 0">
-      <div style="font-size:18px;font-weight:800">Ofertas Paraguai</div>
+    <div style="background:#087F5B;color:#fff;padding:20px 24px;border-radius:12px 12px 0 0">
+      <div style="font-size:18px;font-weight:800">Shoppy</div>
     </div>
     <div style="border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;padding:24px">
       <h1 style="font-size:18px;margin:0 0 12px">${titulo}</h1>
@@ -48,7 +48,7 @@ function layout(titulo: string, corpo: string): string {
 
 function linhaPedido(codigo: string, total: number): string {
   return `<div style="background:#f9fafb;border:1px solid #f3f4f6;border-radius:8px;padding:12px 16px;margin:8px 0;display:flex;justify-content:space-between">
-    <span style="font-family:monospace;font-weight:600;color:#7d1a2b">${codigo}</span>
+    <span style="font-family:monospace;font-weight:600;color:#066649">${codigo}</span>
     <span style="font-weight:700">${formatarPreco(total)}</span>
   </div>`
 }
@@ -71,7 +71,7 @@ export async function emailPedidoRecebido(
     `¡Gracias por tu compra, ${nome}!`,
     `<p style="font-size:14px;color:#374151;line-height:1.6">Recibimos tu pedido. Te avisamos apenas se confirme el pago.</p>${linhas}`,
   )
-  await enviar(to, 'Recibimos tu pedido · Ofertas Paraguai', html)
+  await enviar(to, 'Recibimos tu pedido · Shoppy', html)
 }
 
 /** Pagamento confirmado de um pedido. */

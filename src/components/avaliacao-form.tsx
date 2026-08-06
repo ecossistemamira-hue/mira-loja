@@ -144,7 +144,7 @@ export function AvaliacaoForm({ produtoId }: { produtoId: string }) {
         onClick={enviar}
         disabled={pending}
         className="inline-flex h-10 items-center gap-2 rounded-lg px-5 text-[13.5px] font-semibold text-white transition-[filter] hover:brightness-95 disabled:opacity-60"
-        style={{ background: '#a02237' }}
+        style={{ background: '#087F5B' }}
       >
         {pending && <Loader2 className="size-4 animate-spin" />}
         {jaAvaliou ? t('atualizar') : t('enviar')}
