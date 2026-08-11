@@ -62,14 +62,19 @@ export function CheckoutForm({
     if (!cupomInput.trim()) return
     setCupomErro(null)
     setValidandoCupom(true)
-    void validarCupom(cupomInput).then((r) => {
+    // Manda o e-mail junto: cupom pode ter limite de usos por pessoa (0104).
+    void validarCupom(cupomInput, email).then((r) => {
       setValidandoCupom(false)
       if (r.ok) {
         setCupomAplicado({ codigo: r.codigo, desconto: r.descontoTotal })
-      } else {
-        setCupomAplicado(null)
-        setCupomErro(t(`cupom_erro_${r.error}`))
+        return
       }
+      setCupomAplicado(null)
+      setCupomErro(
+        r.error === 'minimo_nao_atingido' && r.faltam
+          ? t('cupom_erro_minimo_faltam', { valor: formatarPreco(r.faltam) })
+          : t(`cupom_erro_${r.error}`),
+      )
     })
   }
 
@@ -136,7 +141,12 @@ export function CheckoutForm({
           setErro(t('erro_retirada_indisponivel'))
         } else if (r.error.startsWith('cupom:')) {
           setCupomAplicado(null)
-          setErro(t('erro_cupom_finalizar'))
+          const razao = r.error.slice('cupom:'.length)
+          setErro(
+            razao === 'limite_pessoa'
+              ? t('cupom_erro_limite_pessoa')
+              : t('erro_cupom_finalizar'),
+          )
         } else {
           setErro(t('erro_generico'))
         }

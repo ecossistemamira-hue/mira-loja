@@ -46,6 +46,27 @@ async function liberarReservas(
 }
 
 /**
+ * Devolve o uso do cupom quando o checkout morre DEPOIS do consumo (erro de
+ * frete, falha ao gravar o pedido). Sem isso o cliente perde o cupom por um
+ * erro que não foi dele — e com `limite_por_pessoa = 1` perde pra sempre.
+ */
+async function devolverUsoCupom(
+  svc: Svc,
+  cupomId: string | undefined,
+  email: string,
+) {
+  if (!cupomId) return
+  try {
+    await svc.rpc('devolver_uso_cupom', {
+      p_cupom_id: cupomId,
+      p_email: email,
+    })
+  } catch {
+    // best-effort, mesma regra de liberarReservas.
+  }
+}
+
+/**
  * Cria um pedido por franquia a partir do carrinho (§2.3). Reserva o estoque
  * atomicamente ANTES de criar; se faltar estoque de qualquer item, libera tudo
  * que já reservou e aborta. Pedidos nascem em `aguardando_pagamento`.
@@ -79,7 +100,8 @@ export async function criarPedidosDoCarrinho(
   // ── Fase 0: cupom (validação; o consumo atômico vem depois da reserva) ────
   let cupom: CupomAplicado | null = null
   if (dados.cupom) {
-    const r = await validarCupomParaCarrinho(dados.cupom, grupos)
+    // E-mail entra na validação por causa do limite de usos POR PESSOA (0104).
+    const r = await validarCupomParaCarrinho(dados.cupom, grupos, dados.email)
     if (!r.ok) return { ok: false, error: `cupom:${r.error}` }
     cupom = r.cupom
   }
@@ -164,12 +186,17 @@ export async function criarPedidosDoCarrinho(
 
   // ── Fase 2.5: consome 1 uso do cupom (atômico — protege o último uso) ─────
   if (cupom) {
-    const { data: consumiu, error: errCupom } = await svc.rpc('usar_cupom', {
+    // `consumir_cupom` (0104) devolve o motivo: valida ativo/validade (fuso de
+    // Assunção), limite total E limite por pessoa, tudo sob FOR UPDATE.
+    const { data: motivo, error: errCupom } = await svc.rpc('consumir_cupom', {
       p_cupom_id: cupom.cupomId,
+      p_email: emailNorm,
     })
-    if (errCupom || consumiu !== true) {
+    if (errCupom || motivo !== 'ok') {
       await liberarReservas(svc, reservas)
-      return { ok: false, error: 'cupom:esgotado' }
+      const razao =
+        typeof motivo === 'string' && motivo !== 'ok' ? motivo : 'esgotado'
+      return { ok: false, error: `cupom:${razao}` }
     }
   }
 
@@ -202,6 +229,7 @@ export async function criarPedidosDoCarrinho(
       )
       if (!cotacao.ok) {
         await liberarReservas(svc, reservas)
+        await devolverUsoCupom(svc, cupom?.cupomId, emailNorm)
         return { ok: false, error: `frete:${cotacao.error}` }
       }
       frete = cotacao.valor
@@ -243,6 +271,7 @@ export async function criarPedidosDoCarrinho(
 
     if (errPedido || !pedido) {
       await liberarReservas(svc, reservas)
+      await devolverUsoCupom(svc, cupom?.cupomId, emailNorm)
       return { ok: false, error: 'falha_pedido' }
     }
 

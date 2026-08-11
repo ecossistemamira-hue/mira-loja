@@ -68,6 +68,8 @@ export type ItemCarrinho = {
   imagemUrl: string | null
   precoPyg: number | null
   precoPromocionalPyg: number | null
+  /** Categoria do produto — usada pelo escopo de cupom por categoria (0104). */
+  categoria: string | null
   disponivel: number
   quantidade: number
   // Dados de frete (peso real + dimensões pro cubado).

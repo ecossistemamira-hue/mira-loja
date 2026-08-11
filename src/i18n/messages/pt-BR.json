@@ -194,7 +194,11 @@
     "cupom_erro_fora_validade": "Este cupom está fora do período de validade.",
     "cupom_erro_esgotado": "Este cupom atingiu o limite de usos.",
     "cupom_erro_nao_aplicavel": "Este cupom não vale para os itens do seu carrinho.",
-    "erro_cupom_finalizar": "O cupom deixou de ser válido. Remova ou aplique outro e tente de novo."
+    "erro_cupom_finalizar": "O cupom deixou de ser válido. Remova ou aplique outro e tente de novo.",
+    "cupom_erro_minimo_nao_atingido": "Este cupom exige um valor mínimo de compra.",
+    "cupom_erro_minimo_faltam": "Faltam {valor} no carrinho para usar este cupom.",
+    "cupom_erro_limite_pessoa": "Você já usou este cupom o número máximo de vezes.",
+    "cupom_erro_inativo": "Este cupom não está mais disponível."
   },
   "favoritos": {
     "titulo": "Meus favoritos",
