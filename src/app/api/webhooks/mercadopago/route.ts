@@ -9,6 +9,21 @@ export const dynamic = 'force-dynamic'
  * Webhook do Mercado Pago (adaptador). ESQUELETO pronto pra ligar quando as
  * credenciais existirem — hoje o MP não está configurado.
  *
+ * ⚠️ ATENÇÃO ANTES DE INVESTIR TEMPO AQUI (verificado em 2026-08-12): o
+ * Mercado Pago NÃO opera no Paraguai. `mercadopago.com.py` redireciona pra
+ * mercadolibre.com e a documentação lista só AR, BR, CL, CO, MX, PE e UY
+ * (moedas ARS/BRL/CLP/COP/MXN/PEN/UYU — não existe PYG). Como a Shoppy vende
+ * 100% no Paraguai e só em guaranis, este adaptador provavelmente NUNCA vai
+ * ser usado. Os candidatos reais são Pagopar (agregador: cartão local e
+ * internacional, Tigo Money/Personal/Zimple, bocas de cobrança) e Bancard vPOS
+ * (processadora de cartões do país). A decisão do gateway está com o dono do
+ * negócio — não escrever adaptador antes dela.
+ *
+ * O que NÃO se perde na troca: `/api/webhooks/pagamento` (genérico) segue
+ * sendo a fonte da verdade, `aprovarPagamento` segue idempotente e
+ * `pagamentos.gateway` já guarda qual gateway pagou. O trabalho do gateway
+ * novo é só: criar a cobrança e chamar o webhook genérico quando aprovar.
+ *
  * Fluxo quando ativo (plano §4.4):
  *  1. Validar a assinatura do MP (header x-signature) com MP_WEBHOOK_SECRET.
  *  2. NUNCA confiar no payload: consultar o pagamento na API do MP com
