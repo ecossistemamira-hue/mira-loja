@@ -158,7 +158,7 @@ export function CheckoutForm({
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex min-w-0 flex-col gap-5">
       {/* Identificação */}
       <section className="rounded-xl border border-gray-200 bg-white p-5">
         <h2 className="mb-4 text-sm font-bold">{t('secao_identificacao')}</h2>
@@ -202,7 +202,9 @@ export function CheckoutForm({
                 onChange={(e) =>
                   escolherCidade(e.target.value === '' ? '' : Number(e.target.value))
                 }
-                className="h-10 rounded-lg border border-gray-300 bg-white px-3 text-[14px] outline-none focus:border-marca/40"
+                /* w-full + min-w-0: sem isso o select nasce com a largura da
+                   cidade de nome mais longo da AEX (~384px) e estoura o mobile */
+                className="h-10 w-full min-w-0 rounded-lg border border-gray-300 bg-white px-3 text-[14px] outline-none focus:border-marca/40"
               >
                 <option value="">{t('cidade_placeholder')}</option>
                 {grupos.map((g) => (

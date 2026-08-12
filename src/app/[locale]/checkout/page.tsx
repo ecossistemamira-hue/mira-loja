@@ -69,7 +69,7 @@ export default async function CheckoutPage({ params }: PageProps) {
         <CheckoutForm defaults={defaults} permiteRetirada={permiteRetirada} />
 
         {/* Resumo */}
-        <aside className="lg:sticky lg:top-20 lg:self-start">
+        <aside className="min-w-0 lg:sticky lg:top-20 lg:self-start">
           <div className="rounded-xl border border-gray-200 bg-white p-5">
             <h2 className="mb-3 text-sm font-bold">{t('resumo')}</h2>
             <div className="flex flex-col gap-3">

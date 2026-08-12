@@ -92,7 +92,7 @@ export default async function CarrinhoPage({ params }: Props) {
       <div className="mt-6 flex justify-end">
         <Link
           href="/checkout"
-          className="inline-flex h-12 items-center justify-center rounded-full px-8 text-[15px] font-semibold text-white transition-[filter] hover:brightness-95"
+          className="inline-flex h-12 w-full items-center justify-center rounded-full px-8 text-[15px] font-semibold text-white transition-[filter] hover:brightness-95 sm:w-auto"
           style={{ background: '#087F5B' }}
         >
           {t('ir_checkout')}
