@@ -20,3 +20,6 @@ yarn-error.log*
 *.pem
 .vscode/*
 !.vscode/extensions.json
+
+# link local do Vercel CLI
+.vercel
