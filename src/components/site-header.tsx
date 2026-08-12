@@ -40,15 +40,16 @@ export async function SiteHeader() {
       </div>
 
       <header className="sticky top-0 z-40 border-b border-[#E2E8F0] bg-white">
-        <div className="mx-auto flex max-w-[1220px] items-center gap-3 px-4 py-3 sm:gap-6">
+        {/* No mobile a busca desce pra própria linha (a 390px ela ficava com
+            ~70px espremida entre logo e ícones); do sm pra cima, tudo em uma. */}
+        <div className="mx-auto flex max-w-[1220px] flex-wrap items-center gap-x-3 gap-y-2.5 px-4 py-3 sm:flex-nowrap sm:gap-6">
           <Link href="/" className="flex shrink-0 items-center" aria-label={t('site.nome')}>
-            {/* No mobile o wordmark some e fica só a sacola — espaço pra busca */}
-            <ShoppyLogo className="[&>span:last-child]:hidden sm:[&>span:last-child]:inline" />
+            <ShoppyLogo />
           </Link>
 
-          <SearchBox className="min-w-0 flex-1 sm:mx-auto sm:max-w-2xl" />
+          <SearchBox className="order-last w-full min-w-0 sm:order-none sm:mx-auto sm:w-auto sm:max-w-2xl sm:flex-1" />
 
-          <div className="flex shrink-0 items-center gap-1">
+          <div className="ml-auto flex shrink-0 items-center gap-1 sm:ml-0">
             <WishlistHeaderLink />
 
             <HeaderContaCarrinho />

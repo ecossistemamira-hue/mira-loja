@@ -110,10 +110,10 @@ export default function CadastroPage() {
           {pending ? '…' : t('criar_conta')}
         </button>
 
-        <div className="flex items-center gap-3 text-[11px] uppercase tracking-widest text-gray-300">
-          <span className="h-px flex-1 bg-gray-100" />
+        <div className="flex items-center gap-3 text-[11px] uppercase tracking-widest text-gray-500">
+          <span className="h-px flex-1 bg-gray-200" />
           {t('ou')}
-          <span className="h-px flex-1 bg-gray-100" />
+          <span className="h-px flex-1 bg-gray-200" />
         </div>
 
         <GoogleButton />
