@@ -125,7 +125,10 @@
     "newsletter_erro": "E-mail inválido. Tente de novo.",
     "ajuda_rastreio": "Rastrear pedido",
     "pago_selo": "Compra protegida — estoque reservado até o pagamento",
-    "vender_link": "Venda na Shoppy"
+    "vender_link": "Venda na Shoppy",
+    "legal_terminos": "Termos e condições",
+    "legal_privacidad": "Política de privacidade",
+    "legal_devoluciones": "Trocas e devoluções"
   },
   "carrinho": {
     "adicionar": "Adicionar ao carrinho",
@@ -166,6 +169,7 @@
     "frete_aviso": "O frete AEX da cidade escolhida é somado ao total de cada pedido.",
     "finalizar": "Finalizar pedido",
     "pagamento_teste_aviso": "Pagamento de teste: por enquanto o pedido é criado sem cobrança real.",
+    "acepta_legal": "Ao confirmar o pedido, você aceita os <terminos>Termos e condições</terminos> e a <privacidad>Política de privacidade</privacidad>.",
     "erro_campos": "Revise os campos obrigatórios.",
     "erro_sem_estoque": "Sem estoque suficiente de: {produto}",
     "erro_carrinho_vazio": "Seu carrinho está vazio.",

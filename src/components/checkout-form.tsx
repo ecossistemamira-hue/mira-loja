@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl'
 import { useMemo, useState, useTransition } from 'react'
 
 import { finalizarCheckout } from '@/app/checkout-actions'
-import { useRouter } from '@/i18n/navigation'
+import { Link, useRouter } from '@/i18n/navigation'
 import { validarCupom } from '@/app/cupom-actions'
 import { cotarFreteCarrinho, type FreteCarrinhoResultado } from '@/app/frete-actions'
 import { CheckoutSchema } from '@/lib/checkout-schema'
@@ -338,7 +338,21 @@ export function CheckoutForm({
         {pending && <Loader2 className="size-4 animate-spin" />}
         {t('finalizar')}
       </button>
-      <p className="-mt-2 text-[12px] text-gray-400">{t('pagamento_teste_aviso')}</p>
+      <p className="-mt-2 text-[12px] text-gray-400">
+        {t.rich('acepta_legal', {
+          terminos: (partes) => (
+            <Link href="/terminos" className="font-semibold text-gray-500 underline hover:text-marca">
+              {partes}
+            </Link>
+          ),
+          privacidad: (partes) => (
+            <Link href="/privacidad" className="font-semibold text-gray-500 underline hover:text-marca">
+              {partes}
+            </Link>
+          ),
+        })}
+      </p>
+      <p className="-mt-3 text-[12px] text-gray-400">{t('pagamento_teste_aviso')}</p>
     </div>
   )
 }

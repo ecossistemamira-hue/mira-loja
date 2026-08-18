@@ -49,9 +49,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   )
 
+  const rotasEstaticas: MetadataRoute.Sitemap = [
+    '/faq',
+    '/terminos',
+    '/privacidad',
+    '/cambios-y-devoluciones',
+  ].flatMap((path) =>
+    entradasLocalizadas(path, { changeFrequency: 'monthly', priority: 0.3 }),
+  )
+
   return [
     ...entradasLocalizadas('/', { changeFrequency: 'daily', priority: 1 }),
     ...rotasProduto,
     ...rotasFranquia,
+    ...rotasEstaticas,
   ]
 }
